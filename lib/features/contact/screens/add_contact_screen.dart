@@ -1,11 +1,16 @@
 import 'package:alarm_app/constants/colors.dart';
+import 'package:alarm_app/features/contact/add_contacts_controller/add_contact_controller.dart';
 import 'package:alarm_app/widgets/gradient_container.dart';
 import 'package:alarm_app/widgets/warning_circle_icon.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:get/get.dart';
 
 class AddContactScreen extends StatelessWidget {
-  const AddContactScreen({super.key});
+  AddContactScreen({super.key});
+
+  final AddContactController addContactController =
+      Get.put(AddContactController());
 
   @override
   Widget build(BuildContext context) {
@@ -40,33 +45,14 @@ class AddContactScreen extends StatelessWidget {
                         fontSize: 20,
                         fontWeight: FontWeight.w600),
                   ),
-                  const TextField(
-                    decoration: InputDecoration(
-                      hintText: "Ahmad "
-                          "+013256645",
-                      hintStyle: TextStyle(color: AColors.white),
-                      suffixIcon: Icon(
-                        Icons.add,
-                        color: AColors.white,
-                      ),
-                      border: UnderlineInputBorder(
-                        borderSide: BorderSide(
-                          width: 1,
-                          color: AColors.white,
-                        ),
-                      ),
-                      enabledBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(
-                          width: 1,
-                          color: AColors.white,
-                        ),
-                      ),
-                      focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(
-                          width: 1,
-                          color: AColors.white,
-                        ),
-                      ),
+                  ContactCardWidget(
+                    name: "Sam",
+                    phoneNumber: "+013256645",
+                    suffixIcon: IconButton(
+                      icon: const Icon(Icons.add, color: Colors.white),
+                      onPressed: () {
+                        addContactController.showContactPicker(context);
+                      },
                     ),
                   ),
                   const SizedBox(height: 20),
@@ -77,76 +63,54 @@ class AddContactScreen extends StatelessWidget {
                         fontSize: 20,
                         fontWeight: FontWeight.w600),
                   ),
-                  const ATextField(
-                    hintText: "Sam "
-                        "+013256645",
-                    suffix: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          "Pending",
-                          style: TextStyle(
-                            color: AColors.white,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const TextField(
-                    decoration: InputDecoration(
-                      hintText: "Sam "
-                          "+013256645",
-                      hintStyle: TextStyle(color: AColors.white),
-                      suffixIcon: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            "Pending",
-                            style: TextStyle(
-                              color: AColors.white,
+                  const SizedBox(height: 10,),
+                  Expanded(
+                    child: Obx(() {
+                      return ListView.builder(
+                        itemCount: addContactController.selectedContacts.length,
+                        itemBuilder: (context, index) {
+                          Contact contact =
+                              addContactController.selectedContacts[index];
+                          return ContactCardWidget(
+                            name: contact.displayName ?? 'No Name',
+                            phoneNumber: contact.phones.isNotEmpty
+                                ? contact.phones.first.number
+                                : 'No Phone Number',
+                            suffixIcon: IconButton(
+                              icon: const Text(
+                                "Pending",
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              onPressed: () {
+                              },
                             ),
-                          ),
-                        ],
-                      ),
-                      border: UnderlineInputBorder(
-                        borderSide: BorderSide(
-                          width: 1,
-                          color: AColors.white,
-                        ),
-                      ),
-                      enabledBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(
-                          width: 1,
-                          color: AColors.white,
-                        ),
-                      ),
-                      focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(
-                          width: 1,
-                          color: AColors.white,
-                        ),
-                      ),
-                    ),
+                          );
+                        },
+                      );
+                    }),
                   ),
-                  const SizedBox(height: 20),
-                  const ATextField(
-                    hintText: "Ahmad "
-                        "+013256645",
-                    suffix: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.edit,
-                          color: AColors.white,
-                        ),
-                        SizedBox(width: 10),
-                        Icon(
-                          Icons.delete,
-                          color: AColors.white,
-                        ),
-                      ],
-                    ),
-                  ),
+
+                  // SizedBox(height: 10,),
+                  // ContactCardWidget(
+                  //   name: "Sam",
+                  //   phoneNumber: "+013256645",
+                  //   suffixIcon: IconButton(
+                  //     icon: const Row(
+                  //       children: [
+                  //         Icon(Icons.edit, color: Colors.white),
+                  //         SizedBox(
+                  //           width: 20,
+                  //         ),
+                  //         Icon(Icons.delete, color: Colors.white)
+                  //       ],
+                  //     ),
+                  //     onPressed: () {
+                  //       // Handle the suffix icon button press
+                  //     },
+                  //   ),
+                  // ),
                 ],
               ),
             ),
@@ -158,42 +122,75 @@ class AddContactScreen extends StatelessWidget {
   }
 }
 
-class ATextField extends StatelessWidget {
-  const ATextField({
-    super.key,
-    this.hintText,
-    this.suffix,
-  });
+class ContactCardWidget extends StatelessWidget {
+  final String name;
+  final String phoneNumber;
+  final Widget suffixIcon;
 
-  final String? hintText;
-  final Widget? suffix;
+  const ContactCardWidget({
+    super.key,
+    required this.name,
+    required this.phoneNumber,
+    required this.suffixIcon,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
-      decoration: InputDecoration(
-        hintText: "Ahmad "
-            "+013256645",
-        hintStyle: const TextStyle(color: AColors.white),
-        suffixIcon: suffix,
-        border: const UnderlineInputBorder(
-          borderSide: BorderSide(
-            width: 1,
-            color: AColors.white,
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 2),
+      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 15),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                // mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.only(top: 8.0),
+                    child: Icon(Icons.circle, size: 10, color: AColors.white),
+                  ), // The dot icon before the name
+                  const SizedBox(width: 8),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(
+                        width: Get.width * 0.45,
+                        child: Text(
+                          name,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      Text(
+                        phoneNumber,
+                        style: const TextStyle(
+                            fontSize: 18,
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              suffixIcon,
+            ],
           ),
-        ),
-        enabledBorder: const UnderlineInputBorder(
-          borderSide: BorderSide(
-            width: 1,
-            color: AColors.white,
-          ),
-        ),
-        focusedBorder: const UnderlineInputBorder(
-          borderSide: BorderSide(
-            width: 1,
-            color: AColors.white,
-          ),
-        ),
+          const Divider(
+            color: Colors.white,
+            indent: 1,
+            endIndent: 1,
+            thickness: 2,
+          )
+        ],
       ),
     );
   }

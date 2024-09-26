@@ -1,4 +1,6 @@
 import 'package:alarm_app/constants/colors.dart';
+import 'package:alarm_app/features/group/controller/create_group_controller.dart';
+import 'package:alarm_app/features/group/widget/door_mode_widget.dart';
 import 'package:alarm_app/widgets/circular_container.dart';
 import 'package:alarm_app/widgets/elevated_button.dart';
 import 'package:alarm_app/widgets/gradient_container.dart';
@@ -6,7 +8,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class CreateGroupScreen extends StatelessWidget {
-  const CreateGroupScreen({super.key});
+  CreateGroupScreen({super.key});
+
+  final CreateGroupController createGroupController =
+  Get.put(CreateGroupController());
 
   @override
   Widget build(BuildContext context) {
@@ -73,34 +78,35 @@ class CreateGroupScreen extends StatelessWidget {
                   ListView.builder(
                     shrinkWrap: true,
                     itemCount: 2,
-                    itemBuilder: (context, index) => Row(
-                      children: [
-                        const Icon(Icons.label, color: AColors.white),
-                        const SizedBox(width: 10),
-                        SizedBox(
-                          width: Get.width * 0.50,
-                          child: const Text(
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            "Ahmad Akram",
-                            style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                color: AColors.white,
-                                fontSize: 16),
-                          ),
+                    itemBuilder: (context, index) =>
+                        Row(
+                          children: [
+                            const Icon(Icons.label, color: AColors.white),
+                            const SizedBox(width: 10),
+                            SizedBox(
+                              width: Get.width * 0.50,
+                              child: const Text(
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                "Ahmad Akram",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    color: AColors.white,
+                                    fontSize: 16),
+                              ),
+                            ),
+                            const Spacer(),
+                            const Text(
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              "+0123456789",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  color: AColors.white,
+                                  fontSize: 16),
+                            ),
+                          ],
                         ),
-                        const Spacer(),
-                        const Text(
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          "+0123456789",
-                          style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              color: AColors.white,
-                              fontSize: 16),
-                        ),
-                      ],
-                    ),
                   ),
                   const SizedBox(height: 10),
                   const Text(
@@ -117,35 +123,21 @@ class CreateGroupScreen extends StatelessWidget {
                         margin: const EdgeInsets.only(top: 20),
                         color: AColors.darkGrey,
                         height: 100,
-                        child: const Column(
+                        child: Column(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
-                            Padding(
-                              padding: EdgeInsets.all(10.0),
-                              child: TextField(
-                                decoration: InputDecoration(
-                                  suffixIcon: Icon(Icons.arrow_drop_down),
-                                  border: UnderlineInputBorder(
-                                    borderSide: BorderSide(
-                                      width: 1,
-                                      color: AColors.white,
-                                    ),
-                                  ),
-                                  enabledBorder: UnderlineInputBorder(
-                                    borderSide: BorderSide(
-                                      width: 1,
-                                      color: AColors.white,
-                                    ),
-                                  ),
-                                  focusedBorder: UnderlineInputBorder(
-                                    borderSide: BorderSide(
-                                      width: 1,
-                                      color: AColors.white,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
+                            Obx(() {
+                              return DoorModeWidget(
+                                label: createGroupController.groupType
+                                    .value,
+                                value: createGroupController.groupType
+                                    .value, // Default value from controller
+                                onChanged: (newValue) {
+                                  // Handle the dropdown selection change
+                                  createGroupController.updateOption(newValue);
+                                },
+                              );
+                            }),
                           ],
                         ),
                       ),

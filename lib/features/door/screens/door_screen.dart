@@ -1,6 +1,7 @@
 import 'package:alarm_app/constants/colors.dart';
 import 'package:alarm_app/features/door/controllers/door_controller.dart';
 import 'package:alarm_app/features/door/screens/widgets/group_name_drop_down.dart';
+import 'package:alarm_app/utils/utils.dart';
 import 'package:alarm_app/widgets/elevated_button.dart';
 import 'package:alarm_app/widgets/gradient_container.dart';
 import 'package:alarm_app/widgets/warning_circle_icon.dart';
@@ -97,9 +98,9 @@ class DoorScreen extends StatelessWidget {
                       color: AColors.white,
                     ),
                     padding: const EdgeInsets.symmetric(horizontal: 15),
-                    child: const Column(
+                    child: Column(
                       children: [
-                        TextField(
+                        const TextField(
                           maxLines: 5,
                           decoration: InputDecoration(
                             border: InputBorder.none,
@@ -112,13 +113,18 @@ class DoorScreen extends StatelessWidget {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
-                            Icon(Icons.image_outlined, color: AColors.dark),
-                            SizedBox(width: 10),
-                            Icon(Icons.camera_alt_outlined,
-                                color: AColors.dark),
+                            InkWell(
+                                onTap:() async{
+                                  ctrl.localImagePath.value =await Utils.imagePickerBottomSheet(context);
+                                },
+
+                                child: const Icon(Icons.image_outlined, color: AColors.dark,size: 28,)),
+                            const SizedBox(width: 10),
+                            // const Icon(Icons.camera_alt_outlined,
+                            //     color: AColors.dark),
                           ],
                         ),
-                        SizedBox(height: 10),
+                        const SizedBox(height: 10),
                       ],
                     ),
                   ),
