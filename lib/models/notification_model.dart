@@ -1,45 +1,47 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
 class NotificationModel {
-  final String id, notificationFrom;
-  final Timestamp timestamp;
-  final String address, message;
-  final Map<String, dynamic>? data;
+  final String id;
+  final String notificationFrom;
+  final String notificationFor;
+  final DateTime timestamp; // Use DateTime instead of Timestamp
+  final String notificationType;
+  final Map<String, dynamic>? data; // Can include optional fields like image, message, etc.
 
-  NotificationModel(
-      {required this.id,
-      required this.notificationFrom,
-      required this.timestamp,
-      required this.address,
-      required this.message,
-      required this.data});
+  const NotificationModel({
+    required this.id,
+    required this.notificationFrom,
+    required this.notificationFor,
+    required this.timestamp,
+    required this.notificationType,
+    this.data,
+  });
 
-  factory NotificationModel.fromJson(Map<String, dynamic> json) {
-    return NotificationModel(
-      id: json["id"],
-      notificationFrom: json["notificationFrom"],
-      timestamp:  json['timestamp'] as Timestamp,
-      address: json["address"],
-      message: json["message"],
-      data: json['data'] as Map<String, dynamic>?,
-    );
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'notification_from': notificationFrom,
+      'notification_for': notificationFor,
+      'timestamp': timestamp.toIso8601String(), // Store timestamp as ISO string
+      'notification_type': notificationType,
+      'data': data, // This can include address, image, and message
+    };
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      "id": id,
-      "notificationFrom": notificationFrom,
-      "timestamp": timestamp,
-      "address": address,
-      "message": message,
-      "data": data,
-    };
+  factory NotificationModel.fromMap(Map<String, dynamic> map) {
+    return NotificationModel(
+      id: map['id'] as String,
+      notificationFrom: map['notification_from'] as String,
+      notificationFor: map['notification_for'] as String,
+      timestamp: DateTime.parse(map['timestamp']), // Parse the ISO string back to DateTime
+      notificationType: map['notification_type'] as String,
+      data: map['data'] as Map<String, dynamic>?, // Handle optional data
+    );
   }
 
   @override
   String toString() {
-    return 'NotificationModel{id: $id, notificationFrom: $notificationFrom, timestamp: $timestamp, address: $address, message: $message, data: $data}';
+    return 'NotificationModel{id: $id, notificationFrom: $notificationFrom, notificationFor: $notificationFor, timestamp: $timestamp, notificationType: $notificationType, data: $data}';
   }
 
-//
+  @override
+  List<Object?> get props => [id, timestamp, notificationType, data];
 }

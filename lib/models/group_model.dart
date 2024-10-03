@@ -9,18 +9,17 @@ class GroupModel {
   final String type;
   final int totalMembers;
   final DateTime? createdAt;
-  final DateTime? createdBy;
+  final String? createdBy;
 
-  GroupModel(
-      {required this.id,
-      required this.name,
-      required this.contacts,
-      required this.type,
-      required this.totalMembers,
-      required this.createdAt,
-      required this.createdBy});
+  GroupModel({required this.id,
+    required this.name,
+    required this.contacts,
+    required this.type,
+    required this.totalMembers,
+    required this.createdAt,
+    required this.createdBy});
 
-  factory GroupModel.fromJson(Map<String, dynamic> json) {
+  factory GroupModel.fromMap(Map<String, dynamic> json) {
     return GroupModel(
       id: json["id"],
       name: json["name"],
@@ -28,11 +27,11 @@ class GroupModel {
       type: json["type"],
       totalMembers: int.parse(json["totalMembers"]),
       createdAt: DateTime.parse(json["createdAt"]),
-      createdBy: DateTime.parse(json["createdBy"]),
+      createdBy: (json["createdBy"]),
     );
   }
 
-  Map<String, dynamic> toJson() {
+  Map<String, dynamic> toMap() {
     return {
       "id": id,
       "name": name,
@@ -40,7 +39,7 @@ class GroupModel {
       "type": type,
       "totalMembers": totalMembers,
       "createdAt": createdAt?.toIso8601String(),
-      "createdBy": createdBy?.toIso8601String(),
+      "createdBy": createdBy,
     };
   }
 
@@ -49,5 +48,8 @@ class GroupModel {
     return 'GroupModel{id: $id, name: $name, contacts: $contacts, type: $type, totalMembers: $totalMembers, createdAt: $createdAt, createdBy: $createdBy}';
   }
 
+  @override
+  List<Object?> get props =>
+      [id, name, contacts, type, totalMembers, createdAt, createdBy,];
 //
 }

@@ -1,28 +1,36 @@
+import 'package:alarm_app/models/group_model.dart';
+import 'package:alarm_app/models/user_model.dart';
+
 class ContactsModel {
 
-  final String name;
+  final UserModel userId;
 
-  final String number;
+  final GroupModel groupId;
 
-  ContactsModel({required this.name, required this.number});
+  const ContactsModel({
+    required this.userId,
+    required this.groupId,
+  });
 
-  factory ContactsModel.fromJson(Map<String, dynamic> json) {
-    return ContactsModel(
-      name: json["name"],
-      number: json["number"],
-    );
+  Map<String, dynamic> toMap() {
+    return {
+      'userId': userId,
+      'groupId': groupId,
+    };
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      "name": name,
-      "number": number,
-    };
+  factory ContactsModel.fromMap(Map<String, dynamic> map) {
+    return ContactsModel(
+      userId: map['userId'] as UserModel,
+      groupId: map['groupId'] as GroupModel,
+    );
   }
 
   @override
   String toString() {
-    return 'ContactsModel{name: $name, number: $number}';
+    return 'ContactsModel{userId: $userId, groupId: $groupId}';
   }
 
+  @override
+  List<Object> get props => [userId, groupId];
 }
