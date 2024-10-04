@@ -1,10 +1,12 @@
-import 'package:alarm_app/core/supabase/exceptions/supabase_exception.dart';
+import 'package:alarm_app/core/supabase/group_contacts.dart';
 import 'package:alarm_app/core/supabase/user_crud.dart';
 import 'package:alarm_app/features/help/screens/help_me_screen.dart';
+import 'package:alarm_app/models/contacts_model.dart';
 import 'package:alarm_app/models/user_model.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:uuid/uuid.dart';
 import '../screen/otp_screen.dart';
 
 class AuthController extends GetxController {
@@ -13,6 +15,9 @@ final  TextEditingController nameController= TextEditingController();
   final SupabaseClient supabaseClient = Supabase.instance.client;
   Rx<UserModel> userModel =
       UserModel(id: 'id', name: 'name', phone: 'phone', fcm: 'fcm').obs;
+  Rx<ContactsModel> contactModel= const ContactsModel(phone: '').obs;
+
+
   Future<void> signUp() async {
     try {
       await supabaseClient.auth.signInWithOtp(
@@ -25,6 +30,9 @@ final  TextEditingController nameController= TextEditingController();
 
     }
   }
+
+
+
   Future<String?> verifyOtp(String otp) async {
     try {
       final AuthResponse res = await supabaseClient.auth.verifyOTP(
@@ -45,6 +53,9 @@ final  TextEditingController nameController= TextEditingController();
         );
         await UserCrud.insertUserData(user.id, userModel.value);
         Get.to(const HelpMeScreen());
+        contactModel.value=ContactsModel(phone:userModel.value.phone.toString());
+        await  GroupContacts.addUserToGroup(userModel.value);
+
 
         return user.id;
       } else {
@@ -56,6 +67,9 @@ final  TextEditingController nameController= TextEditingController();
       return null;
     }
   }
+
+
+
 
   Future<void> signOut() async {
     await supabaseClient.auth.signOut();

@@ -1,4 +1,5 @@
 import 'package:alarm_app/features/auth/controller/auth_controller.dart';
+import 'package:alarm_app/features/auth/widget/name_field_Widget.dart';
 import 'package:alarm_app/features/auth/widget/phone_auth_field_Widget.dart';
 import 'package:alarm_app/widgets/elevated_button.dart';
 import 'package:alarm_app/widgets/gradient_container.dart';
@@ -15,6 +16,7 @@ class AuthScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: Padding(
         padding: EdgeInsets.only(top: Get.height * 0.15),
         child: Stack(
@@ -26,6 +28,9 @@ class AuthScreen extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
+                    NameFieldWidget(controller: authController.nameController),
+                    SizedBox(height: 10,),
+
                     PhoneAuthFieldWidget(
                       onChanged: (PhoneNumber value) {
                         if (kDebugMode) {

@@ -8,7 +8,7 @@ class UserModel {
     required this.id,
     required this.name,
     required this.phone,
-    required  this.fcm,
+    required this.fcm,
   });
 
   Map<String, dynamic> toMap() {
@@ -23,14 +23,9 @@ class UserModel {
   factory UserModel.fromMap(Map<String, dynamic> map) {
     return UserModel(
       id: map['id'] as String,
-      name: map['name'] ,
-      phone: map['phone'] ,
-      fcm: map['fcm'] ,
+      name: map['name'] as String,
+      phone: map['phone'] as String,
+      fcm: map['fcm'] as String,
     );
-  }
-
-  @override
-  String toString() {
-    return 'UserModel{id: $id, name: $name, phone: $phone, fcm: $fcm}';
   }
 }

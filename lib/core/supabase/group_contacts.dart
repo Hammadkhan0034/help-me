@@ -1,49 +1,43 @@
+import 'package:alarm_app/models/contacts_model.dart';
+import 'package:alarm_app/models/user_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:uuid/uuid.dart';
 
 class GroupContacts{
 
- static Future<void> addUserToGroup(String groupId, String userId) async {
+  static Future<void> addUserToGroup(UserModel userModel, ) async {
+    final contactData = {
+      'phone': userModel.phone,
+      'added_at': DateTime.now().toIso8601String(),
+      'id':userModel.id,
+    };
+
+
+
     final response = await Supabase.instance.client
         .from('group_contacts')
-        .insert({
-       'group_id': groupId,
-       'user_id': userId,
-       'added_at': DateTime.now().toUtc().toIso8601String(),
-    })
-      ;
+        .upsert(contactData, onConflict: 'phone');
+
+    print('Supabase upsert response: ${response.data}');
 
     if (response.error != null) {
-      throw Exception('Error adding user to group: ${response.error!.message}');
+      throw Exception('Error adding/updating user in group: ${response.error!.message}');
     }
+
   }
 
-// Read group contacts
-  static  Future<List<Map<String, dynamic>>> getGroupContacts(String groupId) async {
+static  Future<List<String>> fetchGroupContacts() async {
     final response = await Supabase.instance.client
         .from('group_contacts')
-        .select()
+        .select('phone');
 
-        .eq('group_id', groupId)
-   ;
-
-    // if (response.error != null) {
-    //   throw Exception('Error fetching group contacts: ${response.error!.message}');
-    // }
-    return List<Map<String, dynamic>>.from(response);
-  }
-
-// Delete a user from a group
-  static Future<void> removeUserFromGroup(String groupId, String userId) async {
-    final response = await Supabase.instance.client
-        .from('group_contacts')
-        .delete()
-        .eq('group_id', groupId)
-        .eq('user_id', userId)
-     ;
-
-    if (response.error != null) {
-      throw Exception('Error removing user from group: ${response.error!.message}');
+    if (response.isEmpty) {
+      throw Exception('Error fetching group contacts: $response');
     }
+
+    // Assuming the phone numbers are stored in 'phone' column
+    return List<String>.from(response.map((contact) => contact['phone']));
   }
+
 
 }

@@ -1,36 +1,33 @@
-import 'package:alarm_app/models/group_model.dart';
-import 'package:alarm_app/models/user_model.dart';
-
 class ContactsModel {
-
-  final UserModel userId;
-
-  final GroupModel groupId;
+  final String? id;
+  final String phone;
+  final DateTime? addedAt;
 
   const ContactsModel({
-    required this.userId,
-    required this.groupId,
+    this.id,
+    required this.phone,
+    this.addedAt,
   });
 
   Map<String, dynamic> toMap() {
     return {
-      'userId': userId,
-      'groupId': groupId,
+      'id': id,  // Include 'id' if required for insert or update
+      'phone': phone,
+      'added_at': addedAt?.toIso8601String(),
     };
   }
 
+  // Factory constructor to create ContactsModel from a Map
   factory ContactsModel.fromMap(Map<String, dynamic> map) {
     return ContactsModel(
-      userId: map['userId'] as UserModel,
-      groupId: map['groupId'] as GroupModel,
+      id: map['id'],
+      phone: map['phone'],
+      addedAt: map['added_at'] != null ? DateTime.parse(map['added_at']) : null,
     );
   }
 
   @override
   String toString() {
-    return 'ContactsModel{userId: $userId, groupId: $groupId}';
+    return 'ContactsModel{id: $id, phone: $phone, addedAt: $addedAt}';
   }
-
-  @override
-  List<Object> get props => [userId, groupId];
 }

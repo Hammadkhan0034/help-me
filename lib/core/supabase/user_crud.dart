@@ -3,6 +3,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../models/user_model.dart';
 class UserCrud{
 
+
+
 static  Future<void> insertUserData(String userId, UserModel userModel) async {
     try {
       final response = await  Supabase.instance.client
@@ -10,7 +12,8 @@ static  Future<void> insertUserData(String userId, UserModel userModel) async {
           .select()
           .eq('id', userId)
           .single();
-      if (response != null) {
+
+      if (response.isNotEmpty) {
         await await Supabase.instance.client
             .from('profiles')
             .update(userModel.toMap())
@@ -22,8 +25,8 @@ static  Future<void> insertUserData(String userId, UserModel userModel) async {
       }
 
     } catch (error) {
+      print(error);
      throw Exception('Error creating user: ${error.toString()}');
-      print("Error inserting user data: $error");
     }
   }
 static  Future<Map<String, dynamic>?> getUser(String userId) async {

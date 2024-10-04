@@ -51,7 +51,7 @@ class AddContactScreen extends StatelessWidget {
                     suffixIcon: IconButton(
                       icon: const Icon(Icons.add, color: Colors.white),
                       onPressed: () {
-                        addContactController.showContactPicker(context);
+                        // addContactController.showContactPicker(context);
                       },
                     ),
                   ),
