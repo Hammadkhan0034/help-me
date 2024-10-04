@@ -26,7 +26,34 @@ class GroupContacts{
 
   }
 
-static  Future<List<String>> fetchGroupContacts() async {
+  static Future<List<String>> fetchGroupContacts() async {
+    final response = await Supabase.instance.client
+        .from('group_contacts')
+        .select('phone');
+
+    if (response.isEmpty) {
+      throw Exception('Error fetching group contacts: $response');
+    }
+
+    // Extract and normalize phone numbers (remove country code if present)
+    return List<String>.from(response.map((contact) {
+      String phoneNumber = contact['phone'].replaceAll(RegExp(r'[^0-9]'), ''); // Remove non-numeric characters
+
+      // Dynamically remove the country code if it starts with a '+'
+      if (phoneNumber.startsWith('0')) {
+        // If the number starts with '0', remove it (common for local dialing)
+        return phoneNumber.substring(1); // Remove the leading zero
+      } else if (phoneNumber.length > 10) {
+        // Check if the first few digits correspond to a country code
+        return phoneNumber.substring(phoneNumber.length - 10); // Keep the last 10 digits
+      }
+
+      return phoneNumber; // Return the phone number without country code
+    }));
+  }
+
+
+static  Future<List<String>> fetchFullGroupContacts() async {
     final response = await Supabase.instance.client
         .from('group_contacts')
         .select('phone');
