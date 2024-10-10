@@ -1,0 +1,107 @@
+{
+  "project_info": {
+    "project_number": "1004698611646",
+    "firebase_url": "https://helpme-bf036-default-rtdb.firebaseio.com",
+    "project_id": "helpme-bf036",
+    "storage_bucket": "helpme-bf036.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1004698611646:android:da37068a095166459153ef",
+        "android_client_info": {
+          "package_name": "com.devoasis.alarm_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1004698611646-l7iq0fvvcslngutpebla32idg1vcufsg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDQKjz2WHZqql-uYsS6_iSg4zCOO6YFi7o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1004698611646-l7iq0fvvcslngutpebla32idg1vcufsg.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1004698611646-9mb41t5gqm177sj3kg0kqdpiq1to537q.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.mighoul.helpMe"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1004698611646:android:9939f19322030f3e9153ef",
+        "android_client_info": {
+          "package_name": "com.mighoul.helpme"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1004698611646-1f8bmeqk3bu6icv194qp01mp4qo6v0da.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mighoul.helpme",
+            "certificate_hash": "63d5fd64e64d2e4157e6cb96794f257de4ba14e1"
+          }
+        },
+        {
+          "client_id": "1004698611646-3gavf277odgg83960m46e5voej9neqg4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mighoul.helpme",
+            "certificate_hash": "91b23185330634214bdec610faf177ec30475c99"
+          }
+        },
+        {
+          "client_id": "1004698611646-osj7alg1ue7526u4snea8mogv2e3g6mh.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mighoul.helpme",
+            "certificate_hash": "5df5b7e4b096f70677088e0edde0c10b971f8663"
+          }
+        },
+        {
+          "client_id": "1004698611646-l7iq0fvvcslngutpebla32idg1vcufsg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDQKjz2WHZqql-uYsS6_iSg4zCOO6YFi7o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1004698611646-l7iq0fvvcslngutpebla32idg1vcufsg.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1004698611646-9mb41t5gqm177sj3kg0kqdpiq1to537q.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.mighoul.helpMe"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

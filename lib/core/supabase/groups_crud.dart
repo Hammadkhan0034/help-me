@@ -1,15 +1,17 @@
+import 'package:alarm_app/models/group_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class GroupCrud{
   // Create a new group
-  static Future<void> createGroup(String name, String createdBy, String type) async {
+  static Future<void> createGroup(GroupModel groupModel) async {
     final response = await Supabase.instance.client
         .from('groups')
         .insert({
-      'name': name,
-      'created_by': createdBy,
-      'type': type,
-      'total_members': 0, // Assuming new group starts with 0 members
+      'id':groupModel.id,
+      'name': groupModel.name,
+      'created_by': groupModel.createdBy,
+      'type': groupModel.type,
+      'members': groupModel.contacts,
     });
 
 

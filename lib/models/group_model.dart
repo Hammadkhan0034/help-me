@@ -5,9 +5,9 @@ import 'package:alarm_app/models/contacts_model.dart';
 class GroupModel {
   final String? id;
   final String name;
-  final List<ContactsModel> contacts;
+  final List<String> contacts;
   final String type;
-  final int totalMembers;
+  final int? totalMembers;
   final DateTime? createdAt;
   final String? createdBy;
 
@@ -15,7 +15,7 @@ class GroupModel {
     required this.name,
     required this.contacts,
     required this.type,
-    required this.totalMembers,
+     this.totalMembers,
     required this.createdAt,
     required this.createdBy});
 
@@ -23,7 +23,7 @@ class GroupModel {
     return GroupModel(
       id: json["id"],
       name: json["name"],
-      contacts: List<ContactsModel>.from(json['contacts']),
+      contacts: (json['contacts']),
       type: json["type"],
       totalMembers: int.parse(json["totalMembers"]),
       createdAt: DateTime.parse(json["createdAt"]),

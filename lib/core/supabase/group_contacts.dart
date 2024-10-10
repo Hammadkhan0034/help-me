@@ -5,7 +5,7 @@ import 'package:uuid/uuid.dart';
 
 class GroupContacts{
 
-  static Future<void> addUserToGroup(UserModel userModel, ) async {
+  static Future<void> addUserToContactModel(UserModel userModel, ) async {
     final contactData = {
       'phone': userModel.phone,
       'added_at': DateTime.now().toIso8601String(),
@@ -64,6 +64,20 @@ static  Future<List<String>> fetchFullGroupContacts() async {
 
     // Assuming the phone numbers are stored in 'phone' column
     return List<String>.from(response.map((contact) => contact['phone']));
+  }
+
+  static Future<Map<String, dynamic>?> fetchUserProfileByPhone(String phone) async {
+    String phoneWithoutCode = phone.length > 10 ? phone.substring(phone.length - 10) : phone;
+
+    final response = await Supabase.instance.client
+        .from('profiles')
+        .select('name,id,fcm')
+        .ilike('phone', '%$phoneWithoutCode')
+        ;
+
+     print(response);
+
+    return response.single;
   }
 
 

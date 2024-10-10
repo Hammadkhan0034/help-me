@@ -14,7 +14,6 @@ import 'package:get/get.dart';
 
 class HelpMeScreen extends StatelessWidget {
   const HelpMeScreen({super.key});
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -80,15 +79,15 @@ class HelpMeScreen extends StatelessWidget {
                       onPress: () {
                         Get.to( CreateGroupScreen());
                       }),
-                  const SizedBox(height: 15),
-                  AElevatedButton(
-                    title: "Show Alert",
-                    onPress: () {
-                      Get.dialog(
-                        const NoInternetDialog(),
-                      );
-                    },
-                  ),
+                  // const SizedBox(height: 15),
+                  // AElevatedButton(
+                  //   title: "Show Alert",
+                  //   onPress: () {
+                  //     Get.dialog(
+                  //       const NoInternetDialog(),
+                  //     );
+                  //   },
+                  // ),
                 ],
               ),
             ),

@@ -12,7 +12,48 @@ import 'package:intl/intl.dart';
 
 
 class Utils {
+  static showSuccessSnackBar({
+    required String title,
+    required String description,
+    Duration duration = const Duration(seconds: 2), // Set duration here
+  }) {
+    Get.snackbar(
+      title,
+      description,
+      colorText: Colors.white,
+      borderRadius: 10,
+      backgroundColor: Colors.green,
+      icon: const Icon(Icons.check_circle, color: Colors.white),
+      animationDuration: 0.10.milliseconds,
+      forwardAnimationCurve: Curves.fastLinearToSlowEaseIn,
+      reverseAnimationCurve: Curves.easeOutExpo,
+      margin: const EdgeInsets.symmetric(vertical: 24, horizontal: 12),
+      snackStyle: SnackStyle.FLOATING,
+      snackPosition: SnackPosition.TOP,
+      duration: duration, // Apply the duration here
+    );
+  }
 
+
+  static showErrorSnackBar(
+      {required String title, required String description}) {
+    Get.snackbar(
+      title,
+      description,
+      colorText: Colors.white,
+      borderRadius: 10,
+      backgroundColor: Colors.red.shade800,
+      icon: const Icon(Icons.error, color: Colors.white),
+      animationDuration: 0.45.seconds,
+      forwardAnimationCurve: Curves.fastLinearToSlowEaseIn,
+      reverseAnimationCurve: Curves.easeOutExpo,
+      // overlayColor: Colors.white54,
+      // overlayBlur: .1,
+      margin: const EdgeInsets.symmetric(vertical: 24, horizontal: 12),
+      snackStyle: SnackStyle.FLOATING,
+      snackPosition: SnackPosition.BOTTOM,
+    );
+  }
 
 
 
@@ -22,15 +63,6 @@ class Utils {
     String restOfNumber = number.substring(countryCode);
     return "${number.substring(0, countryCode)} ${restOfNumber.substring(0, 3)} ${restOfNumber.substring(3)}";
   }
-
-
-
-
-
-
-
-
-
 
   static Future<String> imagePicker(ImageSource imageSource) async {
     ImagePicker picker = ImagePicker();
@@ -156,7 +188,8 @@ class Utils {
   }
 
   static Future<bool> askForConfirmation(
-      BuildContext context, String action, String title) async {
+      BuildContext context, String action, String title) async
+  {
     bool isConfirmed = false;
     isConfirmed = await showDialog(
         context: context,
@@ -209,7 +242,8 @@ class Utils {
   }
 
   static DateTime convertTo24HourFormat(
-      String time12Hour, DateTime selectedDate) {
+      String time12Hour, DateTime selectedDate)
+  {
     String period = time12Hour.substring(time12Hour.length - 2);
     String time = time12Hour.substring(0, time12Hour.length - 3);
 
@@ -228,7 +262,8 @@ class Utils {
   }
 
   static Offset getTapPosition(
-      TapDownDetails tapDownDetails, BuildContext context) {
+      TapDownDetails tapDownDetails, BuildContext context)
+  {
     final RenderBox renderBox = context.findRenderObject() as RenderBox;
     Offset offset = renderBox.globalToLocal(tapDownDetails.globalPosition);
     return offset;
@@ -250,7 +285,8 @@ class Utils {
   }
 
   static String getFormattedDateAndTime(
-      DateTime dateTime, TimeOfDay timeOfDay) {
+      DateTime dateTime, TimeOfDay timeOfDay)
+  {
     final formatter = DateFormat('dd.MM.yyyy');
     return "${formatter.format(dateTime)} - ${timeOfDay.hour.toString().padLeft(2, '0')}:${timeOfDay.minute.toString().padLeft(2, '0')}";
   }

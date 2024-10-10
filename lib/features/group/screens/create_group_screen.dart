@@ -11,7 +11,7 @@ class CreateGroupScreen extends StatelessWidget {
   CreateGroupScreen({super.key});
 
   final CreateGroupController createGroupController =
-  Get.put(CreateGroupController());
+      Get.put(CreateGroupController());
 
   @override
   Widget build(BuildContext context) {
@@ -75,39 +75,46 @@ class CreateGroupScreen extends StatelessWidget {
                         fontWeight: FontWeight.w500),
                   ),
                   const SizedBox(height: 10),
-                  ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: 2,
-                    itemBuilder: (context, index) =>
-                        Row(
+                  Obx(() {
+                    return ListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: createGroupController
+                          .addContactController.requestedFriends.length,
+                      itemBuilder: (context, index) {
+                        final contact = createGroupController
+                            .addContactController.requestedFriends[index];
+                        return Row(
                           children: [
                             const Icon(Icons.label, color: AColors.white),
                             const SizedBox(width: 10),
                             SizedBox(
                               width: Get.width * 0.50,
-                              child: const Text(
+                              child: Text(
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
-                                "Ahmad Akram",
-                                style: TextStyle(
+                                contact.editedName,
+                                style: const TextStyle(
                                     fontWeight: FontWeight.w600,
                                     color: AColors.white,
                                     fontSize: 16),
                               ),
                             ),
                             const Spacer(),
-                            const Text(
+                            Text(
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              "+0123456789",
-                              style: TextStyle(
+                              contact.friendPhone.toString(),
+                              style: const TextStyle(
                                   fontWeight: FontWeight.w600,
                                   color: AColors.white,
                                   fontSize: 16),
                             ),
                           ],
-                        ),
-                  ),
+                        );
+                      },
+                    );
+                  }),
                   const SizedBox(height: 10),
                   const Text(
                     "Group Contacts:",
@@ -128,8 +135,7 @@ class CreateGroupScreen extends StatelessWidget {
                           children: [
                             Obx(() {
                               return DoorModeWidget(
-                                label: createGroupController.groupType
-                                    .value,
+                                label: createGroupController.groupType.value,
                                 value: createGroupController.groupType
                                     .value, // Default value from controller
                                 onChanged: (newValue) {
@@ -167,7 +173,11 @@ class CreateGroupScreen extends StatelessWidget {
                   const SizedBox(height: 20),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 30.0),
-                    child: AElevatedButton(title: "Save", onPress: () {}),
+                    child: AElevatedButton(title: "Save", onPress: () {
+createGroupController.createGroup();
+                      //createGroupController.createGroup(id: id, members: members, createdBy: createdBy, createdAt: createdAt)
+
+                    }),
                   ),
                 ],
               ),

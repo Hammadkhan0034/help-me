@@ -11,7 +11,7 @@ class ContactsModel {
 
   Map<String, dynamic> toMap() {
     return {
-      'id': id,  // Include 'id' if required for insert or update
+      'id': id,
       'phone': phone,
       'added_at': addedAt?.toIso8601String(),
     };

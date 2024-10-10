@@ -5,11 +5,13 @@ import 'package:alarm_app/widgets/warning_circle_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../models/friends_model.dart';
+
 class AddContactScreen extends StatelessWidget {
   AddContactScreen({super.key});
 
   final AddContactController addContactController =
-      Get.put(AddContactController());
+     Get.put(AddContactController());
 
   @override
   Widget build(BuildContext context) {
@@ -44,72 +46,52 @@ class AddContactScreen extends StatelessWidget {
                         fontSize: 20,
                         fontWeight: FontWeight.w600),
                   ),
-
-                  Obx(() {
-                    if (addContactController.isLoading.value) {
-                      return Center(child: CircularProgressIndicator());
-                    }
-                    if (addContactController.matchedContacts.isEmpty) {
-                      return Center(child: Text('No matched contacts found.'));
-                    }
-                    return ListView.builder(
-                      shrinkWrap: true, // Use shrinkWrap to avoid overflow
-                      physics: NeverScrollableScrollPhysics(), // Disable scrolling
-                      itemCount: addContactController.matchedContacts.length,
-                      itemBuilder: (context, index) {
-                        final contact = addContactController.matchedContacts[index];
-                        return ContactCardWidget(
-                          name: contact['name']!, // Accessing name from map
-                          phoneNumber: contact['phone']!, // Accessing phone number from map
-                          suffixIcon: IconButton(
-                            icon: const Icon(Icons.add, color: Colors.white),
-                            onPressed: () {
-                              // Handle adding the contact
-                            },
-                          ),
+                  SizedBox(
+                    height: Get.height * 0.2,
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.vertical,
+                      child: Obx(() {
+                        if (addContactController.isLoading.value) {
+                          return const Center(
+                              child: CircularProgressIndicator());
+                        }
+                        if (addContactController.matchedContacts.isEmpty) {
+                          return const Center(
+                              child: Text('No matched contacts found.'));
+                        }
+                        return ListView.builder(
+                          shrinkWrap: true, // Use shrinkWrap to avoid overflow
+                          physics:
+                              const NeverScrollableScrollPhysics(), // Disable scrolling
+                          itemCount:
+                              addContactController.matchedContacts.length,
+                          itemBuilder: (context, index) {
+                            final matchedContacts =
+                                addContactController.matchedContacts[index];
+                            return ContactCardWidget(
+                              name: Text(
+                                matchedContacts['name']!,
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              phoneNumber: matchedContacts['phone']!,
+                              suffixIcon: IconButton(
+                                icon:
+                                    const Icon(Icons.add, color: Colors.white),
+                                onPressed: () {
+                                  addContactController.addedContacts(matchedContacts);
+                                },
+                              ),
+                            );
+                          },
                         );
-                      },
-                    );
-                  }),
-
-                  // Obx(() {
-                  //   if (addContactController.isLoading.value) {
-                  //     return Center(child: CircularProgressIndicator());
-                  //   }
-                  //   if (addContactController.matchedContacts.isEmpty) {
-                  //     return Center(child: Text('No matched contacts found.'));
-                  //   }
-                  //   return ListView.builder(
-                  //     itemCount: addContactController.matchedContacts.length,
-                  //     itemBuilder: (context, index) {
-                  //       final contact = addContactController.matchedContacts[index];
-                  //       print(contact);
-                  //       return ContactCardWidget(
-                  //         name: "contact['name']",
-                  //         phoneNumber: addContactController.matchedContacts[index], // Use the phone number from the matched contact
-                  //         suffixIcon: IconButton(
-                  //           icon: const Icon(Icons.add, color: Colors.white),
-                  //           onPressed: () {
-                  //             // Handle adding the contact
-                  //             // addContactController.showContactPicker(context);
-                  //           },
-                  //         ),
-                  //       );
-                  //     },
-                  //   );
-                  // }),
-
-                  // ContactCardWidget(
-                  //   name: "Sam",
-                  //   phoneNumber: "+013256645",
-                  //   suffixIcon: IconButton(
-                  //     icon: const Icon(Icons.add, color: Colors.white),
-                  //     onPressed: () {
-                  //
-                  //       // addContactController.showContactPicker(context);
-                  //     },
-                  //   ),
-                  // ),
+                      }),
+                    ),
+                  ),
                   const SizedBox(height: 20),
                   const Text(
                     "Added Contacts",
@@ -118,54 +100,79 @@ class AddContactScreen extends StatelessWidget {
                         fontSize: 20,
                         fontWeight: FontWeight.w600),
                   ),
-                  const SizedBox(height: 10,),
-                  // Expanded(
-                  //   child: Obx(() {
-                  //     return ListView.builder(
-                  //       itemCount: addContactController.selectedContacts.length,
-                  //       itemBuilder: (context, index) {
-                  //         Contact contact =
-                  //             addContactController.selectedContacts[index];
-                  //         return ContactCardWidget(
-                  //           name: contact.displayName ?? 'No Name',
-                  //           phoneNumber: contact.phones.isNotEmpty
-                  //               ? contact.phones.first.number
-                  //               : 'No Phone Number',
-                  //           suffixIcon: IconButton(
-                  //             icon: const Text(
-                  //               "Pending",
-                  //               style: TextStyle(
-                  //                   color: Colors.white,
-                  //                   fontWeight: FontWeight.bold),
-                  //             ),
-                  //             onPressed: () {
-                  //             },
-                  //           ),
-                  //         );
-                  //       },
-                  //     );
-                  //   }),
-                  // ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  SizedBox(
+                    height: Get.height * 0.25,
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.vertical,
+                      child:
+                      Obx(() {
+                        if (addContactController.isLoading.value) {
+                          return const Center(child: CircularProgressIndicator());
+                        }
 
-                  // SizedBox(height: 10,),
-                  // ContactCardWidget(
-                  //   name: "Sam",
-                  //   phoneNumber: "+013256645",
-                  //   suffixIcon: IconButton(
-                  //     icon: const Row(
-                  //       children: [
-                  //         Icon(Icons.edit, color: Colors.white),
-                  //         SizedBox(
-                  //           width: 20,
-                  //         ),
-                  //         Icon(Icons.delete, color: Colors.white)
-                  //       ],
-                  //     ),
-                  //     onPressed: () {
-                  //       // Handle the suffix icon button press
-                  //     },
-                  //   ),
-                  // ),
+                        return ListView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: addContactController.requestedFriends.length,
+                          itemBuilder: (context, index) {
+                            final FriendsModel friend = addContactController.requestedFriends[index];
+
+                            return Obx(() {
+                              return ContactCardWidget(
+                                name: addContactController.isEditing.value
+                                    ? TextField(
+                                  controller: TextEditingController(text: friend.editedName),
+                                  style: const TextStyle(color: Colors.white),
+                                  onSubmitted: (newName) {
+                                    addContactController.updateContactName(
+                                      index: index,
+                                      newName: newName,
+                                      friendId: friend.friendId,
+                                    );
+                                    addContactController.isEditing.value = false;
+                                  },
+                                  decoration: const InputDecoration(
+                                    border: InputBorder.none,
+                                    contentPadding: EdgeInsets.all(0),
+                                  ),
+                                )
+                                    : Text(
+                                  friend.editedName,
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                phoneNumber: friend.friendPhone.toString(),
+                                suffixIcon: Row(
+                                  children: [
+                                    IconButton(
+                                      icon: const Icon(Icons.edit, color: Colors.white),
+                                      onPressed: () {
+                                        addContactController.isEditing.value = true;
+                                      },
+                                    ),
+                                    IconButton(
+                                      icon: const Icon(Icons.delete, color: Colors.white),
+                                      onPressed: () {
+                                        addContactController.removeContact(index, friend.friendId);
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              );
+                            });
+                          },
+                        );
+                      })
+
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -178,7 +185,7 @@ class AddContactScreen extends StatelessWidget {
 }
 
 class ContactCardWidget extends StatelessWidget {
-  final String name;
+  final Widget name;
   final String phoneNumber;
   final Widget suffixIcon;
 
@@ -213,18 +220,17 @@ class ContactCardWidget extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      SizedBox(
-                        width: Get.width * 0.45,
-                        child: Text(
-                          name,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                      SizedBox(width: Get.width * 0.45, child: name
+                          // Text(
+                          //   name,
+                          //   style: const TextStyle(
+                          //     fontSize: 18,
+                          //     fontWeight: FontWeight.bold,
+                          //     color: Colors.white,
+                          //   ),
+                          //   overflow: TextOverflow.ellipsis,
+                          // ),
                           ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
                       Text(
                         phoneNumber,
                         style: const TextStyle(
