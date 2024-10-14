@@ -1,11 +1,11 @@
-import 'package:alarm_app/core/firebase_cloud_messaging/fcm_controller.dart';
+import 'package:alarm_app/features/contact/add_contacts_controller/add_contact_controller.dart';
+import 'package:get/get.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../models/friends_model.dart';
 
 class FriendsService {
   final SupabaseClient client = Supabase.instance.client;
-
   Future<void> addFriend(FriendsModel friend) async {
     try {
       final response = await client
@@ -25,15 +25,6 @@ class FriendsService {
     }
   }
 
-  // Read
-  // Future<List<FriendsModel>> getFriends(String userId) async {
-  //   final response = await client
-  //       .from('friends')
-  //       .select()
-  //       .eq('user_id', userId);
-  //
-  //   return response.map((e) => FriendsModel.fromMap(e)).toList();
-  // }
 
 
   Future<void> updateFriend(String name, String friendId, String userId) async {
@@ -97,29 +88,100 @@ class FriendsService {
       return null;
     }
   }
-//Implemented
-  Future<List<FriendsModel>> fetchFriends(String userId) async {
+
+
+  bool isValidUUID(String uuid) {
+    final regex = RegExp(r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$');
+    return regex.hasMatch(uuid);
+  }
+
+  // Future<List<FriendsModel>> fetchFriends(String userId) async {
+  //   if (!isValidUUID(userId)) {
+  //     throw Exception('Invalid UUID format for userId: $userId');
+  //   }
+  //   try {
+  //     final response = await client
+  //         .from('friends')
+  //         .select('*')
+  //         .eq('user_id', userId); // Query using valid UUID
+  //
+  //     if (response == null) {
+  //       throw Exception('Error fetching friends.');
+  //     }
+  //
+  //     List<dynamic> friendsData = response ?? [];
+  //
+  //     List<Future<FriendsModel>> friendFutures = friendsData.map((friend) async {
+  //       Map<String, dynamic> friendMap = friend as Map<String, dynamic>;
+  //
+  //       final profileResponse = await client
+  //           .from('profiles')
+  //           .select('phone')
+  //           .eq('id', friendMap['friend_id'])
+  //           .single();
+  //
+  //       String? phoneNumber = profileResponse['phone'] as String?;
+  //
+  //       return FriendsModel.fromMap(friendMap)..friendPhone = phoneNumber;
+  //     }).toList();
+  //
+  //     List<FriendsModel> friends = await Future.wait(friendFutures);
+  //     return friends;
+  //   } catch (e) {
+  //     print('Error fetching friends: $e');
+  //     return [];
+  //   }
+  // }
+
+  void subscribeToFriends(String userId, RxList<FriendsModel> requestedFriends) {
+    if (!isValidUUID(userId)) {
+      throw Exception('Invalid UUID format for userId: $userId');
+    }
+
     try {
-
-      final response = await client
+      // Subscribe to real-time changes in the 'friends' table for the given user_id
+      final subscription = client
           .from('friends')
-          .select('*, profiles(phone)')
-          .eq('user_id', userId);
-      print("These are friends of minf  ${response}");
-      List<FriendsModel> friends = (response as List)
-          .map((friend) {
-        Map<String, dynamic> friendMap = friend as Map<String, dynamic>;
-        String? phoneNumber = friendMap['profiles']?['phone'];
-        return FriendsModel.fromMap(friendMap)..friendPhone = phoneNumber;
-      })
-          .toList();
+          .stream(primaryKey: ["id"])
+          .eq('user_id', userId) // Filter by user_id
+          .listen((snapshot) async {
+        if (snapshot.isEmpty) {
+          print('No friends found for user: $userId');
+          requestedFriends.clear(); // Clear list if no friends found
+          return;
+        }
 
-      return friends;
+        // Handle the updated friend data
+        List<dynamic> friendsData = snapshot;
+
+        List<Future<FriendsModel>> friendFutures = friendsData.map((friend) async {
+          Map<String, dynamic> friendMap = friend as Map<String, dynamic>;
+
+          final profileResponse = await client
+              .from('profiles')
+              .select('phone')
+              .eq('id', friendMap['friend_id'])
+              .single();
+
+          String? phoneNumber = profileResponse['phone'] as String?;
+
+          return FriendsModel.fromMap(friendMap)..friendPhone = phoneNumber;
+        }).toList();
+
+        List<FriendsModel> friends = await Future.wait(friendFutures);
+
+        // Update the requestedFriends list
+        requestedFriends.value = friends;
+      });
+
     } catch (e) {
-      print('Error fetching friends: $e');
-      return [];
+      print('Error subscribing to friends: $e');
     }
   }
+
+
+
+
 
   Future<String?> fetchFriendPhoneByNumber(String userId, String friendPhoneNumber) async {
     try {
@@ -127,7 +189,8 @@ class FriendsService {
           .from('friends')
           .select('*, profiles(phone)')
           .eq('user_id', userId)
-          .ilike('profiles.phone', '%$friendPhoneNumber%'); // Use ilike for case-insensitive matching
+          .ilike('profiles.phone', '%$friendPhoneNumber%');
+
 
       // Ensure that the response is properly handled
       List<FriendsModel> friends = (response as List)
@@ -154,24 +217,14 @@ class FriendsService {
     }
   }
 
-  // Future<FriendsModel?> fetchFriendByPhone(String phone, String userId) async {
-  //   try {
-  //     final response = await client
-  //         .from('friends')
-  //         .select()
-  //         .eq('phone', phone)
-  //         .eq('userId', userId)
-  //         .limit(1)
-  //         .single();
-  //     if (response != null && response.isNotEmpty) {
-  //       return FriendsModel.fromMap(response); // Assuming you have a fromJson method in FriendsModel
-  //     } else {
-  //       return null; // No friend found
-  //     }
-  //   } catch (error) {
-  //     print('Error fetching friend by phone: $error');
-  //     return null;
-  //   }
-  // }
 
+  void handleRealTimeUpdates(List<Map<String, dynamic>> event,  List requestedFriends) {
+    final updatedFriends = event.map((data) => FriendsModel.fromMap(data)).toList();
+    requestedFriends.assignAll(updatedFriends); // Update the friendsList
+
+  }
 }
+
+
+
+

@@ -27,7 +27,7 @@ class OtpScreen extends StatelessWidget {
             onTap: (){
               Get.back();
             },
-            child: Icon(Icons.arrow_back,color: Colors.black,)),
+            child: const Icon(Icons.arrow_back,color: Colors.black,)),
         // centerTitle: true,
       ),
       body: Padding(

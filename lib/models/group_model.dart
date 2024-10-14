@@ -1,6 +1,3 @@
-import 'dart:convert';
-
-import 'package:alarm_app/models/contacts_model.dart';
 
 class GroupModel {
   final String? id;

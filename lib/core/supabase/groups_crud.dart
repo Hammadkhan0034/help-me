@@ -1,4 +1,5 @@
 import 'package:alarm_app/models/group_model.dart';
+import 'package:alarm_app/utils/utils.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class GroupCrud{
@@ -7,16 +8,16 @@ class GroupCrud{
     final response = await Supabase.instance.client
         .from('groups')
         .insert({
-      'id':groupModel.id,
+      'id': groupModel.id,
       'name': groupModel.name,
       'created_by': groupModel.createdBy,
       'type': groupModel.type,
       'members': groupModel.contacts,
-    });
-
-
-    if (response.error != null) {
-      throw Exception('Error creating group: ${response.error!.message}');
+    })
+        .select();  // Fetch the inserted data.
+Utils.showSuccessSnackBar(title: "Group Created", description: "Your Group ${groupModel.name} is created");
+    if (response == null || response.isEmpty) {
+      throw Exception('Error creating group: Unable to fetch response.');
     }
   }
 

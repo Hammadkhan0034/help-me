@@ -48,12 +48,19 @@ class CreateGroupScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 10),
                   TextField(
+                    controller: createGroupController.name,
+                    style: const TextStyle(
+                      color: AColors.white,  // Set the text color to white
+                    ),
+                    cursorColor: AColors.white,  // Set the cursor color to white
                     decoration: InputDecoration(
                       hintText: "Enter Group Name",
                       fillColor: AColors.darkGrey.withOpacity(0.5),
                       filled: true,
                       hintStyle: TextStyle(
-                          color: AColors.white.withOpacity(0.5), fontSize: 16),
+                        color: AColors.white.withOpacity(0.5),
+                        fontSize: 16,
+                      ),
                       enabledBorder: const OutlineInputBorder(
                         borderRadius: BorderRadius.all(Radius.circular(15)),
                         borderSide: BorderSide(
@@ -66,6 +73,7 @@ class CreateGroupScreen extends StatelessWidget {
                       ),
                     ),
                   ),
+
                   const SizedBox(height: 10),
                   const Text(
                     "Added Contacts:",

@@ -30,6 +30,9 @@ void main() async {
   await Supabase.initialize(
     url: dotenv.env['PROJECT_URL']!,
     anonKey: dotenv.env['ANON_KEY']!,
+    realtimeClientOptions: const RealtimeClientOptions(
+      eventsPerSecond: 2,
+    ),
   );
 
    FirebaseMessaging.onBackgroundMessage(_firebaseBackgroundHandler);
@@ -63,7 +66,6 @@ class _AlarmAppState extends State<AlarmApp> {
 
   @override
   Widget build(BuildContext context) {
-    Get.put(AddContactController(), permanent: true);
     Get.put(AuthController(), permanent: true);
     return const GetMaterialApp(
       debugShowCheckedModeBanner: false,
@@ -81,7 +83,7 @@ class SessionController extends StatelessWidget {
     final session = Supabase.instance.client.auth.currentSession;
 
     if (session != null) {
-      authController.getProfile();
+     authController.getProfile();
       return const HelpMeScreen();
     } else {
       return  AuthScreen();

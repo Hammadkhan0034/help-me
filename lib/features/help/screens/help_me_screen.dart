@@ -13,6 +13,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class HelpMeScreen extends StatelessWidget {
+
+
   const HelpMeScreen({super.key});
   @override
   Widget build(BuildContext context) {
@@ -20,7 +22,7 @@ class HelpMeScreen extends StatelessWidget {
       appBar: AppBar(
         leading: NotificationIconWithCount(
           onPress: () {
-            Get.to(const NotificationScreen());
+            Get.to( ()=> NotificationScreen());
           },
         ),
         title: const Text(

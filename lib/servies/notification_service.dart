@@ -88,7 +88,7 @@ class NotificationService {
     await _flutterLocalNotificationsPlugin.initialize(
       initializationSettings,
       onDidReceiveNotificationResponse: (payload) {
-        handleMessage(context, message);
+        // handleMessage(context, message);
       },
     );
   }
@@ -187,7 +187,7 @@ class NotificationService {
   //handle message
   Future<void> handleMessage(
       BuildContext context, RemoteMessage message) async {
-    Get.to(()=>const NotificationScreen());
+    Get.to(()=> NotificationScreen());
   }
 
 //ios message

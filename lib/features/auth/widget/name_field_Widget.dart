@@ -12,10 +12,13 @@ class NameFieldWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+
       controller: controller,
       keyboardType: TextInputType.name,
       style: const TextStyle(fontSize: 18, color: Colors.white),
+      
       decoration: const InputDecoration(
+        
         helperStyle: TextStyle(fontSize: 14, color: Color(0xffF4F4F9)),
         fillColor: AColors.darkGrey,
         focusColor: Color(0xffF4F4F9),
@@ -37,6 +40,7 @@ class NameFieldWidget extends StatelessWidget {
           borderRadius: BorderRadius.all(Radius.circular(30)),
           borderSide: BorderSide(color: AColors.darkGrey),
         ),
+        // contentPadding: EdgeInsets.symmetric(horizontal: 20)
       ),
 
     );

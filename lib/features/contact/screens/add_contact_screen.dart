@@ -14,14 +14,16 @@ class AddContactScreen extends StatelessWidget {
      Get.put(AddContactController());
 
   @override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         leading: InkWell(
-            onTap: () {
-              Get.back();
-            },
-            child: const Icon(Icons.arrow_back_ios_new)),
+          onTap: () {
+            Get.back();
+          },
+          child: const Icon(Icons.arrow_back_ios_new),
+        ),
         title: const Text(
           "Add Contacts",
           style: TextStyle(fontWeight: FontWeight.w600),
@@ -34,94 +36,93 @@ class AddContactScreen extends StatelessWidget {
             mTop: 110,
             child: Padding(
               padding: const EdgeInsets.all(15),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(height: 100, width: Get.width),
-                  const Text(
-                    "App Contacts",
-                    style: TextStyle(
-                        color: AColors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600),
-                  ),
-                  SizedBox(
-                    height: Get.height * 0.2,
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.vertical,
-                      child: Obx(() {
-                        if (addContactController.isLoading.value) {
-                          return const Center(
-                              child: CircularProgressIndicator());
-                        }
-                        if (addContactController.matchedContacts.isEmpty) {
-                          return const Center(
-                              child: Text('No matched contacts found.'));
-                        }
-                        return ListView.builder(
-                          shrinkWrap: true, // Use shrinkWrap to avoid overflow
-                          physics:
-                              const NeverScrollableScrollPhysics(), // Disable scrolling
-                          itemCount:
-                              addContactController.matchedContacts.length,
-                          itemBuilder: (context, index) {
-                            final matchedContacts =
-                                addContactController.matchedContacts[index];
-                            return ContactCardWidget(
-                              name: Text(
-                                matchedContacts['name']!,
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              phoneNumber: matchedContacts['phone']!,
-                              suffixIcon: IconButton(
-                                icon:
-                                    const Icon(Icons.add, color: Colors.white),
-                                onPressed: () {
-                                  addContactController.addedContacts(matchedContacts);
-                                },
-                              ),
-                            );
-                          },
-                        );
-                      }),
+              child: SingleChildScrollView( // Wrap content in SingleChildScrollView
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(height: 100, width: Get.width),
+                    const Text(
+                      "App Contacts",
+                      style: TextStyle(
+                          color: AColors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600),
                     ),
-                  ),
-                  const SizedBox(height: 20),
-                  const Text(
-                    "Added Contacts",
-                    style: TextStyle(
-                        color: AColors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600),
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  SizedBox(
-                    height: Get.height * 0.25,
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.vertical,
-                      child:
-                      Obx(() {
-                        if (addContactController.isLoading.value) {
-                          return const Center(child: CircularProgressIndicator());
-                        }
-
-                        return ListView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: addContactController.requestedFriends.length,
-                          itemBuilder: (context, index) {
-                            final FriendsModel friend = addContactController.requestedFriends[index];
-
-                            return Obx(() {
+                    SizedBox(
+                      height: Get.height * 0.2,
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.vertical,
+                        child: Obx(() {
+                          if (addContactController.isLoading.value) {
+                            return const Center(
+                                child: CircularProgressIndicator());
+                          }
+                          if (addContactController.matchedContacts.isEmpty) {
+                            return const Center(
+                                child: Text('No matched contacts found.',style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold,fontSize: 16),));
+                          }
+                          return ListView.builder(
+                            shrinkWrap: true, // Use shrinkWrap to avoid overflow
+                            physics: const NeverScrollableScrollPhysics(), // Disable scrolling
+                            itemCount: addContactController.matchedContacts.length,
+                            itemBuilder: (context, index) {
+                              final matchedContacts =
+                              addContactController.matchedContacts[index];
                               return ContactCardWidget(
+                                name: Text(
+                                  matchedContacts['name']!,
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                phoneNumber: matchedContacts['phone']!,
+                                suffixIcon: IconButton(
+                                  icon:
+                                  const Icon(Icons.add, color: Colors.white),
+                                  onPressed: () {
+                                    addContactController.addedContacts(matchedContacts);
+                                  },
+                                ),
+                              );
+                            },
+                          );
+                        }),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    const Text(
+                      "Added Contacts",
+                      style: TextStyle(
+                          color: AColors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600),
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    SizedBox(
+                      height: Get.height * 0.25,
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.vertical,
+                        child: Obx(() {
+                          if (addContactController.isLoading.value) {
+                            return const Center(
+                                child: CircularProgressIndicator());
+                          }
+
+                          return ListView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: addContactController.requestedFriends.length,
+                            itemBuilder: (context, index) {
+                              final FriendsModel friend =
+                              addContactController.requestedFriends[index];
+
+                              return  ContactCardWidget(
                                 name: addContactController.isEditing.value
                                     ? TextField(
                                   controller: TextEditingController(text: friend.editedName),
@@ -139,41 +140,66 @@ class AddContactScreen extends StatelessWidget {
                                     contentPadding: EdgeInsets.all(0),
                                   ),
                                 )
-                                    : Text(
-                                  friend.editedName,
-                                  style: const TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
+                                      : Text(
+                                    friend.editedName,
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
                                   ),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                phoneNumber: friend.friendPhone.toString(),
-                                suffixIcon: Row(
-                                  children: [
-                                    IconButton(
-                                      icon: const Icon(Icons.edit, color: Colors.white),
-                                      onPressed: () {
-                                        addContactController.isEditing.value = true;
-                                      },
-                                    ),
-                                    IconButton(
-                                      icon: const Icon(Icons.delete, color: Colors.white),
-                                      onPressed: () {
-                                        addContactController.removeContact(index, friend.friendId);
-                                      },
-                                    ),
-                                  ],
-                                ),
-                              );
-                            });
-                          },
-                        );
-                      })
+                                  phoneNumber: friend.friendPhone.toString(),
+                                  suffixIcon: friend.requestStatus==1?
+                                  Row(
+                                    children: [
+                                      IconButton(
+                                        icon: const Icon(Icons.edit,
+                                            color: Colors.white),
+                                        onPressed: () {
+                                          addContactController.isEditing.value = true;
+                                        },
+                                      ),
+                                      IconButton(
+                                        icon: const Icon(Icons.delete,
+                                            color: Colors.white),
+                                        onPressed: () {
+                                          addContactController.removeContact(
+                                              index, friend.friendId);
+                                        },
+                                      ),
+                                    ],
+                                  ): const Text("Pending",style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),),
+                                );
 
+                            },
+                          );
+                        }),
+                      ),
                     ),
-                  ),
-                ],
+                    // SizedBox(
+                    //   height: Get.height*0.08,
+                    //   child: Obx(() {
+                    //     if (addContactController.requestedFriends.value.isEmpty) {
+                    //       return Center(child: Text('No Friends yet.'));
+                    //     }
+                    //     return ListView.builder(
+                    //       itemCount: addContactController.requestedFriends.length,
+                    //       itemBuilder: (context, index) {
+                    //         final friend = addContactController.requestedFriends[index];
+                    //         return ListTile(
+                    //           title: Text(friend.editedName ?? 'Friend ${friend.friendId}'),
+                    //           subtitle: Text('Status: ${friend.requestStatus}'),
+                    //           trailing: friend.requestStatus == 1
+                    //               ? Icon(Icons.check, color: Colors.green)
+                    //               : Icon(Icons.hourglass_empty, color: Colors.orange),
+                    //         );
+                    //       },
+                    //     );
+                    //   }),
+                    // ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -182,6 +208,7 @@ class AddContactScreen extends StatelessWidget {
       ),
     );
   }
+
 }
 
 class ContactCardWidget extends StatelessWidget {

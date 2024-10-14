@@ -50,7 +50,7 @@ class SettingsScreen extends StatelessWidget {
                   AElevatedButton(
                       title: "Subscribe",
                       onPress: () {
-                        Get.to(const NotificationScreen());
+                        Get.to( NotificationScreen());
                       }),
                   const SizedBox(height: 15),
                   AElevatedButton(

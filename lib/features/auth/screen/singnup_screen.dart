@@ -33,11 +33,9 @@ class AuthScreen extends StatelessWidget {
 
                     PhoneAuthFieldWidget(
                       onChanged: (PhoneNumber value) {
+                        authController.phoneNumber.value=value.completeNumber;
                         if (kDebugMode) {
                           print(value.completeNumber);
-                          authController.phoneNumber=value.completeNumber;
-
-
                         }
                       },
                     ),
