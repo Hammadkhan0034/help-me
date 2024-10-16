@@ -55,7 +55,7 @@ class _AlarmAppState extends State<AlarmApp> {
   @override
   void initState() {
     super.initState();
-    initNoInternetListener(context);
+    initNoInternetListener();
     getServicesKey.getServerToken();
     notificationService.requestNotificationPermission();
     notificationService.getDeviceToken();

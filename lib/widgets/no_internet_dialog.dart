@@ -5,8 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class NoInternetDialog extends StatelessWidget {
+
+  final void Function() onPress;
   const NoInternetDialog({
-    super.key,
+    super.key, required this.onPress,
   });
 
   @override
@@ -41,23 +43,23 @@ class NoInternetDialog extends StatelessWidget {
                 AElevatedButton(
                     bgColor: AColors.primary,
                     title: "Try Again",
-                    onPress: () {})
+                    onPress: onPress)
               ],
             ),
           ),
-          Positioned(
-            top: 0,
-            right: 0,
-            child: IconButton(
-              onPressed: () {
-                Get.back();
-              },
-              icon: const Icon(
-                Icons.close,
-                color: AColors.dark,
-              ),
-            ),
-          )
+          // Positioned(
+          //   top: 0,
+          //   right: 0,
+          //   child: IconButton(
+          //     onPressed: () {
+          //       Get.back();
+          //     },
+          //     icon: const Icon(
+          //       Icons.close,
+          //       color: AColors.dark,
+          //     ),
+          //   ),
+          // )
         ],
       ),
     );

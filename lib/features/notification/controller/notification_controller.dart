@@ -72,7 +72,7 @@ class NotificationController extends GetxController {
   Future<void> fetchNotifications(String userId) async {
     try {
       // Step 1: Fetch friends for the current user, filtering by request_status 0
-      List<FriendsModel> friends =[]; // await friendsService.fetchFriends(userId);
+      List<FriendsModel> friends = []; //await friendsService.fetchFriends(userId);
       List<String> friendIds = friends
           .where((friend) => friend.requestStatus == 0) // Filter by request_status
           .map((friend) => friend.friendId) // Ensure this is fetching the correct ID

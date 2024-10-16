@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../widgets/no_internet_dialog.dart';
@@ -14,17 +13,22 @@ class ConnectionStatusListener {
 
   bool hasShownNoInternet = false;
   final Connectivity _connectivity = Connectivity();
-
   static ConnectionStatusListener getInstance() => _singleton;
+
   bool hasConnection = false;
-  StreamController connectionChangeController = StreamController.broadcast();
+  StreamController<bool> connectionChangeController = StreamController<bool>.broadcast();
 
-  Stream get connectionChange => connectionChangeController.stream;
+  Stream<bool> get connectionChange => connectionChangeController.stream;
 
-  void _connectionChange(List<ConnectivityResult> result) {
-    checkConnection();
+  // Update the connection state when connectivity changes
+  void _connectionChange(List<ConnectivityResult> resultList) {
+    // You may want to check multiple results to determine the final status
+    if (resultList.isNotEmpty) {
+      checkConnection();
+    }
   }
 
+  // Checks if there is an active internet connection
   Future<bool> checkConnection() async {
     bool previousConnection = hasConnection;
 
@@ -46,44 +50,61 @@ class ConnectionStatusListener {
     return hasConnection;
   }
 
+  // Initialize the listener for connectivity changes
   Future<void> initialize() async {
-    _connectivity.onConnectivityChanged.listen(_connectionChange);
+    _connectivity.onConnectivityChanged.listen(_connectionChange); // Listen for changes
     await checkConnection();
   }
 
+  // Close the stream when done
   void dispose() {
     connectionChangeController.close();
   }
 }
 
-updateConnectivity(
-  dynamic hasConnection,
-  ConnectionStatusListener connectionStatus,
-) {
-  print("updating the network state");
+void updateConnectivity(
+    bool hasConnection,
+    ConnectionStatusListener connectionStatus,
+    ) {
   if (!hasConnection) {
-    connectionStatus.hasShownNoInternet = true;
-    Get.dialog(const NoInternetDialog(), barrierDismissible: false);
-    // Navigator.of(NavigationService.navigatorKey.currentContext!).push(
-    //   MaterialPageRoute(builder: (context) => const NoInternetScreen()),
-    // );
+    // Show the No Internet dialog only if not already shown
+    if (!connectionStatus.hasShownNoInternet) {
+      connectionStatus.hasShownNoInternet = true;
+      Get.dialog(
+        NoInternetDialog(
+          onPress: () async {
+            bool isConnected = await connectionStatus.checkConnection();
+            if (isConnected) {
+              connectionStatus.hasShownNoInternet = false;
+              Get.back(); // Close the dialog if connected
+            }
+          },
+        ),
+        barrierDismissible: false,
+      );
+    }
   } else {
+    // Close the dialog when connection is back
     if (connectionStatus.hasShownNoInternet) {
       connectionStatus.hasShownNoInternet = false;
       Get.back();
-      //Navigator.of(NavigationService.navigatorKey.currentContext!).pop();
     }
   }
 }
 
-initNoInternetListener(BuildContext context) async {
+
+// Function to initialize the internet connection listener
+void initNoInternetListener() async {
   var connectionStatus = ConnectionStatusListener.getInstance();
   await connectionStatus.initialize();
+
+  // Check initial connection status
   if (!connectionStatus.hasConnection) {
     updateConnectivity(false, connectionStatus);
   }
-  connectionStatus.connectionChange.listen((event) {
-    print("initNoInternetListener $event");
-    updateConnectivity(event, connectionStatus);
+
+  // Listen to the connection changes and update the dialog state
+  connectionStatus.connectionChange.listen((hasConnection) {
+    updateConnectivity(hasConnection, connectionStatus);
   });
 }
