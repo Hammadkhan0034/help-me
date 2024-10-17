@@ -83,7 +83,7 @@ class AddContactController extends GetxController {
   void addedContacts(Map<String, String> contact) async
   {
     String phoneNumber = contact['phone']!;
-    String phoneWithoutCode = normalizePhoneNumber(phoneNumber); // Normalize phone number
+    String phoneWithoutCode = normalizePhoneNumber(phoneNumber);
     bool isDuplicateInApp = requestedFriends.any((friend) => friend.friendPhone == phoneWithoutCode);
     if (isDuplicateInApp) {
       Utils.showErrorSnackBar(

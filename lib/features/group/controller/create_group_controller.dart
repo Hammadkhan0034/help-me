@@ -34,9 +34,9 @@ class CreateGroupController extends GetxController {
         totalMembers: memberCount,
       ));
 
-
      Utils.showSuccessSnackBar(title: "Group ${name.text} ", description: "Created Successfully");
-     Get.back();
+     name.clear();
+
     } catch (e) {
       Utils.showErrorSnackBar(title: "ERROR", description: e.toString());
       print("ERROR: $e");

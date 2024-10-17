@@ -1,130 +1,97 @@
 import 'package:alarm_app/core/supabase/FriendsService.dart';
 import 'package:alarm_app/features/auth/controller/auth_controller.dart';
 import 'package:alarm_app/models/notification_model.dart';
+import 'package:alarm_app/models/user_model.dart';
 import 'package:get/get.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/supabase/notification_crud.dart';
 import '../../../core/supabase/user_crud.dart';
 import '../../../models/friends_model.dart';
 
 class NotificationController extends GetxController {
-  AuthController authController=Get.find<AuthController>();
+  AuthController authController = Get.find<AuthController>();
   RxList<NotificationModel> notifications = <NotificationModel>[].obs;
-  FriendsService friendsService=FriendsService();
 
-  //THIS ONE IS WORKING BUT HAS LITTLE ISSUE
-  // Future<void> fetchNotifications(String userId) async {
-  //   try {
-  //     // Step 1: Fetch the friends with request_status 0
-  //     List<FriendsModel> friends = await friendsService.fetchFriends(userId);
-  //     List<String> friendIds = friends
-  //         .where((friend) => friend.requestStatus == 0) // Filter by request_status
-  //         .map((friend) => friend.friendId)
-  //         .toList();
-  //
-  //     print("PRINTING FRIENDS");
-  //     for (var friend in friends) {
-  //       print("Friend ID: ${friend.friendId}, Request Status: ${friend.requestStatus}");
-  //     }
-  //     print("Friend IDs: $friendIds");
-  //
-  //     // Step 2: Fetch notifications for the current user
-  //     final notificationData = await NotificationCrud.getNotifications(userId);
-  //     print("PRINTING NOTIFICATION DATA");
-  //     print(notificationData);
-  //
-  //     notifications.clear();
-  //
-  //     for (var notifData in notificationData) {
-  //       final notification = NotificationModel.fromMap(notifData);
-  //       print("PRINTING NOTIFICATION");
-  //       print(notification);
-  //
-  //       // Print notification details for debugging
-  //       print("Notification From ID: ${notification.notificationFrom}");
-  //
-  //       // Step 3: Check if notification is from a friend with request_status 0
-  //       if (friendIds.contains(notification.notificationFrom)) {
-  //         print("PRINTING user");
-  //
-  //         // Fetch user details
-  //         final user = await UserCrud.getUser(notification.notificationFrom);
-  //         if (user != null) {
-  //           print("PRINTING USER DETAILS WHO SENT NOTIFICATION");
-  //           // Update notification with user info
-  //           notification.data?['name'] = user['name'];
-  //           notification.data?['phone'] = user['phone'];
-  //         }
-  //         // Add the updated notification to the list
-  //         notifications.add(notification);
-  //       } else {
-  //         print("No match found for notification sender in friend IDs.");
-  //       }
-  //     }
-  //
-  //     notifications.refresh();
-  //   } catch (e) {
-  //     print('Error fetching notifications: $e');
-  //   }
-  //   update();
-  // }
-
-  Future<void> fetchNotifications(String userId) async {
-    try {
-      // Step 1: Fetch friends for the current user, filtering by request_status 0
-      List<FriendsModel> friends = []; //await friendsService.fetchFriends(userId);
-      List<String> friendIds = friends
-          .where((friend) => friend.requestStatus == 0) // Filter by request_status
-          .map((friend) => friend.friendId) // Ensure this is fetching the correct ID
-          .toList();
-
-      print("PRINTING FRIENDS");
-      for (var friend in friends) {
-        print("Friend ID: ${friend.friendId}, User ID: ${friend.userId}, Request Status: ${friend.requestStatus}");
-      }
-      print("Friend IDs: $friendIds");
-
-      // Step 2: Fetch notifications for the current user
-      final notificationData = await NotificationCrud.getNotifications(userId);
-      print("PRINTING NOTIFICATION DATA");
-      print(notificationData);
-
-      notifications.clear();
-
-      for (var notifData in notificationData) {
-        final notification = NotificationModel.fromMap(notifData);
-        print("PRINTING NOTIFICATION");
-        print(notification);
-
-        // Print notification details for debugging
-        print("Notification From ID: ${notification.notificationFrom}");
-
-        // Step 3: Check if notification is from a friend with request_status 0
-        if (friendIds.contains(notification.notificationFrom)) {
-          print("Found matching friend for notification sender");
-
-          // Fetch user details
-          final user = await UserCrud.getUser(notification.notificationFrom);
-          if (user != null) {
-            print("PRINTING USER DETAILS WHO SENT NOTIFICATION");
-            // Update notification with user info
-            notification.data?['name'] = user['name'];
-            notification.data?['phone'] = user['phone'];
-          }
-          // Add the updated notification to the list
-          notifications.add(notification);
-        } else {
-          print("No match found for notification sender in friend IDs: ${notification.notificationFrom}");
-        }
-      }
-
-      notifications.refresh();
-    } catch (e) {
-      print('Error fetching notifications: $e');
+  void subscribeToPendingFriendNotifications(String userId) {
+    if (!FriendsService.isValidUUID(userId)) {
+      throw Exception('Invalid UUID format for userId: $userId');
     }
-    update();
+    print('UUID format for userId: $userId');
+    try {
+        final subscription = Supabase.instance.client
+            .from('notifications')
+            .stream(primaryKey: ["id"])
+            .eq('notification_for', userId)
+            .listen((snapshot) async {
+              print("Notifications SnapShot of against my ID :  $snapshot");
+
+              if (snapshot.isEmpty) {
+                print('No pending friend requests for user: $userId');
+                return;
+              }
+
+              // Clear the list before adding new notifications (optional)
+              // notifications.clear();
+
+              for (var friendData in snapshot) {
+                final notificationFromId = friendData['notification_from'];
+
+                if (notificationFromId != null) {
+                  print(
+                      "Pending Notification from friend request from user ID: $notificationFromId");
+
+                  // Fetch user details from the profiles table
+                  final user = await fetchUserDetails(notificationFromId);
+
+                  if (user != null) {
+                    print(
+                        "Pending friend request from: ${user['name']}, Phone: ${user['phone']}");
+
+                    final notification = NotificationModel.fromMap(friendData);
+                    notification.data?['name'] = user['name'];
+                    notification.data?['phone'] = user['phone'];
+
+                    // Check if this notification already exists before adding
+                    bool alreadyExists =
+                        notifications.any((n) => n.id == notification.id);
+
+                    if (!alreadyExists) {
+                      notifications.add(notification);
+                    }
+                    notifications.refresh();
+                  }
+                } else {
+                  print(
+                      "notification_from is null for friend data: $friendData");
+                }
+              }
+            });
+    } catch (e) {
+      print('Error subscribing to pending friend requests: $e');
+    }
   }
 
+  Future<Map<String, dynamic>?> fetchUserDetails(String userId) async {
+    try {
+      final response = await Supabase.instance.client
+          .from('profiles')
+          .select('*')
+          .eq('id', userId)
+          .single();
+
+
+      if (response == null) {
+        print('Error fetching user details: ${response}');
+        return null;
+      }
+
+      return response;
+    } catch (e) {
+      print('Error fetching user details: $e');
+      return null;
+    }
+  }
 
   Future<void> createNotification({
     required String notificationFrom,
@@ -142,26 +109,28 @@ class NotificationController extends GetxController {
 
   Future<void> deleteNotification(String notificationId) async {
     try {
-    //  notifications.removeWhere((n) => n.id == notificationId); // Remove from local list as well
+      notifications.removeWhere(
+          (n) => n.id == notificationId); // Remove from local list as well
       await NotificationCrud.deleteNotification(notificationId);
     } catch (e) {
       print('Error deleting notification: $e');
     }
-    notifications.refresh()
-;    update();
+    notifications.refresh();
+    update();
   }
+
   //
-  Future<void> acceptInvitation(String friendId, userId)async{
+  Future<void> acceptInvitation(String friendId, userId) async {
     try {
       await NotificationCrud.acceptFriendInvitation(friendId, userId);
     } catch (e) {
       print('Error Accepting  Invitation: $e');
     }
   }
-  Future<void> rejectInvitation(String friendId, userId)async{
+
+  Future<void> rejectInvitation(String friendId, userId) async {
     try {
       await NotificationCrud.rejectFriendInvitation(friendId, userId);
-
     } catch (e) {
       print('Error Accepting  Invitation: $e');
     }
@@ -169,7 +138,7 @@ class NotificationController extends GetxController {
 
   @override
   void onInit() {
-    fetchNotifications(authController.userModel.value.id);
+    subscribeToPendingFriendNotifications(authController.userModel.value.id);
     super.onInit();
   }
 }

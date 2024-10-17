@@ -1,9 +1,6 @@
 import 'package:alarm_app/utils/utils.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
-
-import '../../models/friends_model.dart';
-
 class NotificationCrud{
 //IMPLEMENTED
   static Future<void> createNotification({
@@ -72,29 +69,41 @@ print("NOTIFICATION RESPOINSE  ");
 
   }
 
-  static Future<void> acceptFriendInvitation( String friendId, String userId) async {
-     await Supabase.instance.client
-        .from('friends')
-        .update({
-      'request_status': 1,
-      'updated_at': DateTime.now().toIso8601String(),
-      'accepted_at': DateTime.now().toIso8601String(),
-    })
-        .eq('friend_id', friendId)
-        .eq('user_id', userId)
-        .select();
+  static Future<void> acceptFriendInvitation(String friendId, String userId) async {
+    print("Friend ID is here for accepting: $friendId");
+    print("My ID is here to accept: $userId");
+    try {
+      print('Checking record with friend_id: $userId and user_id: $friendId');
+    final response=  await Supabase.instance.client
+          .from('friends')
+          .update({
+        'request_status': 1,
+        'updated_at': DateTime.now().toIso8601String(),
+        'accepted_at': DateTime.now().toIso8601String(),
+      })
+          .eq('friend_id', userId,)
+          .eq('user_id', friendId);
+
+      // Check response
+      print('Invitation accepted successfully $response');
+      print(response);
+    } catch (e) {
+      print('Exception occurred while accepting invitation: $e');
+    }
   }
 
- static Future<void> rejectFriendInvitation( String friendId, String userId) async {
+
+
+  static Future<void> rejectFriendInvitation( String friendId, String userId) async {
      await Supabase.instance.client
         .from('friends')
         .update({
       'request_status': 2,
       'updated_at': DateTime.now().toIso8601String(),
     })
-        .eq('friend_id', friendId)
-        .eq('user_id', userId)
-        .select();
+         .eq('friend_id',userId )
+         .eq('user_id', friendId)
+       ;
 
   }
 

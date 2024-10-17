@@ -90,7 +90,7 @@ class FriendsService {
   }
 
 
-  bool isValidUUID(String uuid) {
+static  bool isValidUUID(String uuid) {
     final regex = RegExp(r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$');
     return regex.hasMatch(uuid);
   }
@@ -196,21 +196,14 @@ class FriendsService {
       List<FriendsModel> friends = (response as List)
           .map((friend) {
         Map<String, dynamic> friendMap = friend as Map<String, dynamic>;
-
-        // Extract the phone number from the joined profiles table
         String? phoneNumber = friendMap['profiles']?['phone'];
-
-        // Add the phone number to FriendsModel or handle it as needed
         return FriendsModel.fromMap(friendMap)..friendPhone = phoneNumber;
       })
           .toList();
-
-      // If there are any matched friends, return the phone number of the first matched friend
       if (friends.isNotEmpty) {
         return friends.first.friendPhone;
       }
-
-      return null; // Return null if no matches are found
+      return null;
     } catch (e) {
       print('Error fetching friend phone number: $e');
       return null;

@@ -223,7 +223,7 @@ class NotificationScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     print("THIS IS ID FROM NOTI SCREEN");
     print(notificationController.authController.userModel.value.id);
-    notificationController.fetchNotifications(notificationController.authController.userModel.value.id);
+    // notificationController.fetchNotifications(notificationController.authController.userModel.value.id);
     return Scaffold(
       appBar: AppBar(
         leading: InkWell(
@@ -325,9 +325,9 @@ class NotificationScreen extends StatelessWidget {
                                   bgColor: CupertinoColors.activeGreen,
                                   title: "Accept",
                                   padding: 0,
-                                  onPress: () {
-                                    notificationController.acceptInvitation(notification.notificationFrom, notification.notificationFor);
-                                    notificationController.deleteNotification(notification.id);
+                                  onPress: () async{
+                                   await notificationController.acceptInvitation(notification.notificationFrom, notification.notificationFor);
+                                   // notificationController.deleteNotification(notification.id);
 
                                   }),
                             ),
@@ -337,9 +337,9 @@ class NotificationScreen extends StatelessWidget {
                                   bgColor: CupertinoColors.destructiveRed,
                                   title: "Reject",
                                   padding: 0,
-                                  onPress: () {
-                                    notificationController.rejectInvitation(notification.notificationFrom, notification.notificationFor);
-                                    notificationController.deleteNotification(notification.id);
+                                  onPress: ()async {
+                                   await notificationController.rejectInvitation(notification.notificationFrom, notification.notificationFor);
+                                    //notificationController.deleteNotification(notification.id);
 
                                   }),
                             ),

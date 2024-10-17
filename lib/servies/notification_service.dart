@@ -179,7 +179,7 @@ class NotificationService {
         .getInitialMessage()
         .then((RemoteMessage? message) {
       if (message != null && message.data.isNotEmpty) {
-        handleMessage(context, message);
+       // handleMessage(context, message);
       }
     });
   }

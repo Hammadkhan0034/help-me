@@ -14,8 +14,7 @@ class GroupCrud{
       'type': groupModel.type,
       'members': groupModel.contacts,
     })
-        .select();  // Fetch the inserted data.
-Utils.showSuccessSnackBar(title: "Group Created", description: "Your Group ${groupModel.name} is created");
+        ;  // Fetch the inserted data.
     if (response == null || response.isEmpty) {
       throw Exception('Error creating group: Unable to fetch response.');
     }
