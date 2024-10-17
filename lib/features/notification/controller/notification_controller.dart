@@ -30,9 +30,9 @@ class NotificationController extends GetxController {
                 print('No pending friend requests for user: $userId');
                 return;
               }
-
+              // notifications.refresh();
               // Clear the list before adding new notifications (optional)
-              // notifications.clear();
+               notifications.clear();
 
               for (var friendData in snapshot) {
                 final notificationFromId = friendData['notification_from'];
@@ -51,14 +51,13 @@ class NotificationController extends GetxController {
                     final notification = NotificationModel.fromMap(friendData);
                     notification.data?['name'] = user['name'];
                     notification.data?['phone'] = user['phone'];
-
                     // Check if this notification already exists before adding
                     bool alreadyExists =
                         notifications.any((n) => n.id == notification.id);
-
                     if (!alreadyExists) {
                       notifications.add(notification);
                     }
+
                     notifications.refresh();
                   }
                 } else {

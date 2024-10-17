@@ -79,7 +79,7 @@ class HelpMeScreen extends StatelessWidget {
                   AElevatedButton(
                       title: "Create Group",
                       onPress: () {
-                        Get.to( CreateGroupScreen());
+                        Get.to( () => CreateGroupScreen());
                       }),
                   // const SizedBox(height: 15),
                   // AElevatedButton(

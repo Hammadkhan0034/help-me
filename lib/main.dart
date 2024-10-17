@@ -37,6 +37,7 @@ void main() async {
 
    FirebaseMessaging.onBackgroundMessage(_firebaseBackgroundHandler);
 
+
   runApp( const AlarmApp());
 }
 
@@ -79,7 +80,7 @@ class SessionController extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final authController = Get.find<AuthController>();
+    final authController =Get.find<AuthController>();
     final session = Supabase.instance.client.auth.currentSession;
 
     if (session != null) {

@@ -35,7 +35,7 @@ class GroupNameDropDown extends StatelessWidget {
                   () => DropdownButton(
                     isExpanded: true,
                     focusColor: AColors.dark,
-                    value: ctrl.selectedItem.value,
+                    value: ctrl.selectedType.value,
                     icon: const Icon(Icons.arrow_drop_down_rounded),
                     iconSize: 24,
                     iconEnabledColor: AColors.white,

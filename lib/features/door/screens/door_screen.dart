@@ -1,12 +1,15 @@
 import 'package:alarm_app/constants/colors.dart';
 import 'package:alarm_app/features/door/controllers/door_controller.dart';
 import 'package:alarm_app/features/door/screens/widgets/group_name_drop_down.dart';
+import 'package:alarm_app/servies/send_notification_services.dart';
 import 'package:alarm_app/utils/utils.dart';
 import 'package:alarm_app/widgets/elevated_button.dart';
 import 'package:alarm_app/widgets/gradient_container.dart';
 import 'package:alarm_app/widgets/warning_circle_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
+import '../../../models/group_model.dart';
 
 class DoorScreen extends StatelessWidget {
   DoorScreen({super.key});
@@ -25,7 +28,7 @@ class DoorScreen extends StatelessWidget {
         actions: const [Icon(Icons.person), SizedBox(width: 10)],
         title: Obx(() {
           return Text(
-            "Send ${ctrl.selectedItem.value}",
+            "Send ${ctrl.selectedType.value}",
             style: const TextStyle(fontWeight: FontWeight.w600),
           );
         }),
@@ -57,33 +60,58 @@ class DoorScreen extends StatelessWidget {
                         margin: const EdgeInsets.only(top: 20),
                         color: AColors.darkGrey,
                         height: 100,
-                        child: const Column(
+                        child:  Column(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
                             Padding(
                               padding: EdgeInsets.all(10.0),
-                              child: TextField(
-                                decoration: InputDecoration(
-                                  border: UnderlineInputBorder(
-                                    borderSide: BorderSide(
-                                      width: 1,
-                                      color: AColors.white,
-                                    ),
+                              child:Obx(() {
+                                return DropdownButton<GroupModel>(
+                                  isExpanded: true,
+                                  value: ctrl.selectedGroup.value, // It will be null after type change, so the hint will be displayed
+                                  hint: Text(
+                                    ctrl.selectedGroup.value != null
+                                        ? ctrl.selectedGroup.value!.name
+                                        : "Select a Group",  // This will be shown after the group is reset
+                                    style: const TextStyle(color: Colors.white),
                                   ),
-                                  enabledBorder: UnderlineInputBorder(
-                                    borderSide: BorderSide(
-                                      width: 1,
-                                      color: AColors.white,
-                                    ),
-                                  ),
-                                  focusedBorder: UnderlineInputBorder(
-                                    borderSide: BorderSide(
-                                      width: 1,
-                                      color: AColors.white,
-                                    ),
-                                  ),
-                                ),
-                              ),
+                                  items: ctrl.groups.map((GroupModel group) {
+                                    return DropdownMenuItem<GroupModel>(
+                                      value: group,
+                                      child: Text(group.name),
+                                    );
+                                  }).toList(),
+                                  onChanged: (GroupModel? selectedGroup) {
+                                    ctrl.selectedGroup.value = selectedGroup; // Update the selected group
+                                  },
+                                );
+                              }),
+
+
+
+
+                              // TextField(
+                              //   decoration: InputDecoration(
+                              //     border: UnderlineInputBorder(
+                              //       borderSide: BorderSide(
+                              //         width: 1,
+                              //         color: AColors.white,
+                              //       ),
+                              //     ),
+                              //     enabledBorder: UnderlineInputBorder(
+                              //       borderSide: BorderSide(
+                              //         width: 1,
+                              //         color: AColors.white,
+                              //       ),
+                              //     ),
+                              //     focusedBorder: UnderlineInputBorder(
+                              //       borderSide: BorderSide(
+                              //         width: 1,
+                              //         color: AColors.white,
+                              //       ),
+                              //     ),
+                              //   ),
+                              // ),
                             ),
                           ],
                         ),
@@ -134,7 +162,10 @@ class DoorScreen extends StatelessWidget {
                     child: AElevatedButton(
                       title: "Send",
                       bgColor: AColors.brown,
-                      onPress: () {},
+                      onPress: () {
+                        // SendNotificationService.sendNotificationUsingApi(fcmList: fcmList, title: title, body: body, data: );
+
+                      },
                     ),
                   )
                 ],
