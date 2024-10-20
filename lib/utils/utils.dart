@@ -1,4 +1,6 @@
 
+import 'dart:io';
+
 import 'package:alarm_app/constants/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -64,16 +66,15 @@ class Utils {
     return "${number.substring(0, countryCode)} ${restOfNumber.substring(0, 3)} ${restOfNumber.substring(3)}";
   }
 
-  static Future<String> imagePicker(ImageSource imageSource) async {
+  static Future<File?> imagePicker(ImageSource imageSource) async {
     ImagePicker picker = ImagePicker();
     XFile? xFile = await picker.pickImage(source: imageSource);
-    // print("picking file");
 
     if (xFile != null) {
+      // Cropping the image
       CroppedFile? croppedFile = await ImageCropper().cropImage(
         aspectRatio: const CropAspectRatio(ratioX: 1, ratioY: 1),
         sourcePath: xFile.path,
-
         uiSettings: [
           AndroidUiSettings(
               toolbarTitle: 'Cropper',
@@ -86,15 +87,21 @@ class Utils {
           ),
         ],
       );
-      if (croppedFile == null) return xFile.path;
-      return croppedFile.path;
-    }
-    return "";
-  }
 
-  static Future<String> imagePickerBottomSheet(BuildContext context) async {
-    // print("here");
-    String? imagePath = await showModalBottomSheet<String>(
+      // If cropping was done, return the cropped file as a File object
+      if (croppedFile != null) {
+        return File(croppedFile.path);
+      }
+
+      // If no cropping was done, return the original picked file as a File object
+      return File(xFile.path);
+    }
+
+    // Return null if no file was picked
+    return null;
+  }
+  static Future<File?> imagePickerBottomSheet(BuildContext context) async {
+    File? imageFile = await showModalBottomSheet<File>(
       context: context,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.only(
@@ -116,9 +123,9 @@ class Utils {
                 children: [
                   GestureDetector(
                     onTap: () async {
-                      String imagePath = await imagePicker(ImageSource.camera);
+                      File? pickedFile = await imagePicker(ImageSource.camera);
 
-                      Navigator.of(Get.context!).pop(imagePath);
+                      Navigator.of(context).pop(pickedFile);
                     },
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -148,9 +155,9 @@ class Utils {
                   ),
                   GestureDetector(
                     onTap: () async {
-                      String imagePath = await imagePicker(ImageSource.gallery);
+                      File? pickedFile = await imagePicker(ImageSource.gallery);
 
-                      Navigator.of(Get.context!).pop(imagePath);
+                      Navigator.of(context).pop(pickedFile);
                     },
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -183,8 +190,8 @@ class Utils {
         );
       },
     );
-    // print(imagePath);
-    return imagePath ?? "";
+
+    return imageFile;
   }
 
   static Future<bool> askForConfirmation(

@@ -107,6 +107,8 @@ class NotificationController extends GetxController {
   }
 
   Future<void> deleteNotification(String notificationId) async {
+    print("Delting Noptification id");
+    print(notificationId);
     try {
       notifications.removeWhere(
           (n) => n.id == notificationId); // Remove from local list as well

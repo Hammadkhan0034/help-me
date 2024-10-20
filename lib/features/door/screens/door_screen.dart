@@ -1,4 +1,8 @@
+import 'dart:io';
+
 import 'package:alarm_app/constants/colors.dart';
+import 'package:alarm_app/core/supabase/FriendsService.dart';
+import 'package:alarm_app/core/supabase/user_crud.dart';
 import 'package:alarm_app/features/door/controllers/door_controller.dart';
 import 'package:alarm_app/features/door/screens/widgets/group_name_drop_down.dart';
 import 'package:alarm_app/servies/send_notification_services.dart';
@@ -6,9 +10,12 @@ import 'package:alarm_app/utils/utils.dart';
 import 'package:alarm_app/widgets/elevated_button.dart';
 import 'package:alarm_app/widgets/gradient_container.dart';
 import 'package:alarm_app/widgets/warning_circle_icon.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../core/supabase/notification_crud.dart';
+import '../../../core/supabase/storage/storage.dart';
 import '../../../models/group_model.dart';
 
 class DoorScreen extends StatelessWidget {
@@ -60,19 +67,20 @@ class DoorScreen extends StatelessWidget {
                         margin: const EdgeInsets.only(top: 20),
                         color: AColors.darkGrey,
                         height: 100,
-                        child:  Column(
+                        child: Column(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
                             Padding(
                               padding: EdgeInsets.all(10.0),
-                              child:Obx(() {
+                              child: Obx(() {
                                 return DropdownButton<GroupModel>(
                                   isExpanded: true,
-                                  value: ctrl.selectedGroup.value, // It will be null after type change, so the hint will be displayed
+                                  value: ctrl.selectedGroup
+                                      .value, // It will be null after type change, so the hint will be displayed
                                   hint: Text(
                                     ctrl.selectedGroup.value != null
                                         ? ctrl.selectedGroup.value!.name
-                                        : "Select a Group",  // This will be shown after the group is reset
+                                        : "Select a Group", // This will be shown after the group is reset
                                     style: const TextStyle(color: Colors.white),
                                   ),
                                   items: ctrl.groups.map((GroupModel group) {
@@ -82,36 +90,11 @@ class DoorScreen extends StatelessWidget {
                                     );
                                   }).toList(),
                                   onChanged: (GroupModel? selectedGroup) {
-                                    ctrl.selectedGroup.value = selectedGroup; // Update the selected group
+                                    ctrl.selectedGroup.value =
+                                        selectedGroup; // Update the selected group
                                   },
                                 );
                               }),
-
-
-
-
-                              // TextField(
-                              //   decoration: InputDecoration(
-                              //     border: UnderlineInputBorder(
-                              //       borderSide: BorderSide(
-                              //         width: 1,
-                              //         color: AColors.white,
-                              //       ),
-                              //     ),
-                              //     enabledBorder: UnderlineInputBorder(
-                              //       borderSide: BorderSide(
-                              //         width: 1,
-                              //         color: AColors.white,
-                              //       ),
-                              //     ),
-                              //     focusedBorder: UnderlineInputBorder(
-                              //       borderSide: BorderSide(
-                              //         width: 1,
-                              //         color: AColors.white,
-                              //       ),
-                              //     ),
-                              //   ),
-                              // ),
                             ),
                           ],
                         ),
@@ -120,53 +103,111 @@ class DoorScreen extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 10),
-                  Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      color: AColors.white,
-                    ),
-                    padding: const EdgeInsets.symmetric(horizontal: 15),
-                    child: Column(
-                      children: [
-                        const TextField(
-                          maxLines: 5,
-                          decoration: InputDecoration(
-                            border: InputBorder.none,
-                            hintText: "message....",
-                            hintStyle: TextStyle(
-                              color: AColors.darkGrey,
-                            ),
-                          ),
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            InkWell(
-                                onTap:() async{
-                                  ctrl.localImagePath.value =await Utils.imagePickerBottomSheet(context);
-                                },
 
-                                child: const Icon(Icons.image_outlined, color: AColors.dark,size: 28,)),
-                            const SizedBox(width: 10),
-                            // const Icon(Icons.camera_alt_outlined,
-                            //     color: AColors.dark),
-                          ],
-                        ),
-                        const SizedBox(height: 10),
-                      ],
+
+            Container(
+                decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+        color: AColors.white,
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 15),
+      child: Column(
+        children: [
+          TextField(
+            controller: ctrl.message,
+            maxLines: 5,
+            decoration: const InputDecoration(
+              border: InputBorder.none,
+              hintText: "message....",
+              hintStyle: TextStyle(
+                color: AColors.darkGrey,
+              ),
+            ),
+          ),
+              Obx(() {
+                if (ctrl.localImagePath.value.isNotEmpty) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: Container(
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20)
+                      ),
+                      height: 150,
+                      width: 150,
+                      child: Image.file(
+                        File(ctrl.localImagePath.value),
+                        fit: BoxFit.cover,
+                      ),
                     ),
-                  ),
+                  );
+                } else {
+                  return SizedBox.shrink(); // If no image is selected, show nothing
+                }
+              }),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              InkWell(
+                onTap: () async {
+                  File? selectedImageFile = await Utils.imagePickerBottomSheet(context);
+
+                  // If an image is picked, upload it to Supabase
+                  if (selectedImageFile != null) {
+                    ctrl.imageUrl.value = selectedImageFile.path;
+                    ctrl.localImagePath.value = selectedImageFile.path;
+                    // Upload the image file to Supabase and get the image URL
+                    String? uploadedImageUrl = await MySupabaseStorage.uploadImage(selectedImageFile);
+                    if (uploadedImageUrl != null) {
+                      print('Image uploaded successfully: $uploadedImageUrl');
+                      // Optionally, update your controller or state with the uploaded image URL
+                      ctrl.imageUrl.value = uploadedImageUrl; // assuming you have such a field
+                    } else {
+                      // Handle the upload failure
+                      print('Failed to upload image');
+                    }
+                  } else {
+                    // Handle the case where no image was selected
+                    print('No image selected');
+                  }
+                },
+                child: const Icon(
+                  Icons.image_outlined,
+                  color: AColors.dark,
+                  size: 28,
+                ),
+              ),
+
+              const SizedBox(width: 10),
+              // const Icon(Icons.camera_alt_outlined,
+              //     color: AColors.dark),
+            ],
+          ),
+          const SizedBox(height: 10),
+        ],
+      ),
+    ),
+
+
+
                   const SizedBox(height: 25),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 50),
-                    child: AElevatedButton(
-                      title: "Send",
-                      bgColor: AColors.brown,
-                      onPress: () {
-                        // SendNotificationService.sendNotificationUsingApi(fcmList: fcmList, title: title, body: body, data: );
 
-                      },
-                    ),
+                  Padding(
+
+                    padding: const EdgeInsets.symmetric(horizontal: 50),
+
+                    child: Obx(() {
+                      if (ctrl.isLoading.value) {
+                        return loadingIndicator(); // Show loading indicator
+                      } else {
+                        return ElevatedButton(
+                          onPressed: () {
+                            ctrl.onPress();
+                          },
+                          child: Text("Send Notification"),
+                        );
+                      }
+                    })
+
                   )
                 ],
               ),
@@ -177,4 +218,12 @@ class DoorScreen extends StatelessWidget {
       ),
     );
   }
+}
+Widget loadingIndicator() {
+  return Center(
+    child: CircularProgressIndicator(
+      valueColor: AlwaysStoppedAnimation<Color>(Colors.blue), // Customize color
+      strokeWidth: 6, // Customize thickness
+    ),
+  );
 }

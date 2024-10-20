@@ -38,10 +38,10 @@ class UserCrud {
   static Future<Map<String, dynamic>?> getUser(String userId) async {
     final response = await Supabase.instance.client
         .from('profiles')
-        .select()
+        .select('*')
         .eq('id', userId)
         .maybeSingle();
-
+print(response);
     return response;
   }
 

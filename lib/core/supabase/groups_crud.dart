@@ -32,7 +32,8 @@ class GroupCrud{
         .eq('type', type).eq('created_by', userId) // Assuming 'group_type' is your column name
         .select();
     if (response.isEmpty ) {
-      print('Error fetching groups:');
+
+      print('NO Groups ');
       return []; // Return an empty list in case of error
     }
     print("Groups");

@@ -29,10 +29,10 @@ class NotificationCrud{
         throw Exception('Error creating notification:');
       }
       // Notify user of success
-      Utils.showSuccessSnackBar(
-          title: "Request Sent",
-          description: "Request sent successfully."
-      );
+      // Utils.showSuccessSnackBar(
+      //     title: "Request Sent",
+      //     description: "Request sent successfully."
+      // );
       // Optionally, print the data returned from the database
       print("Notification created successfully: ${response.length}");
 
@@ -92,15 +92,10 @@ print("NOTIFICATION RESPOINSE  ");
     }
   }
 
-
-
   static Future<void> rejectFriendInvitation( String friendId, String userId) async {
      await Supabase.instance.client
         .from('friends')
-        .update({
-      'request_status': 2,
-      'updated_at': DateTime.now().toIso8601String(),
-    })
+         .delete()
          .eq('friend_id',userId )
          .eq('user_id', friendId)
        ;

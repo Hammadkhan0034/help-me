@@ -22,7 +22,6 @@ class CreateGroupController extends GetxController {
       groupContacts.add(contact);
     }
 
-    print(groupContacts);
   }
   void updateOption(String option) {
     groupType.value = option;
@@ -50,12 +49,14 @@ class CreateGroupController extends GetxController {
       return;
     }
     try {
+      print("MY FRIENDS ID ${groupContacts
+          .map((members) => members.friendId)}");
       int memberCount = getMemberCount();
       await GroupCrud.createGroup(GroupModel(
         id: const Uuid().v4(),
         name: name.text,
         members:groupContacts
-            .map((contact) => contact.id ?? '')
+            .map((members) => members.friendId ?? '')
             .toList(),
         type: groupType.value,
         createdAt: DateTime.now(),
@@ -71,7 +72,7 @@ class CreateGroupController extends GetxController {
 
     } catch (e) {
       Utils.showErrorSnackBar(
-        title: "ERROR",
+        title: "ERROR: ",
         description: e.toString(),
       );
       print("ERROR: $e");
