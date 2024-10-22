@@ -183,29 +183,58 @@ static  bool isValidUUID(String uuid) {
 
 
 
-  Future<String?> fetchFriendPhoneByNumber(String userId, String friendPhoneNumber) async {
+  // Future<String?> fetchFriendPhoneByNumber(String userId, String friendPhoneNumber) async {
+  //   try {
+  //     final response = await client
+  //         .from('friends')
+  //         .select('*, profiles!friends_friend_id_fkey(*)')
+  //         .eq('user_id', userId)
+  //         .ilike('profiles.phone', '%$friendPhoneNumber%');
+  //
+  //
+  //     // Ensure that the response is properly handled
+  //     List<FriendsModel> friends = (response as List)
+  //         .map((friend) {
+  //       Map<String, dynamic> friendMap = friend as Map<String, dynamic>;
+  //       String? phoneNumber = friendMap['profiles']?['phone'];
+  //       return FriendsModel.fromMap(friendMap)..friendPhone = phoneNumber;
+  //     })
+  //         .toList();
+  //     if (friends.isNotEmpty) {
+  //       return friends.first.friendPhone;
+  //     }
+  //     return null;
+  //   } catch (e) {
+  //     print('Error fetching friend phone number: $e');
+  //     return null;
+  //   }
+  // }
+
+  Future<List<String>?> fetchFriendPhoneByNumber(String userId, String friendPhoneNumber) async {
     try {
       final response = await client
           .from('friends')
-          .select('*, profiles(phone)')
-          .eq('user_id', userId)
-          .ilike('profiles.phone', '%$friendPhoneNumber%');
+          .select('*, profiles!friends_friend_id_fkey(*)') // Join profiles with friends
+          .eq('user_id', userId) // Check if the friend belongs to this user
+          .ilike('profiles.phone', '%$friendPhoneNumber%'); // Match phone number partially
 
-
-      // Ensure that the response is properly handled
-      List<FriendsModel> friends = (response as List)
-          .map((friend) {
-        Map<String, dynamic> friendMap = friend as Map<String, dynamic>;
-        String? phoneNumber = friendMap['profiles']?['phone'];
-        return FriendsModel.fromMap(friendMap)..friendPhone = phoneNumber;
-      })
-          .toList();
-      if (friends.isNotEmpty) {
-        return friends.first.friendPhone;
+      if (response == null || response.isEmpty) {
+        print('No friends found.');
+        return null; // No friends found
       }
-      return null;
+
+      // Map response to a list of friend phone numbers with null checks
+      List<String> friendPhones = response.map<String>((friend) {
+        final profile = friend['profiles']; // Access profiles object
+        if (profile != null && profile['phone'] != null) {
+          return profile['phone'] as String; // Extract phone number
+        }
+        return ''; // Return empty string if phone number is null
+      }).where((phone) => phone.isNotEmpty).toList(); // Filter out empty phone numbers
+
+      return friendPhones.isNotEmpty ? friendPhones : null; // Return list of matching friend phone numbers
     } catch (e) {
-      print('Error fetching friend phone number: $e');
+      print('Error fetching friends: $e');
       return null;
     }
   }

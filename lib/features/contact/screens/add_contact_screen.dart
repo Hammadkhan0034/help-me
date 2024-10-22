@@ -36,7 +36,7 @@ class AddContactScreen extends StatelessWidget {
             mTop: 110,
             child: Padding(
               padding: const EdgeInsets.all(15),
-              child: SingleChildScrollView( // Wrap content in SingleChildScrollView
+              child: SingleChildScrollView(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -177,27 +177,7 @@ class AddContactScreen extends StatelessWidget {
                         }),
                       ),
                     ),
-                    // SizedBox(
-                    //   height: Get.height*0.08,
-                    //   child: Obx(() {
-                    //     if (addContactController.requestedFriends.value.isEmpty) {
-                    //       return Center(child: Text('No Friends yet.'));
-                    //     }
-                    //     return ListView.builder(
-                    //       itemCount: addContactController.requestedFriends.length,
-                    //       itemBuilder: (context, index) {
-                    //         final friend = addContactController.requestedFriends[index];
-                    //         return ListTile(
-                    //           title: Text(friend.editedName ?? 'Friend ${friend.friendId}'),
-                    //           subtitle: Text('Status: ${friend.requestStatus}'),
-                    //           trailing: friend.requestStatus == 1
-                    //               ? Icon(Icons.check, color: Colors.green)
-                    //               : Icon(Icons.hourglass_empty, color: Colors.orange),
-                    //         );
-                    //       },
-                    //     );
-                    //   }),
-                    // ),
+
                   ],
                 ),
               ),

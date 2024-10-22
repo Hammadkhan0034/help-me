@@ -2,13 +2,13 @@ import 'package:alarm_app/servies/get_services_key.dart';
 import 'dart:convert';
 import 'dart:developer';
 import 'package:http/http.dart' as http;
-
 class SendNotificationService {
   static Future<void> sendNotificationUsingApi({
     required List<String> fcmList,
     required String? title,
     required String? body,
     required Map<String, dynamic>? data,
+
   }) async
   {
     try {
@@ -26,6 +26,18 @@ class SendNotificationService {
               "title": title,
               "body": body,
             },
+            "android": {
+              "notification": {
+                "sound": "raw_alarm"
+              }
+            },
+            "apns": {
+              "payload": {
+                "aps": {
+                  "sound": "raw_alarm.wav"
+                }
+              }
+            },
             "data": data,
           }
         };
@@ -36,7 +48,6 @@ class SendNotificationService {
             headers: headers,
             body: jsonEncode(message),
           );
-
           if (response.statusCode == 200) {
             log('Notification sent successfully to $fcmToken: ${response.body}');
           } else {
@@ -48,7 +59,4 @@ class SendNotificationService {
       }
     } catch (e) {
       log('Error in sendNotificationUsingApi: $e');
-    }
-  }
-}
-
+    }}}

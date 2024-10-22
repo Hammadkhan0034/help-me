@@ -32,7 +32,6 @@ class CreateGroupController extends GetxController {
   }
 
   Future<void> createGroup() async {
-    // Check if the name or group contacts are empty
     if (name.text.isEmpty) {
       Utils.showErrorSnackBar(
         title: "Missing Information",

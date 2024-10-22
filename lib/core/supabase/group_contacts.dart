@@ -72,7 +72,7 @@ static  Future<List<String>> fetchFullGroupContacts() async {
     final response = await Supabase.instance.client
         .from('profiles')
         .select('name,id,fcm')
-        .ilike('phone', '%$phoneWithoutCode')
+        .ilike('phone', '%$phoneWithoutCode%')
         ;
 
      print(response);

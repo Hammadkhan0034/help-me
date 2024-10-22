@@ -108,12 +108,12 @@ class NotificationService {
 
       if (Platform.isIOS) {
         iosForegroundMessage();
-        handleMessage(context, message);
+        // handleMessage(context, message);
       }
       if (Platform.isAndroid) {
         intiLocationNotification(context, message);
         showNotification(message);
-        handleMessage(context, message);
+        // handleMessage(context, message);
       }
     });
   }
@@ -125,8 +125,10 @@ class NotificationService {
     AndroidNotificationChannel channel = AndroidNotificationChannel(
         message.notification!.android!.channelId.toString(),
         message.notification!.android!.channelId.toString(),
-        importance: Importance.high,
+        importance: Importance.max,
         showBadge: true,
+        sound: RawResourceAndroidNotificationSound('raw_alarm'),
+        enableVibration: true,
         playSound: true);
 //android setting
     AndroidNotificationDetails androidNotificationDetails =
@@ -136,7 +138,7 @@ class NotificationService {
             importance: Importance.high,
             priority: Priority.high,
             playSound: true,
-            sound: channel.sound);
+            sound: RawResourceAndroidNotificationSound("raw_alarm"));
 
     //ios setting
 
@@ -169,7 +171,7 @@ class NotificationService {
 
     FirebaseMessaging.onMessageOpenedApp.listen(
       (event) {
-        handleMessage(context, event);
+        // handleMessage(context, event);
       },
     );
 
@@ -185,10 +187,10 @@ class NotificationService {
   }
 
   //handle message
-  Future<void> handleMessage(
-      BuildContext context, RemoteMessage message) async {
-    Get.to(()=> NotificationScreen());
-  }
+  // Future<void> handleMessage(
+  //     BuildContext context, RemoteMessage message) async {
+  //   Get.to(()=> NotificationScreen());
+  // }
 
 //ios message
   Future iosForegroundMessage() async {

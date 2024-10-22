@@ -1,4 +1,3 @@
-import 'package:alarm_app/utils/utils.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
 class NotificationCrud{

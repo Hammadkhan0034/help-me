@@ -241,6 +241,7 @@ class DoorController extends GetxController {
         title: authController.userModel.value.name,
         body: message.text,
         data: {'imageUrl': imageUrl.value},
+
       );
 
       // Create notifications for each user in the group

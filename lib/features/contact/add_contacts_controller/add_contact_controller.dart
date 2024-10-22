@@ -79,30 +79,94 @@ class AddContactController extends GetxController {
   String normalizePhoneNumber(String phone) {
     return phone.replaceAll(RegExp(r'\D'), '');
   }
-
-  void addedContacts(Map<String, String> contact) async
-  {
+  //
+  // void addedContacts(Map<String, String> contact) async
+  // {
+  //   String phoneNumber = contact['phone']!;
+  //   String phoneWithoutCode = normalizePhoneNumber(phoneNumber);
+  //   bool isDuplicateInApp = requestedFriends.any((friend) => friend.friendPhone == phoneWithoutCode);
+  //   if (isDuplicateInApp) {
+  //     Utils.showErrorSnackBar(
+  //         title: "Already Added", description: "Contact already exists.");
+  //     return;
+  //   }
+  //   var existingFriend = await friendsService.fetchFriendPhoneByNumber(authController.userModel.value.id, phoneWithoutCode);
+  //   if (existingFriend != null) {
+  //     Utils.showErrorSnackBar(
+  //         title: "Already Added",
+  //         description: "Contact already exists in the database.");
+  //     return;
+  //   }
+  //   var userProfile = await GroupContacts.fetchUserProfileByPhone(phoneWithoutCode);
+  //   if (userProfile == null) {
+  //     Utils.showErrorSnackBar(
+  //         title: "Contact Not Found", description: "This contact does not exist in the system.");
+  //     return;
+  //   }
+  //   await friendsService.addFriend(FriendsModel(
+  //     id: const Uuid().v4(),
+  //     friendId: userProfile['id']!,
+  //     editedName: contact['name']!,
+  //     userId: authController.userModel.value.id,
+  //     requestStatus: 0,
+  //     createdAt: DateTime.now(),
+  //     friendPhone: phoneWithoutCode,
+  //   ));
+  //
+  //   final fcm = await friendsService.fetchFriendFcm(
+  //       userProfile['id']!, authController.userModel.value.id);
+  //   if (fcm != null && fcm.isNotEmpty) {
+  //     SendNotificationService.sendNotificationUsingApi(
+  //         fcmList: [fcm.toString()],
+  //         title: "Request Contacts: ${authController.userModel.value.name}",
+  //         body: "${authController.userModel.value.phone}",
+  //         data: {});
+  //
+  //    await  NotificationCrud.createNotification(notificationFrom:authController.userModel.value.id , notificationFor:  userProfile['id']!, notificationType: 'invitation', data: {});
+  //
+  //
+  //   } else {
+  //     print("Failed to send notification: Invalid FCM token");
+  //   }
+  //
+  //   if (kDebugMode) {
+  //     print('Contact added to Supabase.');
+  //   }
+  //
+  //
+  // }
+  void addedContacts(Map<String, String> contact) async {
     String phoneNumber = contact['phone']!;
     String phoneWithoutCode = normalizePhoneNumber(phoneNumber);
+    // Check if the contact is already added
     bool isDuplicateInApp = requestedFriends.any((friend) => friend.friendPhone == phoneWithoutCode);
     if (isDuplicateInApp) {
       Utils.showErrorSnackBar(
-          title: "Already Added", description: "Contact already exists.");
+          title: "Already Added",
+          description: "Contact already exists in the added contacts."
+      );
       return;
     }
+    // Check if the contact exists in the Supabase database
     var existingFriend = await friendsService.fetchFriendPhoneByNumber(authController.userModel.value.id, phoneWithoutCode);
     if (existingFriend != null) {
       Utils.showErrorSnackBar(
           title: "Already Added",
-          description: "Contact already exists in the database.");
+          description: "Contact already exists in the database."
+      );
       return;
     }
+    // Fetch user profile by phone number
     var userProfile = await GroupContacts.fetchUserProfileByPhone(phoneWithoutCode);
     if (userProfile == null) {
       Utils.showErrorSnackBar(
-          title: "Contact Not Found", description: "This contact does not exist in the system.");
+          title: "Contact Not Found",
+          description: "This contact does not exist in the system."
+      );
       return;
     }
+
+    // Add the friend to Supabase
     await friendsService.addFriend(FriendsModel(
       id: const Uuid().v4(),
       friendId: userProfile['id']!,
@@ -113,28 +177,43 @@ class AddContactController extends GetxController {
       friendPhone: phoneWithoutCode,
     ));
 
-    final fcm = await friendsService.fetchFriendFcm(
-        userProfile['id']!, authController.userModel.value.id);
+    // Send notification to the friend if FCM is available
+    final fcm = await friendsService.fetchFriendFcm(userProfile['id']!, authController.userModel.value.id);
     if (fcm != null && fcm.isNotEmpty) {
-      SendNotificationService.sendNotificationUsingApi(
-          fcmList: [fcm.toString()],
-          title: "Request Contacts: ${authController.userModel.value.name}",
-          body: "${authController.userModel.value.phone}",
-          data: {});
+      // SendNotificationService.sendNotificationUsingApi(
+      //     fcmList: [fcm.toString()],
+      //     title: "Request Contacts: ${authController.userModel.value.name}",
+      //     body: "${authController.userModel.value.phone}",
+      //     data: {}
+      // );
 
-     await  NotificationCrud.createNotification(notificationFrom:authController.userModel.value.id , notificationFor:  userProfile['id']!, notificationType: 'invitation', data: {});
+    }
 
-
-    } else {
+    else {
       print("Failed to send notification: Invalid FCM token");
     }
+    await NotificationCrud.createNotification(
+        notificationFrom: authController.userModel.value.id,
+        notificationFor: userProfile['id']!,
+        notificationType: 'invitation',
+        data: {}
+    );
+    // Add the contact to the local list of added friends
+    requestedFriends.add(FriendsModel(
+      id: const Uuid().v4(),
+      friendId: userProfile['id']!,
+      editedName: contact['name']!,
+      userId: authController.userModel.value.id,
+      requestStatus: 0,
+      createdAt: DateTime.now(),
+      friendPhone: phoneWithoutCode,
+    ));
 
     if (kDebugMode) {
-      print('Contact added to Supabase.');
+      print('Contact added to Supabase and local list.');
     }
-
-
   }
+
 
 
 

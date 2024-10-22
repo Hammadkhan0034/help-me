@@ -268,6 +268,8 @@ class NotificationScreen extends StatelessWidget {
                   onDismissed: (direction) {
                     // Remove the notification from the list
                     notificationController.deleteNotification(notification.id);
+                     notificationController.rejectInvitation(notification.notificationFrom, notification.notificationFor);
+
 
                     // Show a snackbar or a message if desired
                     Utils.showSuccessSnackBar(

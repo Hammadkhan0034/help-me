@@ -19,28 +19,29 @@ class NotificationIconWithCount extends StatelessWidget {
             height: 50,
             child: Icon(
               Icons.notifications,
+
               size: 30,
             ),
           ),
-          Positioned(
-            right: 1,
-            top: 1,
-            child: Container(
-                padding: const EdgeInsets.all(5),
-                decoration: BoxDecoration(
-                  color: Colors.red,
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: const Center(
-                  child: Text(
-                    "10",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 10,
-                    ),
-                  ),
-                )),
-          )
+          // Positioned(
+          //   right: 1,
+          //   top: 1,
+          //   child: Container(
+          //       padding: const EdgeInsets.all(5),
+          //       decoration: BoxDecoration(
+          //         color: Colors.red,
+          //         borderRadius: BorderRadius.circular(4),
+          //       ),
+          //       child: const Center(
+          //         child: Text(
+          //           "10",
+          //           style: TextStyle(
+          //             color: Colors.white,
+          //             fontSize: 10,
+          //           ),
+          //         ),
+          //       )),
+          // )
         ],
       ),
     );

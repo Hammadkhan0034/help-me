@@ -114,11 +114,11 @@ class CreateGroupScreen extends StatelessWidget {
                                   color: AColors.white,
                                   fontSize: 16),
                             ) ,
-                            trailing:  GestureDetector(
+                            trailing: contact.requestStatus==1? GestureDetector(
                                 onTap: () {
                                   createGroupController.addToGroupContacts(contact );
                                 },
-                                child: Icon(Icons.add,color: Colors.white,)),
+                                child: Icon(Icons.add,color: Colors.white,)): Text("Pending",style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                           );
                         },
                       );
