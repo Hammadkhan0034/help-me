@@ -158,9 +158,7 @@ class AuthController extends GetxController {
       final userId = supabaseClient.auth.currentSession!.user.id;
       print("This is ID comming from the supabse ${userId}");
       final response = await UserCrud.getUser(userId);
-
       print("This is ID comming from the supabse ${response}");
-
       if (response != null) {
         userModel.value = UserModel.fromMap(response);
         if (kDebugMode) {
@@ -180,6 +178,20 @@ class AuthController extends GetxController {
       if (kDebugMode) {
         print('Unexpected error: $error');
       }
+      Utils.showErrorSnackBar(
+          title: 'Error', description: 'An unexpected error occurred');
+    }
+  }
+
+  void checkUserSubscription() async {
+    try {
+      // await UserCrud.updateUserSubscription(userModel.value);
+      Utils.showSuccessSnackBar(
+          title: 'Success', description: 'Profile updated successfully');
+    } on PostgrestException catch (error) {
+      Utils.showErrorSnackBar(
+          title: 'Error', description: error.message);
+    } catch (error) {
       Utils.showErrorSnackBar(
           title: 'Error', description: 'An unexpected error occurred');
     }

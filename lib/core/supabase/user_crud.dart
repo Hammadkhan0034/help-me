@@ -50,13 +50,36 @@ print(response);
     final response = await Supabase.instance.client.from('profiles').update({
       'name': name,
       'phone': phone,
-      'fcm':fcm
+      'fcm':fcm,
     }).eq('id', userId);
 
     if (response.error != null) {
       throw Exception('Error updating user: ${response.error!.message}');
     }
   }
+  static Future<void> updateUserSubscription(
+  {required String userId}) async {
+    final response = await Supabase.instance.client.from('profiles').update({
+      'is_premium': true,
+      'subscription_expiry_date': DateTime.now()
+          .add(const Duration(days: 365))
+          .toIso8601String(),
+    }).eq('id', userId);
+    if (response.error != null) {
+      throw Exception('Error updating User Subscription: ${response.error!.message}');
+    }
+  }
+  static Future<void> cancelUserSubscription(
+      {required String userId}) async {
+    final response = await Supabase.instance.client.from('profiles').update({
+      'is_premium': false,
+      'subscription_expiry_date': null,
+    }).eq('id', userId);
+    if (response.error != null) {
+      throw Exception('Error updating user: ${response.error!.message}');
+    }
+  }
+
 
 // Delete a user
   static Future<void> deleteUser(String userId) async {

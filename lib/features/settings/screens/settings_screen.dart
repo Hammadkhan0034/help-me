@@ -1,6 +1,8 @@
 import 'package:alarm_app/constants/colors.dart';
 import 'package:alarm_app/features/door/screens/door_screen.dart';
 import 'package:alarm_app/features/notification/screens/notification_screen.dart';
+import 'package:alarm_app/features/plans/screens/plans_screen.dart';
+
 import 'package:alarm_app/features/settings/screens/widgets/primary_group.dart';
 import 'package:alarm_app/widgets/elevated_button.dart';
 import 'package:alarm_app/widgets/gradient_container.dart';
@@ -50,7 +52,7 @@ class SettingsScreen extends StatelessWidget {
                   AElevatedButton(
                       title: "Subscribe",
                       onPress: () {
-                        Get.to( NotificationScreen());
+                      Get.to(PaymentScreen());
                       }),
                   const SizedBox(height: 15),
                   AElevatedButton(

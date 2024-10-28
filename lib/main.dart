@@ -70,7 +70,8 @@ class _AlarmAppState extends State<AlarmApp> {
     Get.put(AuthController(), permanent: true);
     return const GetMaterialApp(
       debugShowCheckedModeBanner: false,
-      home: SessionController(),
+      home:  HelpMeScreen(),
+      // home: SessionController(),
     );
   }
 }
@@ -85,6 +86,7 @@ class SessionController extends StatelessWidget {
 
     if (session != null) {
      authController.getProfile();
+
       return const HelpMeScreen();
     } else {
       return  AuthScreen();
