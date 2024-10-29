@@ -35,14 +35,14 @@ class YearlyPlan extends StatelessWidget {
                   const Divider(color: Colors.white),
                   SizedBox(height: 10),
                   Text(
-                    "Pro account gives you freedom with uploading HD videos and can also meet all your business needs apasih kamu",
+                    "There is a fee of 1 RM only per month to be paid 12 RM for 1 year subscription if you want to use both the Indoor and Outdoor functions.",
                     style: TextStyle(color: Colors.white),
                   ),
                   SizedBox(height: 15),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text("100/day",
+                      Text("12 RM/Year",
                           style: TextStyle(
                               fontWeight: FontWeight.w600,
                               fontSize: 25,
@@ -60,6 +60,7 @@ class YearlyPlan extends StatelessWidget {
                           style: TextStyle(fontWeight: FontWeight.w600, color: AColors.secondary),
                         ),
                         onPressed: () {
+                          paymentController.makePayment("12");
                           // settingsController.updateAccountPrivacy();
                         },
                       ),
@@ -70,6 +71,6 @@ class YearlyPlan extends StatelessWidget {
           ],
         ),
       );
-    });
+    },);
   }
 }

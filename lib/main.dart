@@ -7,6 +7,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:get/get.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'features/auth/screen/singnup_screen.dart';
@@ -27,6 +28,7 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   await dotenv.load(fileName: ".env");
+  Stripe.publishableKey =dotenv.env['STRIPE_PUBLISHABLE_KEY']!;
   await Supabase.initialize(
     url: dotenv.env['PROJECT_URL']!,
     anonKey: dotenv.env['ANON_KEY']!,
@@ -62,7 +64,6 @@ class _AlarmAppState extends State<AlarmApp> {
     notificationService.getDeviceToken();
     notificationService.firebaseInit(context);
     notificationService.setupInteractMessage(context);
-
   }
 
   @override

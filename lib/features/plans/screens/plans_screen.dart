@@ -19,18 +19,20 @@ class PaymentScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text("Plans"),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: Column(
-          children: [
-            BasicPlan(paymentController: paymentController),
-            SizedBox(height: 15),
-            DailyPlan(paymentController: paymentController),
-            SizedBox(height: 15),
-            MonthlyPlan(paymentController: paymentController),
-            SizedBox(height: 15),
-            YearlyPlan(paymentController: paymentController)
-          ],
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(10.0),
+          child: Column(
+            children: [
+              // BasicPlan(paymentController: paymentController),
+              // SizedBox(height: 15),
+              // DailyPlan(paymentController: paymentController),
+              // SizedBox(height: 15),
+              // MonthlyPlan(paymentController: paymentController),
+              // SizedBox(height: 15),
+              YearlyPlan(paymentController: paymentController)
+            ],
+          ),
         ),
       ),
     );
