@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:alarm_app/models/contacts_model.dart';
 import 'package:alarm_app/models/user_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -5,26 +7,39 @@ import 'package:uuid/uuid.dart';
 
 class GroupContacts{
 
-  static Future<void> addUserToContactModel(UserModel userModel, ) async {
+  static Future<void> addUserToContactModel(UserModel userModel) async {
     final contactData = {
       'phone': userModel.phone,
       'added_at': DateTime.now().toIso8601String(),
-      'id':userModel.id,
+      'id': userModel.id,
     };
-
-
-
-    final response = await Supabase.instance.client
+  try {
+    await Supabase.instance.client
         .from('group_contacts')
         .upsert(contactData, onConflict: 'phone');
-
-    print('Supabase upsert response: ${response.data}');
-
-    if (response.error != null) {
-      throw Exception('Error adding/updating user in group: ${response.error!.message}');
-    }
-
   }
+  catch(error,st){
+    log("ERROR ADDING USER",error:error,stackTrace: st);
+  }
+  }
+  // static Future<void> addUserToContactModel(UserModel userModel, ) async {
+  //   final contactData = {
+  //     'phone': userModel.phone,
+  //     'added_at': DateTime.now().toIso8601String(),
+  //     'id':userModel.id,
+  //   };
+  //
+  //
+  //
+  //   final response = await Supabase.instance.client
+  //       .from('group_contacts')
+  //       .upsert(contactData, onConflict: 'phone');
+  //
+  //   if (response.error != null) {
+  //     throw Exception('Error adding/updating user in group: ${response.error!.message}');
+  //   }
+  //
+  // }
 
   static Future<List<String>> fetchGroupContacts() async {
     final response = await Supabase.instance.client
@@ -66,19 +81,48 @@ static  Future<List<String>> fetchFullGroupContacts() async {
     return List<String>.from(response.map((contact) => contact['phone']));
   }
 
+
   static Future<Map<String, dynamic>?> fetchUserProfileByPhone(String phone) async {
+    // Normalize the phone number
     String phoneWithoutCode = phone.length > 10 ? phone.substring(phone.length - 10) : phone;
 
-    final response = await Supabase.instance.client
-        .from('profiles')
-        .select('name,id,fcm')
-        .ilike('phone', '%$phoneWithoutCode%')
-        ;
+    try {
+      final response = await Supabase.instance.client
+          .from('profiles')
+          .select('name, id, fcm')
+          .ilike('phone', '%$phoneWithoutCode%')
+          .single() // Use .single() if you expect only one user to match
+          ; // This might vary depending on the client library version
 
-     print(response);
+      // Check if the response has an error
+      if (response.isEmpty) {
+        print('Error fetching user: ');
+        return null; // Return null in case of an error
+      }
 
-    return response.single;
+      // If response is successful, return the user data
+      return response as Map<String, dynamic>?;
+    } catch (e) {
+      print('Exception occurred: $e');
+      return null; // Return null in case of an exception
+    }
   }
+
+
+
+// static Future<Map<String, dynamic>?> fetchUserProfileByPhone(String phone) async {
+  //   String phoneWithoutCode = phone.length > 10 ? phone.substring(phone.length - 10) : phone;
+  //
+  //   final response = await Supabase.instance.client
+  //       .from('profiles')
+  //       .select('name,id,fcm')
+  //       .ilike('phone', '%$phoneWithoutCode%')
+  //       ;
+  //
+  //    print(response);
+  //
+  //   return response.single;
+  // }
 
 
 }

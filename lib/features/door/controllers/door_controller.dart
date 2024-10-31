@@ -120,6 +120,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/supabase/groups_crud.dart';
 import '../../../core/supabase/notification_crud.dart';
 import '../../../core/supabase/user_crud.dart';
@@ -134,6 +135,8 @@ class DoorController extends GetxController {
   final items = ['Indoor', 'Outdoor'].obs;
   var selectedType = 'Indoor'.obs;
   RxString imageUrl = ''.obs;
+  RxDouble latitude=0.0.obs;
+  RxDouble longitude=0.0.obs;
   RxString localImagePath = ''.obs;
   var selectedGroup = Rxn<GroupModel>();
   final groups = <GroupModel>[].obs;
@@ -152,47 +155,53 @@ class DoorController extends GetxController {
     print('Loaded groups: $groups');
   }
 
-  // Method to get the current location and convert it to an address
   Future<void> getCurrentAddress() async {
     try {
-      // Check for location permission
       LocationPermission permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
       }
-
       if (permission == LocationPermission.deniedForever) {
-        Utils.showErrorSnackBar(title: 'Location Permission Denied', description: 'Please enable location permissions in settings.');
+        Utils.showErrorSnackBar(
+          title: 'Location Permission Denied',
+          description: 'Please enable location permissions in settings.',
+        );
         return;
       }
 
-      // Set location settings
+      // Define location accuracy and obtain current position
       LocationSettings locationSettings = LocationSettings(
-        accuracy: LocationAccuracy.high,
+        accuracy: LocationAccuracy.best,
         distanceFilter: 10,
       );
-
-      // Get the current position
       Position position = await Geolocator.getCurrentPosition(locationSettings: locationSettings);
-      print("Position: ${position.latitude}, ${position.longitude}");
+        latitude.value=position.latitude;
+        longitude.value=position.longitude;
+      // Reverse geocoding to get address details
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+        position.latitude,
+        position.longitude,
+      );
 
-      // Convert the coordinates to a human-readable address
-      List<Placemark> placemarks = await placemarkFromCoordinates(position.latitude, position.longitude);
       if (placemarks.isNotEmpty) {
         final Placemark place = placemarks[0];
 
-        // Construct the complete address
-        currentAddress.value = "${place.name ?? 'Unknown'}, ${place.thoroughfare ?? 'Unknown'}, "
-            "${place.subLocality ?? 'Unknown'}, ${place.locality ?? 'Unknown'}, "
-            "${place.administrativeArea ?? 'Unknown'}, ${place.country ?? 'Unknown'}";
-
-        print("Current Address: ${currentAddress.value}");
+        // Construct a detailed address format
+        String address = "${place.name ?? ''}, ${place.street ?? ''}, "
+            "${place.subLocality ?? ''}, ${place.locality ?? ''}, "
+            "${place.subAdministrativeArea ?? ''}, ${place.administrativeArea ?? ''}, "
+            "${place.country ?? ''}";
+        print("Current Address: $address");
+        await Supabase.instance.client
+            .from('notifications')
+            .update({'address': {"longitude":position.longitude, "latitude":position.latitude}})
+            .eq('notification_from', authController.userModel.value.id);
       }
     } catch (e) {
       print("Error retrieving location: $e");
       Utils.showErrorSnackBar(title: 'Location Error', description: e.toString());
-    }
-  }
+    }}
+
 
 
   Future<void> onPress() async {
@@ -234,13 +243,11 @@ class DoorController extends GetxController {
           print('No data found for user ID: $user');
         }
       }
-
-      // Send notification to all FCM tokens
       await SendNotificationService.sendNotificationUsingApi(
         fcmList: fcmList,
         title: authController.userModel.value.name,
         body: message.text,
-        data: {'imageUrl': imageUrl.value},
+        data: {'imageUrl': imageUrl.value, 'address':currentAddress.value},
 
       );
 
@@ -253,7 +260,11 @@ class DoorController extends GetxController {
           data: {
             'message': message.text,
             'imageUrl': imageUrl.value,
-          },
+            'address':currentAddress.value
+          }, address: {
+            'longitude':longitude.value,
+            'latitude':latitude.value
+        },
         );
       }
 

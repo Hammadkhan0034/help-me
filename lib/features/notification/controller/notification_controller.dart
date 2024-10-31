@@ -4,6 +4,7 @@ import 'package:alarm_app/models/notification_model.dart';
 import 'package:alarm_app/models/user_model.dart';
 import 'package:get/get.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/supabase/notification_crud.dart';
 import '../../../core/supabase/user_crud.dart';
@@ -13,6 +14,19 @@ class NotificationController extends GetxController {
   AuthController authController = Get.find<AuthController>();
   RxList<NotificationModel> notifications = <NotificationModel>[].obs;
 
+
+  Future<void> openMap(double latitude, double longitude) async {
+    String googleUrl = 'https://www.google.com/maps/search/?api=1&query=$latitude,$longitude';
+    String appleUrl = 'https://maps.apple.com/?q=$latitude,$longitude';
+
+    if (await canLaunch(googleUrl)) {
+      await launch(googleUrl);
+    } else if (await canLaunch(appleUrl)) {
+      await launch(appleUrl);
+    } else {
+      throw 'Could not launch map';
+    }
+  }
   void subscribeToPendingFriendNotifications(String userId) {
     if (!FriendsService.isValidUUID(userId)) {
       throw Exception('Invalid UUID format for userId: $userId');
@@ -97,12 +111,13 @@ class NotificationController extends GetxController {
     required String notificationFor,
     required String notificationType,
     required Map<String, dynamic>? data,
+    required Map<String, double> address,
   }) async {
     await NotificationCrud.createNotification(
       notificationFrom: notificationFrom,
       notificationFor: notificationFor,
       notificationType: notificationType,
-      data: data,
+      data: data, address: address,
     );
   }
 
@@ -111,7 +126,7 @@ class NotificationController extends GetxController {
     print(notificationId);
     try {
       notifications.removeWhere(
-          (n) => n.id == notificationId); // Remove from local list as well
+          (n) => n.id == notificationId);
       await NotificationCrud.deleteNotification(notificationId);
     } catch (e) {
       print('Error deleting notification: $e');
@@ -119,7 +134,6 @@ class NotificationController extends GetxController {
     notifications.refresh();
     update();
   }
-
   //
   Future<void> acceptInvitation(String friendId, userId) async {
     try {
@@ -128,7 +142,6 @@ class NotificationController extends GetxController {
       print('Error Accepting  Invitation: $e');
     }
   }
-
   Future<void> rejectInvitation(String friendId, userId) async {
     try {
       await NotificationCrud.rejectFriendInvitation(friendId, userId);
@@ -136,10 +149,10 @@ class NotificationController extends GetxController {
       print('Error Accepting  Invitation: $e');
     }
   }
-
   @override
   void onInit() {
     subscribeToPendingFriendNotifications(authController.userModel.value.id);
     super.onInit();
   }
+
 }

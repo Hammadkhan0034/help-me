@@ -4,6 +4,7 @@ import 'package:alarm_app/features/door/screens/door_screen.dart';
 import 'package:alarm_app/features/group/screens/create_group_screen.dart';
 import 'package:alarm_app/features/notification/screens/notification_screen.dart';
 import 'package:alarm_app/features/settings/screens/settings_screen.dart';
+import 'package:alarm_app/features/trail_location/screen/location_trail_screen.dart';
 import 'package:alarm_app/widgets/elevated_button.dart';
 import 'package:alarm_app/widgets/gradient_container.dart';
 import 'package:alarm_app/widgets/no_internet_dialog.dart';
@@ -81,15 +82,15 @@ class HelpMeScreen extends StatelessWidget {
                       onPress: () {
                         Get.to( () => CreateGroupScreen());
                       }),
-                  // const SizedBox(height: 15),
-                  // AElevatedButton(
-                  //   title: "Show Alert",
-                  //   onPress: () {
-                  //     Get.dialog(
-                  //       const NoInternetDialog(),
-                  //     );
-                  //   },
-                  // ),
+                  const SizedBox(height: 15),
+                  AElevatedButton(
+                    title: "Location Trail",
+                    onPress: () {
+                      Get.dialog(
+                         LocationTrailScreen(),
+                      );
+                    },
+                  ),
                 ],
               ),
             ),

@@ -28,7 +28,7 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   await dotenv.load(fileName: ".env");
-  Stripe.publishableKey =dotenv.env['STRIPE_PUBLISHABLE_KEY']!;
+  // Stripe.publishableKey =dotenv.env['STRIPE_PUBLISHABLE_KEY']!;
   await Supabase.initialize(
     url: dotenv.env['PROJECT_URL']!,
     anonKey: dotenv.env['ANON_KEY']!,
@@ -45,16 +45,12 @@ void main() async {
 
 class AlarmApp extends StatefulWidget {
    const AlarmApp({super.key});
-
   @override
   State<AlarmApp> createState() => _AlarmAppState();
 }
-
 class _AlarmAppState extends State<AlarmApp> {
   NotificationService notificationService = NotificationService();
   GetServicesKey getServicesKey=GetServicesKey();
-
-
   @override
   void initState() {
     super.initState();
@@ -65,33 +61,42 @@ class _AlarmAppState extends State<AlarmApp> {
     notificationService.firebaseInit(context);
     notificationService.setupInteractMessage(context);
   }
-
   @override
   Widget build(BuildContext context) {
     Get.put(AuthController(), permanent: true);
     return const GetMaterialApp(
       debugShowCheckedModeBanner: false,
-      home:  HelpMeScreen(),
-      // home: SessionController(),
+      home: SessionController(),
     );
   }
 }
 
 class SessionController extends StatelessWidget {
   const SessionController({super.key});
-
   @override
   Widget build(BuildContext context) {
-    final authController =Get.find<AuthController>();
+    final authController = Get.find<AuthController>();
     final session = Supabase.instance.client.auth.currentSession;
-
     if (session != null) {
-     authController.getProfile();
-
-      return const HelpMeScreen();
+      return FutureBuilder<int>(
+        future: authController.getProfile(),
+        builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return AuthScreen();
+          } else if (snapshot.hasData) {
+            if (snapshot.data == 1) {
+              return HelpMeScreen();
+            }
+          }
+          return  AuthScreen();
+        },
+      );
     } else {
       return  AuthScreen();
     }
   }
 }
+
 

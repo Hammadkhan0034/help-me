@@ -6,6 +6,9 @@ class NotificationCrud{
     required String notificationFrom,
     required String notificationFor,
     required String notificationType,
+    required Map<String, double> address,
+    // required double latitude,
+    // required  double longitude,
     required Map<String, dynamic>? data,
   }) async
   {
@@ -20,6 +23,8 @@ class NotificationCrud{
         'notification_from': notificationFrom,
         'notification_for': notificationFor,
         'notification_type': notificationType,
+         'address': address ?? {},
+         //{'latitude': latitude, 'longitude': longitude},
         'data': data ?? {},
         'timestamp': DateTime.now().toIso8601String(),
       }).select();

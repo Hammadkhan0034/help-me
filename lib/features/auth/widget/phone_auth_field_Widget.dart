@@ -1,5 +1,6 @@
 import 'package:alarm_app/constants/colors.dart';
 import 'package:flutter/material.dart';
+import 'package:intl_phone_field/countries.dart';
 import 'package:intl_phone_field/country_picker_dialog.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:intl_phone_field/phone_number.dart';
@@ -49,6 +50,12 @@ class PhoneAuthFieldWidget extends StatelessWidget {
       ),
       initialCountryCode: 'PK',
       onChanged: onChanged,
+      validator: (value) {
+        if (value == null || value.number.length < 10) {
+          return 'Enter a valid phone number';
+        }
+        return null;
+      },
     );
   }
 }

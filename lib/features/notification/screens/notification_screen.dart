@@ -298,11 +298,13 @@ class NotificationScreen extends StatelessWidget {
                           NotificationWidget(title:  "From: ${notification.data?['name'] ?? 'Unknown'}"),
                           const SizedBox(height: 8),
                           if (notification.data?['address'] != null)
+                            GestureDetector(
+                                onTap: (){
+                                  notificationController.openMap(notification.address!['latitude']!, notification.address!['longitude']!);
+                                },
 
-                            NotificationWidget(title:   "Address: ${notification.data?['address'] ?? 'Address not provided'}"),
-
+                                child: NotificationWidget(title:   "Address: ${notification.data?['address'] ?? 'Address not provided'}")),
                           const SizedBox(height: 15),
-                          // Message content
                           if (notification.data?['message'] != null)
                             NotificationWidget(title:"Message: ${notification.data?['message'] ?? 'No message'}"),
                           const SizedBox(height: 15),
@@ -324,7 +326,6 @@ class NotificationScreen extends StatelessWidget {
                                       notification.data?['imageUrl'] ?? '',
                                       fit: BoxFit.cover,
                                       errorBuilder: (context, error, stackTrace) {
-                                        // Placeholder when the image fails to load
                                         return Container(
                                           decoration: BoxDecoration(
                                             color: Colors.grey, // Background color for the placeholder

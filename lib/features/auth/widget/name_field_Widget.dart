@@ -16,7 +16,12 @@ class NameFieldWidget extends StatelessWidget {
       controller: controller,
       keyboardType: TextInputType.name,
       style: const TextStyle(fontSize: 18, color: Colors.white),
-      
+      validator: (value) {
+        if (value == null || value.trim().isEmpty) {
+          return 'Name cannot be empty';
+        }
+        return null;
+      },
       decoration: const InputDecoration(
         
         helperStyle: TextStyle(fontSize: 14, color: Color(0xffF4F4F9)),

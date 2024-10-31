@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:alarm_app/core/supabase/group_contacts.dart';
 import 'package:alarm_app/core/supabase/user_crud.dart';
 import 'package:alarm_app/features/auth/screen/singnup_screen.dart';
@@ -49,44 +51,59 @@ class AuthController extends GetxController {
     }
   }
 
+
+
   // Future<String?> verifyOtp(String otp) async {
   //   NotificationService notificationService = NotificationService();
   //   String? fcmToken = await notificationService.getDeviceToken();
+  //
   //   try {
   //     final AuthResponse? res = await supabaseClient.auth.verifyOTP(
   //       type: OtpType.sms,
   //       token: otp,
-  //       phone:phoneNumber.value,
+  //       phone: phoneNumber.value, // phone number from your controller
   //     );
   //
   //     if (res == null) {
   //       print("AuthResponse is null");
-  //       Utils.showErrorSnackBar(title: "Verification Failed", description: "Unable to verify OTP. Please try again later");
+  //       Utils.showErrorSnackBar(
+  //         title: "Verification Failed",
+  //         description: "Unable to verify OTP. Please try again later",
+  //       );
   //       return null;
   //     }
+  //
   //     final User? user = res.user;
   //     final Session? session = res.session;
   //
   //     if (session != null && user != null) {
+  //       // Create UserModel from response
   //       userModel.value = UserModel(
   //         id: user.id,
   //         name: nameController.text.trim(),
   //         phone: user.phone!,
   //         fcm: fcmToken ?? "",
   //       );
+  //
+  //       // Insert user data into the database
   //       await UserCrud.insertUserData(user.id, userModel.value);
   //
+  //       // Navigate to the next screen after successful OTP verification
   //       Get.to(() => const HelpMeScreen());
-  //       await getProfile();
   //
-  //       contactModel.value =
-  //           ContactsModel(phone: userModel.value.phone.toString());
+  //       // Fetch profile information
+  //         await getProfile();
+  //
+  //       // Update contact model and add user to contacts
+  //       contactModel.value = ContactsModel(phone: userModel.value.phone.toString());
   //       await GroupContacts.addUserToContactModel(userModel.value);
+  //
   //       return user.id;
   //     } else {
   //       return null;
   //     }
   //   } catch (error) {
+  //
   //     if (kDebugMode) {
   //       print("Error verifying OTP: $error");
   //     }
@@ -94,57 +111,49 @@ class AuthController extends GetxController {
   //   }
   // }
 
+
   Future<String?> verifyOtp(String otp) async {
     NotificationService notificationService = NotificationService();
     String? fcmToken = await notificationService.getDeviceToken();
 
     try {
-      final AuthResponse? res = await supabaseClient.auth.verifyOTP(
+      final AuthResponse  res = await supabaseClient.auth.verifyOTP(
         type: OtpType.sms,
         token: otp,
-        phone: phoneNumber.value, // phone number from your controller
+        phone: phoneNumber.value,
       );
 
-      if (res == null) {
-        print("AuthResponse is null");
+      // Ensure both user and session are available
+      if (res.user == null || res.session == null) {
+        print("User or Session is null in AuthResponse");
         Utils.showErrorSnackBar(
           title: "Verification Failed",
-          description: "Unable to verify OTP. Please try again later",
+          description: "Invalid OTP or session could not be established",
         );
         return null;
       }
 
-      final User? user = res.user;
-      final Session? session = res.session;
+      final User? user = supabaseClient.auth.currentUser;
+      final Session? session = supabaseClient.auth.currentSession;
 
-      if (session != null && user != null) {
-        // Create UserModel from response
-        userModel.value = UserModel(
-          id: user.id,
-          name: nameController.text.trim(), // Assuming you take this from a text field
-          phone: user.phone!,
-          fcm: fcmToken ?? "",
-        );
 
-        // Insert user data into the database
-        await UserCrud.insertUserData(user.id, userModel.value);
+      userModel.value = UserModel(
+        id: user!.id,
+        name: nameController.text.trim(),
+        phone: user.phone!,
+        fcm: fcmToken ?? "",
+      );
 
-        // Navigate to the next screen after successful OTP verification
-        Get.to(() => const HelpMeScreen());
+      await UserCrud.insertUserData(user.id, userModel.value);
+      Get.to(() => const HelpMeScreen());
+      await getProfile();
 
-        // Fetch profile information
-          await getProfile();
+      contactModel.value = ContactsModel(phone: userModel.value.phone.toString());
+       await GroupContacts.addUserToContactModel(userModel.value);
 
-        // Update contact model and add user to contacts
-        contactModel.value = ContactsModel(phone: userModel.value.phone.toString());
-        await GroupContacts.addUserToContactModel(userModel.value);
-
-        return user.id;
-      } else {
-        return null;
-      }
-    } catch (error) {
-
+      return user.id;
+    } catch (error, st) {
+      log("ERROR verofing otp lof", error:error ,stackTrace:st);
       if (kDebugMode) {
         print("Error verifying OTP: $error");
       }
@@ -153,20 +162,22 @@ class AuthController extends GetxController {
   }
 
 
-  Future<void> getProfile() async {
+  Future<int> getProfile() async {
     try {
       final userId = supabaseClient.auth.currentSession!.user.id;
-      print("This is ID comming from the supabse ${userId}");
+      print("This is ID coming from Supabase: $userId");
       final response = await UserCrud.getUser(userId);
-      print("This is ID comming from the supabse ${response}");
+      print("This is response coming from Supabase: $response");
+
       if (response != null) {
         userModel.value = UserModel.fromMap(response);
         if (kDebugMode) {
-          print("User Model fetched ${userModel.toString()}");
+          print("User Model fetched: ${userModel.toString()}");
         }
+        return 1; // Return 1 when profile is successfully fetched
       } else {
         Utils.showErrorSnackBar(title: 'Error', description: 'User Not Found');
-        Get.off(()=>AuthScreen());
+        Get.off(() => AuthScreen());
       }
     } on PostgrestException catch (error) {
       if (kDebugMode) {
@@ -181,7 +192,9 @@ class AuthController extends GetxController {
       Utils.showErrorSnackBar(
           title: 'Error', description: 'An unexpected error occurred');
     }
+    return 0; // Return 0 in case of failure
   }
+
 
   void checkUserSubscription() async {
     try {
