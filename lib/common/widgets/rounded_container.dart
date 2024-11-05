@@ -37,7 +37,9 @@ class MRoundedContainer extends StatelessWidget {
             end: Alignment.bottomCenter,
             colors: [
               AColors.primary,
-              AColors.secondary,
+              AColors.primary,
+
+              // AColors.secondary,
             ],
           ):null,
 

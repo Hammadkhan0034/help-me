@@ -13,10 +13,13 @@ import 'package:alarm_app/widgets/warning_circle_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../controller/alar_controller.dart';
+
 class HelpMeScreen extends StatelessWidget {
 
+  final AlarmController alarmController = Get.put(AlarmController());
 
-  const HelpMeScreen({super.key});
+   HelpMeScreen({super.key});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -53,6 +56,10 @@ class HelpMeScreen extends StatelessWidget {
                   AElevatedButton(
                       title: "ALARM",
                       onPress: () {
+
+                          alarmController.playAlarm();
+                          alarmController.showAlert(context);
+
                         // Get.to(const NotificationScreen());
                       }),
                   const SizedBox(height: 15),
@@ -68,29 +75,29 @@ class HelpMeScreen extends StatelessWidget {
                         Get.to(const SettingsScreen());
                       }),
                   const SizedBox(height: 15),
-                  AElevatedButton(
-                    title: "Add Contact",
-                    onPress: () {
-                      Get.dialog(
-                         AddContactScreen(),
-                      );
-                    },
-                  ),
+                  // AElevatedButton(
+                  //   title: "Add Contact",
+                  //   onPress: () {
+                  //     Get.dialog(
+                  //        AddContactScreen(),
+                  //     );
+                  //   },
+                  // ),
                   const SizedBox(height: 15),
-                  AElevatedButton(
-                      title: "Create Group",
-                      onPress: () {
-                        Get.to( () => CreateGroupScreen());
-                      }),
+                  // AElevatedButton(
+                  //     title: "Create Group",
+                  //     onPress: () {
+                  //       Get.to( () => CreateGroupScreen());
+                  //     }),
                   const SizedBox(height: 15),
-                  AElevatedButton(
-                    title: "Location Trail",
-                    onPress: () {
-                      Get.dialog(
-                         LocationTrailScreen(),
-                      );
-                    },
-                  ),
+                  // AElevatedButton(
+                  //   title: "Location Trail",
+                  //   onPress: () {
+                  //     Get.dialog(
+                  //        LocationTrailScreen(),
+                  //     );
+                  //   },
+                  // ),
                 ],
               ),
             ),

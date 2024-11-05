@@ -146,7 +146,7 @@ class AuthController extends GetxController {
       );
 
       await UserCrud.insertUserData(user.id, userModel.value);
-      Get.to(() => const HelpMeScreen());
+      Get.to(() =>  HelpMeScreen());
       await getProfile();
 
       contactModel.value = ContactsModel(phone: userModel.value.phone.toString());

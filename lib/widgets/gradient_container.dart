@@ -24,7 +24,7 @@ class GradientContainer extends StatelessWidget {
             AColors.primary,
             AColors.primary,
             AColors.primary,
-            AColors.secondary,
+            // AColors.secondary,
           ],
         ),
       ),

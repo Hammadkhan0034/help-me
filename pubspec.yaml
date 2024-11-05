@@ -63,6 +63,7 @@ dependencies:
   geocoding: ^3.0.0
   connectivity_plus: ^6.1.0
   flutter_stripe: ^11.2.0
+  just_audio: ^0.9.42
 
 dev_dependencies:
   flutter_test:

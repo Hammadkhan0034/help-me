@@ -9,6 +9,10 @@ import 'package:alarm_app/widgets/gradient_container.dart';
 import 'package:alarm_app/widgets/warning_circle_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+import '../../contact/screens/add_contact_screen.dart';
+import '../../group/screens/create_group_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -26,7 +30,7 @@ class SettingsScreen extends StatelessWidget {
           "Settings",
           style: TextStyle(fontWeight: FontWeight.w600),
         ),
-        actions: const [Icon(Icons.person), SizedBox(width: 10)],
+        // actions: const [Icon(Icons.person), SizedBox(width: 10)],
         centerTitle: true,
       ),
       body: Stack(
@@ -39,9 +43,9 @@ class SettingsScreen extends StatelessWidget {
                 // mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   const SizedBox(height: 100),
-                  const Center(
+                   Center(
                     child: Text(
-                      "Your Phone No",
+                      Supabase.instance.client.auth.currentUser?.phone?? "",
                       style: TextStyle(
                           color: AColors.white,
                           fontSize: 25,
@@ -58,13 +62,17 @@ class SettingsScreen extends StatelessWidget {
                   AElevatedButton(
                       title: "Contacts",
                       onPress: () {
-                        Get.to(DoorScreen());
+                        Get.to(
+                          AddContactScreen(),
+                        );
+                        // Get.to(DoorScreen());
                       }),
                   const SizedBox(height: 15),
                   AElevatedButton(
                       title: "Groups",
                       onPress: () {
-                        Get.to(const SettingsScreen());
+                        Get.to( () => CreateGroupScreen());
+                        // Get.to(const SettingsScreen());
                       }),
                   const SizedBox(height: 15),
                   const PrimaryGroup(title: "Primary Indoor Group"),
