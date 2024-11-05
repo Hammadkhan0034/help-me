@@ -28,7 +28,7 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   await dotenv.load(fileName: ".env");
-  // Stripe.publishableKey =dotenv.env['STRIPE_PUBLISHABLE_KEY']!;
+   Stripe.publishableKey =dotenv.env['STRIPE_PUBLISHABLE_KEY']!;
   await Supabase.initialize(
     url: dotenv.env['PROJECT_URL']!,
     anonKey: dotenv.env['ANON_KEY']!,

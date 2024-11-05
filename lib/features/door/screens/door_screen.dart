@@ -32,7 +32,7 @@ class DoorScreen extends StatelessWidget {
               Get.back();
             },
             child: const Icon(Icons.arrow_back_ios_new)),
-        actions: const [Icon(Icons.person), SizedBox(width: 10)],
+        // actions: const [Icon(Icons.person), SizedBox(width: 10)],
         title: Obx(() {
           return Text(
             "Send ${ctrl.selectedType.value}",
