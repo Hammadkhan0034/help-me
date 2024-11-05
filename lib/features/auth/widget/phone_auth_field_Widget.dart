@@ -48,14 +48,14 @@ class PhoneAuthFieldWidget extends StatelessWidget {
           borderSide: BorderSide(color: AColors.darkGrey),
         ),
       ),
-      initialCountryCode: 'MYS',
+      initialCountryCode: 'PK',
       onChanged: onChanged,
-      // validator: (value) {
-      //   if (value == null || value.number.length < 10) {
-      //     return 'Enter a valid phone number';
-      //   }
-      //   return null;
-      // },
+      validator: (value) {
+        if ( value == null || value.completeNumber== value.countryCode) {
+          return 'Enter a valid phone number';
+        }
+        return null;
+      },
     );
   }
 }
