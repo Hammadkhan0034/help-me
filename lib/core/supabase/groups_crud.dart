@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:alarm_app/models/group_model.dart';
 import 'package:alarm_app/utils/utils.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -44,7 +46,6 @@ class GroupCrud{
   }
 
 
-// Delete a group
   static Future<void> deleteGroup(String groupId) async {
     final response = await Supabase.instance.client
         .from('groups')
@@ -56,6 +57,21 @@ class GroupCrud{
       throw Exception('Error deleting group: ${response.error!.message}');
     }
   }
+
+  static Future<void> updateGroupMembers(String groupId, List<String> members) async {
+    try {
+     await Supabase.instance.client
+          .from('groups')
+          .update({'members': members})
+          .eq('id', groupId)
+          ;
+
+
+    } catch (e, st) {
+      log("Error updating group $groupId", error: e, stackTrace: st);
+    }
+  }
+
 
 
 }

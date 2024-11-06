@@ -214,9 +214,9 @@ static  bool isValidUUID(String uuid) {
     try {
       final response = await client
           .from('friends')
-          .select('*, profiles!friends_friend_id_fkey(*)') // Join profiles with friends
-          .eq('user_id', userId) // Check if the friend belongs to this user
-          .ilike('profiles.phone', '%$friendPhoneNumber%'); // Match phone number partially
+          .select('*, profiles!friends_friend_id_fkey(*)')
+          .eq('user_id', userId)
+          .ilike('profiles.phone', '%$friendPhoneNumber%');
 
       if (response == null || response.isEmpty) {
         print('No friends found.');

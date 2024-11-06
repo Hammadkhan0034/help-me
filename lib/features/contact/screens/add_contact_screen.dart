@@ -12,8 +12,7 @@ class AddContactScreen extends StatelessWidget {
 
   final AddContactController addContactController =
      Get.put(AddContactController());
-
-  @override
+bool isEnabled = true;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -83,8 +82,15 @@ class AddContactScreen extends StatelessWidget {
                                 suffixIcon: IconButton(
                                   icon:
                                   const Icon(Icons.add, color: Colors.white),
-                                  onPressed: () {
-                                    addContactController.addedContacts(matchedContacts);
+                                  onPressed: () async{
+                                    if(isEnabled) {
+                                      isEnabled = false;
+                                      await addContactController.addedContacts(
+                                          matchedContacts);
+                                      isEnabled = true;
+                                    }
+
+
                                   },
                                 ),
                               );

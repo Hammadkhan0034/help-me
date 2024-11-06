@@ -4,12 +4,15 @@ class UserModel {
   final String phone;
   final String fcm;
   final bool? isPremium;
+  final double? latitude;
+  final double? longitude;
   final DateTime? subscriptionExpiryDate;
-  UserModel({
+  UserModel( {
     required this.id,
     required this.name,
     required this.phone,
     required this.fcm,
+    this.latitude, this.longitude,
     this.isPremium,
     this.subscriptionExpiryDate,
   });
@@ -21,6 +24,8 @@ class UserModel {
       'fcm': fcm,
       'is_premium': isPremium,
       'subscription_expiry_date': subscriptionExpiryDate?.toIso8601String(),
+      'latitude':latitude,
+      'longitude':longitude,
     };
   }
 
@@ -31,11 +36,14 @@ class UserModel {
         phone: map['phone'] as String,
         fcm: map['fcm'] as String,
         isPremium: map['is_premium']?? false as bool?,
+        latitude: map['latitude'],
+        longitude: map['longitude'],
         subscriptionExpiryDate: map['subscription_expiry_date']);
+
   }
 
   @override
   String toString() {
-    return 'UserModel{id: $id, name: $name, phone: $phone, fcm: $fcm, isPremium: $isPremium, subscriptionExpiryDate: $subscriptionExpiryDate}';
+    return 'UserModel{id: $id, name: $name, phone: $phone, fcm: $fcm, isPremium: $isPremium, latitude: $latitude, longitude: $longitude, subscriptionExpiryDate: $subscriptionExpiryDate}';
   }
 }

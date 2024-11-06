@@ -103,7 +103,6 @@ print("NOTIFICATION RESPOINSE  ");
          .eq('friend_id',userId )
          .eq('user_id', friendId)
        ;
-
   }
 
  // static Future<List<FriendsModel>> fetchFriends(String userId) async {

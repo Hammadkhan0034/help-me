@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:get/get.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -5,9 +7,15 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 class LocationController extends GetxController {
   final supabase = Supabase.instance.client;
   final isTracking = false.obs;
-  final position = Rx<Position?>(null);
-  Position? lastPosition; // Store the last known position
 
+  final position = Rx<Position?>(null);
+  Position? lastPosition;
+  final fetchedLocation = Rx<Position?>(null);
+  final selectedDate = Rx<DateTime?>(null); // Selected date as observable
+
+  void updateSelectedDate(DateTime date) {
+    selectedDate.value = date;
+  }
   @override
   void onInit() {
     super.onInit();
@@ -41,41 +49,62 @@ class LocationController extends GetxController {
   Future<void> _logLocation(Position newPosition) async {
     final userId = supabase.auth.currentUser?.id;
     if (userId != null) {
-      if (lastPosition == null || _isDistanceExceeded(lastPosition!, newPosition)) {
-        // Update or insert the location only if the distance is exceeded
-        lastPosition = newPosition; // Update last known position
+      await supabase.from('location_logs').insert({
+        'user_id': userId,
+        'latitude': newPosition.latitude,
+        'longitude': newPosition.longitude,
+        'timestamp': DateTime.now().toIso8601String(),
+      });
+    }
+  }
+  Stream<Position?> fetchLocationByDate(String userId, DateTime date) async* {
+    final formattedDate = date.toIso8601String().split('T').first;
 
-        // Fetch the existing record
-        var response = await supabase
+    try {
+      while (true) {  // Continuous stream
+        final response = await supabase
             .from('location_logs')
-            .select()
+            .select('latitude, longitude')
             .eq('user_id', userId)
-            .maybeSingle(); // Use maybeSingle instead of single
+            .gte('timestamp', '$formattedDate 00:00:00')
+            .lte('timestamp', '$formattedDate 23:59:59')
+            .order('timestamp', ascending: true)
+            .limit(1)
+            ;
 
-        print(response);
-        if (response != null) {
-          // Record exists, update it
-          await supabase.from('location_logs').update({
-            'latitude': newPosition.latitude,
-            'longitude': newPosition.longitude,
-            'timestamp': DateTime.now().toIso8601String(),
-          }).eq('user_id', userId);
+        // if (response.error != null) {
+        //   Get.snackbar('Error', 'Failed to fetch location: ${response.error!.message}');
+        //   yield null; // Yield null in case of an error
+        // } else
+          if (response.isNotEmpty) {
+          final data = response[0];
+          yield Position(
+            latitude: data['latitude'],
+            longitude: data['longitude'],
+            accuracy: data['accuracy'] ?? 0,
+            altitude: data['altitude'] ?? 0,
+            altitudeAccuracy: data['altitudeAccuracy'] ?? 0,
+            heading: data['heading'] ?? 0,
+            headingAccuracy: data['headingAccuracy'] ?? 0,
+            speed: 0,
+            speedAccuracy: 0,
+            timestamp: DateTime.now(),
+          );
         } else {
-          // No record exists, insert a new one
-          await supabase.from('location_logs').insert({
-            'user_id': userId,
-            'latitude': newPosition.latitude,
-            'longitude': newPosition.longitude,
-            'timestamp': DateTime.now().toIso8601String(),
-          });
+          yield null; // Yield null if no data is found for specified date
         }
 
+        await Future.delayed(Duration(seconds: 5)); // Delay to poll every 5 seconds
       }
+    } catch (e,st) {
+      log("Error",error: e,stackTrace: st);
+      Get.snackbar('Error', 'An error occurred while fetching location: $e');
+      yield null; // Yield null if an exception occurs
     }
   }
 
   bool _isDistanceExceeded(Position lastPosition, Position newPosition) {
-    // Calculate the distance between the last known position and the new position
+
     final distanceInMeters = Geolocator.distanceBetween(
       lastPosition.latitude,
       lastPosition.longitude,

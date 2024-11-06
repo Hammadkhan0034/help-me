@@ -3,6 +3,7 @@ import 'package:alarm_app/features/auth/controller/auth_controller.dart';
 import 'package:alarm_app/models/notification_model.dart';
 import 'package:alarm_app/models/user_model.dart';
 import 'package:get/get.dart';
+import 'package:path/path.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -19,10 +20,10 @@ class NotificationController extends GetxController {
     String googleUrl = 'https://www.google.com/maps/search/?api=1&query=$latitude,$longitude';
     String appleUrl = 'https://maps.apple.com/?q=$latitude,$longitude';
 
-    if (await canLaunch(googleUrl)) {
-      await launch(googleUrl);
-    } else if (await canLaunch(appleUrl)) {
-      await launch(appleUrl);
+    if (await canLaunchUrl(Uri.parse(googleUrl))) {
+      await launchUrl(Uri.parse(googleUrl));
+    } else if (await launchUrl(Uri.parse(appleUrl))) {
+      await canLaunchUrl(Uri.parse(appleUrl));
     } else {
       throw 'Could not launch map';
     }
@@ -134,7 +135,7 @@ class NotificationController extends GetxController {
     notifications.refresh();
     update();
   }
-  //
+
   Future<void> acceptInvitation(String friendId, userId) async {
     try {
       await NotificationCrud.acceptFriendInvitation(friendId, userId);

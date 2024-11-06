@@ -37,10 +37,9 @@ void main() async {
     ),
   );
 
-   FirebaseMessaging.onBackgroundMessage(_firebaseBackgroundHandler);
+FirebaseMessaging.onBackgroundMessage(_firebaseBackgroundHandler);
 
-
-  runApp( const AlarmApp());
+runApp( const AlarmApp());
 }
 
 class AlarmApp extends StatefulWidget {
@@ -64,9 +63,10 @@ class _AlarmAppState extends State<AlarmApp> {
   @override
   Widget build(BuildContext context) {
     Get.put(AuthController(), permanent: true);
-    return const GetMaterialApp(
+    return GetMaterialApp(
+      theme: ThemeData(appBarTheme: AppBarTheme(backgroundColor: Colors.white,surfaceTintColor: Colors.white)),
       debugShowCheckedModeBanner: false,
-      home: SessionController(),
+      home: const SessionController(),
     );
   }
 }

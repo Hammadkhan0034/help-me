@@ -53,6 +53,9 @@ class FriendsModel {
     };
   }
 
+
+
+
   @override
   String toString() {
     return 'FriendsModel{id: $id, createdAt: $createdAt, friendId: $friendId,friendPhone: $friendPhone ,editedName: $editedName, userId: $userId, acceptedAt: $acceptedAt, updatedAt: $updatedAt, requestStatus: $requestStatus}';

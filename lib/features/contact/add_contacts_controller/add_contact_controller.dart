@@ -58,12 +58,13 @@ class AddContactController extends GetxController {
   }
 
   Future<void> fetchPhoneContacts() async {
+    String userNumber = authController.userModel.value.phone.substring(authController.userModel.value.phone.length - 10 );
     if (await FlutterContacts.requestPermission()) {
       List<Contact> contacts =
           await FlutterContacts.getContacts(withProperties: true);
 
       phoneContacts.value = contacts
-          .where((contact) => contact.phones.isNotEmpty)
+          .where((contact) => contact.phones.isNotEmpty && !contact.phones.first.number.replaceAll(RegExp(r'[^0-9]'), '').contains(userNumber))
           .map((contact) => {
                 'phone': contact.phones.first.number
                     .replaceAll(RegExp(r'[^0-9]'), ''),
@@ -77,20 +78,23 @@ class AddContactController extends GetxController {
     }
   }
   String normalizePhoneNumber(String phone) {
-    return phone.replaceAll(RegExp(r'\D'), '');
+    return phone.replaceAll(RegExp(r'[^0-9]'), '');
   }
 
-  void addedContacts(Map<String, String> contact) async {
+  Future addedContacts(Map<String, String> contact) async {
+
     String phoneNumber = contact['phone']!;
     String phoneWithoutCode = normalizePhoneNumber(phoneNumber);
-    bool isDuplicateInApp = requestedFriends.any((friend) => friend.friendPhone == phoneWithoutCode);
-    if (isDuplicateInApp) {
+        phoneWithoutCode = phoneWithoutCode.substring(phoneWithoutCode.length - 10);
+    final isDuplicateInApp = requestedFriends.where((friend) => friend.friendPhone!.contains(phoneWithoutCode)).toList();
+    if (isDuplicateInApp.isNotEmpty) {
       Utils.showErrorSnackBar(
           title: "Already Added",
           description: "Contact already exists in the added contacts."
       );
       return;
     }
+
     var existingFriend = await friendsService.fetchFriendPhoneByNumber(authController.userModel.value.id, phoneWithoutCode);
     if (existingFriend != null) {
       Utils.showErrorSnackBar(
@@ -121,20 +125,21 @@ class AddContactController extends GetxController {
     ));
 
     // Send notification to the friend if FCM is available
-    final fcm = await friendsService.fetchFriendFcm(userProfile['id']!, authController.userModel.value.id);
-    if (fcm != null && fcm.isNotEmpty) {
-      // SendNotificationService.sendNotificationUsingApi(
-      //     fcmList: [fcm.toString()],
-      //     title: "Request Contacts: ${authController.userModel.value.name}",
-      //     body: "${authController.userModel.value.phone}",
-      //     data: {}
-      // );
+    // final fcm = await friendsService.fetchFriendFcm(userProfile['id']!, authController.userModel.value.id);
+    // if (fcm != null && fcm.isNotEmpty) {
+    //   // SendNotificationService.sendNotificationUsingApi(
+    //   //     fcmList: [fcm.toString()],
+    //   //     title: "Request Contacts: ${authController.userModel.value.name}",
+    //   //     body: "${authController.userModel.value.phone}",
+    //   //     data: {}
+    //   // );
+    //
+    // }
+    //
+    // else {
+    //   print("Failed to send notification: Invalid FCM token");
+    // }
 
-    }
-
-    else {
-      print("Failed to send notification: Invalid FCM token");
-    }
     await NotificationCrud.createNotification(
         notificationFrom: authController.userModel.value.id,
         notificationFor: userProfile['id']!,
@@ -142,6 +147,7 @@ class AddContactController extends GetxController {
         data: {}, address: {}
     );
     // Add the contact to the local list of added friends
+
     requestedFriends.add(FriendsModel(
       id: const Uuid().v4(),
       friendId: userProfile['id']!,
@@ -151,10 +157,11 @@ class AddContactController extends GetxController {
       createdAt: DateTime.now(),
       friendPhone: phoneWithoutCode,
     ));
-
     if (kDebugMode) {
       print('Contact added to Supabase and local list.');
     }
+
+
   }
 
 

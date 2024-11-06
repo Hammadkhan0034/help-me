@@ -36,6 +36,7 @@ class HelpMeScreen extends StatelessWidget {
         centerTitle: true,
       ),
       body: Stack(
+
         children: [
           GradientContainer(
             mTop: 110,
@@ -74,7 +75,7 @@ class HelpMeScreen extends StatelessWidget {
                       onPress: () {
                         Get.to(const SettingsScreen());
                       }),
-                  const SizedBox(height: 15),
+                  // const SizedBox(height: 15),
                   // AElevatedButton(
                   //   title: "Add Contact",
                   //   onPress: () {
@@ -83,21 +84,21 @@ class HelpMeScreen extends StatelessWidget {
                   //     );
                   //   },
                   // ),
-                  const SizedBox(height: 15),
+                  // const SizedBox(height: 15),
                   // AElevatedButton(
                   //     title: "Create Group",
                   //     onPress: () {
                   //       Get.to( () => CreateGroupScreen());
                   //     }),
-                  const SizedBox(height: 15),
-                  // AElevatedButton(
-                  //   title: "Location Trail",
-                  //   onPress: () {
-                  //     Get.dialog(
-                  //        LocationTrailScreen(),
-                  //     );
-                  //   },
-                  // ),
+                  // const SizedBox(height: 15),
+                  AElevatedButton(
+                    title: "Location Trail",
+                    onPress: () {
+                      Get.dialog(
+                         LocationTrailScreen(),
+                      );
+                    },
+                  ),
                 ],
               ),
             ),
