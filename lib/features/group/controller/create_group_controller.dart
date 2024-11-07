@@ -1,18 +1,16 @@
-import 'package:alarm_app/core/supabase/group_contacts.dart';
+import 'package:alarm_app/core/supabase/groups_crud.dart';
 import 'package:alarm_app/features/auth/controller/auth_controller.dart';
+import 'package:alarm_app/features/contact/add_contacts_controller/add_contact_controller.dart';
 import 'package:alarm_app/models/friends_model.dart';
+import 'package:alarm_app/models/group_model.dart';
 import 'package:alarm_app/utils/utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_contacts/contact.dart';
 import 'package:get/get.dart';
 import 'package:uuid/uuid.dart';
-import 'package:alarm_app/core/supabase/groups_crud.dart';
-import 'package:alarm_app/features/contact/add_contacts_controller/add_contact_controller.dart';
-import 'package:alarm_app/models/group_model.dart';
 
 class CreateGroupController extends GetxController {
-  final addContactController = Get.put(AddContactController());
+  final addContactController = Get.put(ContactController());
   final authController = Get.find<AuthController>();
   var groupContacts = <FriendsModel>[].obs;
   final TextEditingController name = TextEditingController();
@@ -21,8 +19,8 @@ class CreateGroupController extends GetxController {
     if (!groupContacts.contains(contact)) {
       groupContacts.add(contact);
     }
-
   }
+
   void updateOption(String option) {
     groupType.value = option;
   }
@@ -48,15 +46,14 @@ class CreateGroupController extends GetxController {
       return;
     }
     try {
-      print("MY FRIENDS ID ${groupContacts
-          .map((members) => members.friendId)}");
+      print(
+          "MY FRIENDS ID ${groupContacts.map((members) => members.friendId)}");
       int memberCount = getMemberCount();
       await GroupCrud.createGroup(GroupModel(
         id: const Uuid().v4(),
         name: name.text,
-        members:groupContacts
-            .map((members) => members.friendId ?? '')
-            .toList(),
+        members:
+            groupContacts.map((members) => members.friendId ?? '').toList(),
         type: groupType.value,
         createdAt: DateTime.now(),
         createdBy: addContactController.authController.userModel.value.id,
@@ -68,7 +65,6 @@ class CreateGroupController extends GetxController {
         description: "Created Successfully",
       );
       name.clear();
-
     } catch (e) {
       Utils.showErrorSnackBar(
         title: "ERROR: ",
@@ -77,15 +73,4 @@ class CreateGroupController extends GetxController {
       print("ERROR: $e");
     }
   }
-
-
-
-
-
-
-
 }
-
-
-
-

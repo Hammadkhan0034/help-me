@@ -6,14 +6,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:get/get.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../core/supabase/FriendsService.dart';
 import '../../../models/friends_model.dart';
-import '../../../servies/send_notification_services.dart';
 
-class AddContactController extends GetxController {
+class ContactController extends GetxController {
   var groupContacts = <String>[].obs;
   var phoneContacts = <Map<String, String>>[].obs;
   var matchedContacts = <Map<String, String>>[].obs;
@@ -58,13 +56,18 @@ class AddContactController extends GetxController {
   }
 
   Future<void> fetchPhoneContacts() async {
-    String userNumber = authController.userModel.value.phone.substring(authController.userModel.value.phone.length - 10 );
+    String userNumber = authController.userModel.value.phone
+        .substring(authController.userModel.value.phone.length - 10);
     if (await FlutterContacts.requestPermission()) {
       List<Contact> contacts =
           await FlutterContacts.getContacts(withProperties: true);
 
       phoneContacts.value = contacts
-          .where((contact) => contact.phones.isNotEmpty && !contact.phones.first.number.replaceAll(RegExp(r'[^0-9]'), '').contains(userNumber))
+          .where((contact) =>
+              contact.phones.isNotEmpty &&
+              !contact.phones.first.number
+                  .replaceAll(RegExp(r'[^0-9]'), '')
+                  .contains(userNumber))
           .map((contact) => {
                 'phone': contact.phones.first.number
                     .replaceAll(RegExp(r'[^0-9]'), ''),
@@ -77,39 +80,40 @@ class AddContactController extends GetxController {
           'Please grant contact access permission to load contacts.');
     }
   }
+
   String normalizePhoneNumber(String phone) {
     return phone.replaceAll(RegExp(r'[^0-9]'), '');
   }
 
-  Future addedContacts(Map<String, String> contact) async {
-
+  Future sendFriendRequestToUser(Map<String, String> contact) async {
     String phoneNumber = contact['phone']!;
     String phoneWithoutCode = normalizePhoneNumber(phoneNumber);
-        phoneWithoutCode = phoneWithoutCode.substring(phoneWithoutCode.length - 10);
-    final isDuplicateInApp = requestedFriends.where((friend) => friend.friendPhone!.contains(phoneWithoutCode)).toList();
+    phoneWithoutCode = phoneWithoutCode.substring(phoneWithoutCode.length - 10);
+    final isDuplicateInApp = requestedFriends
+        .where((friend) => friend.friendPhone!.contains(phoneWithoutCode))
+        .toList();
     if (isDuplicateInApp.isNotEmpty) {
       Utils.showErrorSnackBar(
           title: "Already Added",
-          description: "Contact already exists in the added contacts."
-      );
+          description: "Contact already exists in the added contacts.");
       return;
     }
 
-    var existingFriend = await friendsService.fetchFriendPhoneByNumber(authController.userModel.value.id, phoneWithoutCode);
+    var existingFriend = await friendsService.fetchFriendPhoneByNumber(
+        authController.userModel.value.id, phoneWithoutCode);
     if (existingFriend != null) {
       Utils.showErrorSnackBar(
           title: "Already Added",
-          description: "Contact already exists in the database."
-      );
+          description: "Contact already exists in the database.");
       return;
     }
     // Fetch user profile by phone number
-    var userProfile = await GroupContacts.fetchUserProfileByPhone(phoneWithoutCode);
+    var userProfile =
+        await GroupContacts.fetchUserProfileByPhone(phoneWithoutCode);
     if (userProfile == null) {
       Utils.showErrorSnackBar(
           title: "Contact Not Found",
-          description: "This contact does not exist in the system."
-      );
+          description: "This contact does not exist in the system.");
       return;
     }
 
@@ -144,8 +148,8 @@ class AddContactController extends GetxController {
         notificationFrom: authController.userModel.value.id,
         notificationFor: userProfile['id']!,
         notificationType: 'invitation',
-        data: {}, address: {}
-    );
+        data: {},
+        address: {});
     // Add the contact to the local list of added friends
 
     requestedFriends.add(FriendsModel(
@@ -160,15 +164,7 @@ class AddContactController extends GetxController {
     if (kDebugMode) {
       print('Contact added to Supabase and local list.');
     }
-
-
   }
-
-
-
-
-
-
 
   void removeContact(int index, var friendId) async {
     await friendsService.deleteFriend(
@@ -185,9 +181,8 @@ class AddContactController extends GetxController {
     update();
   }
 
-
-  void fetchFriends(){
-    var userId=Get.find<AuthController>().userModel.value.id;
+  void fetchFriends() {
+    var userId = Get.find<AuthController>().userModel.value.id;
     print(userId);
     friendsService.subscribeToFriends(userId, requestedFriends);
   }
@@ -216,10 +211,7 @@ class AddContactController extends GetxController {
   //   }
   // }
 
-
   //REAL TIME PROGRESS O
-
-
 
   // // var friendsList = <FriendsModel>[].obs; // Observable list of friends
   //
@@ -257,7 +249,7 @@ class AddContactController extends GetxController {
   //
 
   @override
-  void onInit()async {
+  void onInit() async {
     super.onInit();
     fetchGroupContacts();
     fetchPhoneContacts();

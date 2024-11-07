@@ -21,7 +21,7 @@ class MRoundedContainer extends StatelessWidget {
   final double? borderRadius;
   final double? width;
   final VoidCallback? onTap;
-  final bool isGradient ;
+  final bool isGradient;
 
   @override
   Widget build(BuildContext context) {
@@ -32,17 +32,18 @@ class MRoundedContainer extends StatelessWidget {
         width: width,
         decoration: BoxDecoration(
           color: bgColor,
-          gradient:isGradient? LinearGradient(
-            begin: Alignment.center,
-            end: Alignment.bottomCenter,
-            colors: [
-              AColors.primary,
-              AColors.primary,
+          gradient: isGradient
+              ? LinearGradient(
+                  begin: Alignment.center,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    AColors.primary,
+                    AColors.primary,
 
-              // AColors.secondary,
-            ],
-          ):null,
-
+                    // AColors.secondary,
+                  ],
+                )
+              : null,
           borderRadius: BorderRadius.circular(borderRadius ?? 15),
         ),
         padding: EdgeInsets.all(padding ?? 0.0),

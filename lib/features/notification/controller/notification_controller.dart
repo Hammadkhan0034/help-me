@@ -1,86 +1,70 @@
 import 'package:alarm_app/core/supabase/FriendsService.dart';
+import 'package:alarm_app/core/supabase/user_crud.dart';
 import 'package:alarm_app/features/auth/controller/auth_controller.dart';
 import 'package:alarm_app/models/notification_model.dart';
 import 'package:alarm_app/models/user_model.dart';
+import 'package:alarm_app/utils/utils.dart';
 import 'package:get/get.dart';
-import 'package:path/path.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:uuid/uuid.dart';
 
 import '../../../core/supabase/notification_crud.dart';
-import '../../../core/supabase/user_crud.dart';
 import '../../../models/friends_model.dart';
 
 class NotificationController extends GetxController {
   AuthController authController = Get.find<AuthController>();
   RxList<NotificationModel> notifications = <NotificationModel>[].obs;
 
-
-  Future<void> openMap(double latitude, double longitude) async {
-    String googleUrl = 'https://www.google.com/maps/search/?api=1&query=$latitude,$longitude';
-    String appleUrl = 'https://maps.apple.com/?q=$latitude,$longitude';
-
-    if (await canLaunchUrl(Uri.parse(googleUrl))) {
-      await launchUrl(Uri.parse(googleUrl));
-    } else if (await launchUrl(Uri.parse(appleUrl))) {
-      await canLaunchUrl(Uri.parse(appleUrl));
-    } else {
-      throw 'Could not launch map';
-    }
-  }
   void subscribeToPendingFriendNotifications(String userId) {
     if (!FriendsService.isValidUUID(userId)) {
       throw Exception('Invalid UUID format for userId: $userId');
     }
     print('UUID format for userId: $userId');
     try {
-        final subscription = Supabase.instance.client
-            .from('notifications')
-            .stream(primaryKey: ["id"])
-            .eq('notification_for', userId)
-            .listen((snapshot) async {
-              print("Notifications SnapShot of against my ID :  $snapshot");
+      final subscription = Supabase.instance.client
+          .from('notifications')
+          .stream(primaryKey: ["id"])
+          .eq('notification_for', userId)
+          .order("timestamp")
+          .listen((snapshot) async {
+            print("Notifications SnapShot of against my ID :  $snapshot");
 
-              if (snapshot.isEmpty) {
-                print('No pending friend requests for user: $userId');
-                return;
-              }
-              // notifications.refresh();
-              // Clear the list before adding new notifications (optional)
-               notifications.clear();
+            if (snapshot.isEmpty) {
+              print('No pending friend requests for user: $userId');
+              return;
+            }
+            // notifications.refresh();
+            notifications.clear();
 
-              for (var friendData in snapshot) {
-                final notificationFromId = friendData['notification_from'];
+            for (var friendData in snapshot) {
+              final notificationFromId = friendData['notification_from'];
 
-                if (notificationFromId != null) {
+              if (notificationFromId != null) {
+                print(
+                    "Pending Notification from friend request from user ID: $notificationFromId");
+
+                final user = await fetchUserDetails(notificationFromId);
+
+                if (user != null) {
                   print(
-                      "Pending Notification from friend request from user ID: $notificationFromId");
+                      "Pending friend request from: ${user['name']}, Phone: ${user['phone']}");
 
-                  // Fetch user details from the profiles table
-                  final user = await fetchUserDetails(notificationFromId);
-
-                  if (user != null) {
-                    print(
-                        "Pending friend request from: ${user['name']}, Phone: ${user['phone']}");
-
-                    final notification = NotificationModel.fromMap(friendData);
-                    notification.data?['name'] = user['name'];
-                    notification.data?['phone'] = user['phone'];
-                    // Check if this notification already exists before adding
-                    bool alreadyExists =
-                        notifications.any((n) => n.id == notification.id);
-                    if (!alreadyExists) {
-                      notifications.add(notification);
-                    }
-
-                    notifications.refresh();
+                  final notification = NotificationModel.fromMap(friendData);
+                  notification.data?['name'] = user['name'];
+                  notification.data?['phone'] = user['phone'];
+                  bool alreadyExists =
+                      notifications.any((n) => n.id == notification.id);
+                  if (!alreadyExists) {
+                    notifications.add(notification);
                   }
-                } else {
-                  print(
-                      "notification_from is null for friend data: $friendData");
+
+                  notifications.refresh();
                 }
+              } else {
+                print("notification_from is null for friend data: $friendData");
               }
-            });
+            }
+          });
     } catch (e) {
       print('Error subscribing to pending friend requests: $e');
     }
@@ -93,7 +77,6 @@ class NotificationController extends GetxController {
           .select('*')
           .eq('id', userId)
           .single();
-
 
       if (response == null) {
         print('Error fetching user details: ${response}');
@@ -118,7 +101,8 @@ class NotificationController extends GetxController {
       notificationFrom: notificationFrom,
       notificationFor: notificationFor,
       notificationType: notificationType,
-      data: data, address: address,
+      data: data,
+      address: address,
     );
   }
 
@@ -126,8 +110,7 @@ class NotificationController extends GetxController {
     print("Delting Noptification id");
     print(notificationId);
     try {
-      notifications.removeWhere(
-          (n) => n.id == notificationId);
+      notifications.removeWhere((n) => n.id == notificationId);
       await NotificationCrud.deleteNotification(notificationId);
     } catch (e) {
       print('Error deleting notification: $e');
@@ -136,13 +119,25 @@ class NotificationController extends GetxController {
     update();
   }
 
-  Future<void> acceptInvitation(String friendId, userId) async {
+  Future<void> acceptInvitation(String friendId, String userId) async {
     try {
       await NotificationCrud.acceptFriendInvitation(friendId, userId);
+      UserModel? userModel = await UserCrud.getUserById(friendId);
+      await FriendsService().addFriend(FriendsModel(
+        id: const Uuid().v4(),
+        friendId: friendId, //other user userid
+        editedName: userModel?.name ?? "",
+        userId: authController.userModel.value.id,
+        requestStatus: 1,
+        updatedAt: DateTime.now(),
+        createdAt: DateTime.now(),
+        friendPhone: Utils.getPhoneWithoutCode(userModel?.phone ?? ""),
+      ));
     } catch (e) {
       print('Error Accepting  Invitation: $e');
     }
   }
+
   Future<void> rejectInvitation(String friendId, userId) async {
     try {
       await NotificationCrud.rejectFriendInvitation(friendId, userId);
@@ -150,10 +145,10 @@ class NotificationController extends GetxController {
       print('Error Accepting  Invitation: $e');
     }
   }
+
   @override
   void onInit() {
     subscribeToPendingFriendNotifications(authController.userModel.value.id);
     super.onInit();
   }
-
 }

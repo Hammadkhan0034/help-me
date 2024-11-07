@@ -1,32 +1,36 @@
 import 'package:alarm_app/constants/colors.dart';
-import 'package:alarm_app/features/contact/screens/add_contact_screen.dart';
+import 'package:alarm_app/features/auth/controller/auth_controller.dart';
 import 'package:alarm_app/features/door/screens/door_screen.dart';
-import 'package:alarm_app/features/group/screens/create_group_screen.dart';
 import 'package:alarm_app/features/notification/screens/notification_screen.dart';
 import 'package:alarm_app/features/settings/screens/settings_screen.dart';
-import 'package:alarm_app/features/trail_location/screen/location_trail_screen.dart';
+import 'package:alarm_app/features/trail_location/controller/LocationManageController.dart';
+import 'package:alarm_app/features/trail_location/screen/location_manage_screen.dart';
 import 'package:alarm_app/widgets/elevated_button.dart';
 import 'package:alarm_app/widgets/gradient_container.dart';
-import 'package:alarm_app/widgets/no_internet_dialog.dart';
 import 'package:alarm_app/widgets/notification_icon_with_count.dart';
 import 'package:alarm_app/widgets/warning_circle_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../contact/add_contacts_controller/add_contact_controller.dart';
 import '../controller/alar_controller.dart';
 
 class HelpMeScreen extends StatelessWidget {
-
   final AlarmController alarmController = Get.put(AlarmController());
 
-   HelpMeScreen({super.key});
+  final ContactController addContactController =
+      Get.put(ContactController(), permanent: true);
+  final LocationManageController locationManageController =
+      Get.put(LocationManageController(), permanent: true);
+
+  HelpMeScreen({super.key});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         leading: NotificationIconWithCount(
           onPress: () {
-            Get.to( ()=> NotificationScreen());
+            Get.to(() => NotificationScreen());
           },
         ),
         title: const Text(
@@ -36,7 +40,6 @@ class HelpMeScreen extends StatelessWidget {
         centerTitle: true,
       ),
       body: Stack(
-
         children: [
           GradientContainer(
             mTop: 110,
@@ -57,9 +60,8 @@ class HelpMeScreen extends StatelessWidget {
                   AElevatedButton(
                       title: "ALARM",
                       onPress: () {
-
-                          alarmController.playAlarm();
-                          alarmController.showAlert(context);
+                        alarmController.playAlarm();
+                        alarmController.showAlert(context);
 
                         // Get.to(const NotificationScreen());
                       }),
@@ -67,13 +69,13 @@ class HelpMeScreen extends StatelessWidget {
                   AElevatedButton(
                       title: "DOOR",
                       onPress: () {
-                        Get.to(DoorScreen());
+                        Get.to(() => DoorScreen());
                       }),
                   const SizedBox(height: 15),
                   AElevatedButton(
                       title: "SETTINGS",
                       onPress: () {
-                        Get.to(const SettingsScreen());
+                        Get.to(() => const SettingsScreen());
                       }),
                   // const SizedBox(height: 15),
                   // AElevatedButton(
@@ -90,13 +92,17 @@ class HelpMeScreen extends StatelessWidget {
                   //     onPress: () {
                   //       Get.to( () => CreateGroupScreen());
                   //     }),
-                  // const SizedBox(height: 15),
+                  const SizedBox(height: 15),
                   AElevatedButton(
                     title: "Location Trail",
                     onPress: () {
-                      Get.dialog(
-                         LocationTrailScreen(),
-                      );
+                      locationManageController.getFriends(
+                          Get.find<AuthController>().userModel.value.id);
+                      Get.to(() => LocationManageScreen(
+                          locationManageController: locationManageController));
+                      // Get.dialog(
+                      //   LocationTrailScreen(),
+                      // );
                     },
                   ),
                 ],

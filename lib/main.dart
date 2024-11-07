@@ -10,10 +10,9 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:get/get.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'features/auth/screen/singnup_screen.dart';
-import 'features/contact/add_contacts_controller/add_contact_controller.dart';
-import 'firebase_options.dart';
 
+import 'features/auth/screen/singnup_screen.dart';
+import 'firebase_options.dart';
 
 @pragma("vm:entry-point")
 Future<void> _firebaseBackgroundHandler(RemoteMessage message) async {
@@ -21,6 +20,7 @@ Future<void> _firebaseBackgroundHandler(RemoteMessage message) async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 }
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -28,7 +28,7 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   await dotenv.load(fileName: ".env");
-   Stripe.publishableKey =dotenv.env['STRIPE_PUBLISHABLE_KEY']!;
+  Stripe.publishableKey = dotenv.env['STRIPE_PUBLISHABLE_KEY']!;
   await Supabase.initialize(
     url: dotenv.env['PROJECT_URL']!,
     anonKey: dotenv.env['ANON_KEY']!,
@@ -37,19 +37,19 @@ void main() async {
     ),
   );
 
-FirebaseMessaging.onBackgroundMessage(_firebaseBackgroundHandler);
-
-runApp( const AlarmApp());
+  FirebaseMessaging.onBackgroundMessage(_firebaseBackgroundHandler);
+  runApp(const AlarmApp());
 }
 
 class AlarmApp extends StatefulWidget {
-   const AlarmApp({super.key});
+  const AlarmApp({super.key});
   @override
   State<AlarmApp> createState() => _AlarmAppState();
 }
+
 class _AlarmAppState extends State<AlarmApp> {
   NotificationService notificationService = NotificationService();
-  GetServicesKey getServicesKey=GetServicesKey();
+  GetServicesKey getServicesKey = GetServicesKey();
   @override
   void initState() {
     super.initState();
@@ -59,12 +59,15 @@ class _AlarmAppState extends State<AlarmApp> {
     notificationService.getDeviceToken();
     notificationService.firebaseInit(context);
     notificationService.setupInteractMessage(context);
+    Get.put(AuthController(), permanent: true);
   }
+
   @override
   Widget build(BuildContext context) {
-    Get.put(AuthController(), permanent: true);
     return GetMaterialApp(
-      theme: ThemeData(appBarTheme: AppBarTheme(backgroundColor: Colors.white,surfaceTintColor: Colors.white)),
+      theme: ThemeData(
+          appBarTheme: AppBarTheme(
+              backgroundColor: Colors.white, surfaceTintColor: Colors.white)),
       debugShowCheckedModeBanner: false,
       home: const SessionController(),
     );
@@ -90,13 +93,11 @@ class SessionController extends StatelessWidget {
               return HelpMeScreen();
             }
           }
-          return  AuthScreen();
+          return AuthScreen();
         },
       );
     } else {
-      return  AuthScreen();
+      return AuthScreen();
     }
   }
 }
-
-

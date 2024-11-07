@@ -8,11 +8,10 @@ import 'package:get/get.dart';
 import '../../../models/friends_model.dart';
 
 class AddContactScreen extends StatelessWidget {
-  AddContactScreen({super.key});
+  AddContactScreen({super.key, required this.addContactController});
 
-  final AddContactController addContactController =
-     Get.put(AddContactController());
-bool isEnabled = true;
+  final ContactController addContactController;
+  bool isEnabled = true;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -59,15 +58,24 @@ bool isEnabled = true;
                           }
                           if (addContactController.matchedContacts.isEmpty) {
                             return const Center(
-                                child: Text('No matched contacts found.',style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold,fontSize: 16),));
+                                child: Text(
+                              'No matched contacts found.',
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16),
+                            ));
                           }
                           return ListView.builder(
-                            shrinkWrap: true, // Use shrinkWrap to avoid overflow
-                            physics: const NeverScrollableScrollPhysics(), // Disable scrolling
-                            itemCount: addContactController.matchedContacts.length,
+                            shrinkWrap:
+                                true, // Use shrinkWrap to avoid overflow
+                            physics:
+                                const NeverScrollableScrollPhysics(), // Disable scrolling
+                            itemCount:
+                                addContactController.matchedContacts.length,
                             itemBuilder: (context, index) {
                               final matchedContacts =
-                              addContactController.matchedContacts[index];
+                                  addContactController.matchedContacts[index];
                               return ContactCardWidget(
                                 name: Text(
                                   matchedContacts['name']!,
@@ -80,17 +88,16 @@ bool isEnabled = true;
                                 ),
                                 phoneNumber: matchedContacts['phone']!,
                                 suffixIcon: IconButton(
-                                  icon:
-                                  const Icon(Icons.add, color: Colors.white),
-                                  onPressed: () async{
-                                    if(isEnabled) {
+                                  icon: const Icon(Icons.add,
+                                      color: Colors.white),
+                                  onPressed: () async {
+                                    if (isEnabled) {
                                       isEnabled = false;
-                                      await addContactController.addedContacts(
-                                          matchedContacts);
+                                      await addContactController
+                                          .sendFriendRequestToUser(
+                                              matchedContacts);
                                       isEnabled = true;
                                     }
-
-
                                   },
                                 ),
                               );
@@ -120,70 +127,93 @@ bool isEnabled = true;
                                 child: CircularProgressIndicator());
                           }
 
-                          return ListView.builder(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            itemCount: addContactController.requestedFriends.length,
-                            itemBuilder: (context, index) {
-                              final FriendsModel friend =
-                              addContactController.requestedFriends[index];
-
-                              return  ContactCardWidget(
-                                name: addContactController.isEditing.value
-                                    ? TextField(
-                                  controller: TextEditingController(text: friend.editedName),
-                                  style: const TextStyle(color: Colors.white),
-                                  onSubmitted: (newName) {
-                                    addContactController.updateContactName(
-                                      index: index,
-                                      newName: newName,
-                                      friendId: friend.friendId,
-                                    );
-                                    addContactController.isEditing.value = false;
-                                  },
-                                  decoration: const InputDecoration(
-                                    border: InputBorder.none,
-                                    contentPadding: EdgeInsets.all(0),
-                                  ),
-                                )
-                                      : Text(
-                                    friend.editedName,
-                                    style: const TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
+                          return addContactController.requestedFriends.isEmpty
+                              ? Center(
+                                  child: Text(
+                                  'No Added contacts found.',
+                                  style: TextStyle(
                                       color: Colors.white,
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  phoneNumber: friend.friendPhone.toString(),
-                                  suffixIcon: friend.requestStatus==1?
-                                  Row(
-                                    children: [
-                                      IconButton(
-                                        icon: const Icon(Icons.edit,
-                                            color: Colors.white),
-                                        onPressed: () {
-                                          addContactController.isEditing.value = true;
-                                        },
-                                      ),
-                                      IconButton(
-                                        icon: const Icon(Icons.delete,
-                                            color: Colors.white),
-                                        onPressed: () {
-                                          addContactController.removeContact(
-                                              index, friend.friendId);
-                                        },
-                                      ),
-                                    ],
-                                  ): const Text("Pending",style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),),
-                                );
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16),
+                                ))
+                              : ListView.builder(
+                                  shrinkWrap: true,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  itemCount: addContactController
+                                      .requestedFriends.length,
+                                  itemBuilder: (context, index) {
+                                    final FriendsModel friend =
+                                        addContactController
+                                            .requestedFriends[index];
 
-                            },
-                          );
+                                    return ContactCardWidget(
+                                      name: addContactController.isEditing.value
+                                          ? TextField(
+                                              controller: TextEditingController(
+                                                  text: friend.editedName),
+                                              style: const TextStyle(
+                                                  color: Colors.white),
+                                              onSubmitted: (newName) {
+                                                addContactController
+                                                    .updateContactName(
+                                                  index: index,
+                                                  newName: newName,
+                                                  friendId: friend.friendId,
+                                                );
+                                                addContactController
+                                                    .isEditing.value = false;
+                                              },
+                                              decoration: const InputDecoration(
+                                                border: InputBorder.none,
+                                                contentPadding:
+                                                    EdgeInsets.all(0),
+                                              ),
+                                            )
+                                          : Text(
+                                              friend.editedName,
+                                              style: const TextStyle(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.white,
+                                              ),
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                      phoneNumber:
+                                          friend.friendPhone.toString(),
+                                      suffixIcon: friend.requestStatus == 1
+                                          ? Row(
+                                              children: [
+                                                IconButton(
+                                                  icon: const Icon(Icons.edit,
+                                                      color: Colors.white),
+                                                  onPressed: () {
+                                                    addContactController
+                                                        .isEditing.value = true;
+                                                  },
+                                                ),
+                                                IconButton(
+                                                  icon: const Icon(Icons.delete,
+                                                      color: Colors.white),
+                                                  onPressed: () {
+                                                    addContactController
+                                                        .removeContact(index,
+                                                            friend.friendId);
+                                                  },
+                                                ),
+                                              ],
+                                            )
+                                          : const Text(
+                                              "Pending",
+                                              style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                    );
+                                  },
+                                );
                         }),
                       ),
                     ),
-
                   ],
                 ),
               ),
@@ -194,7 +224,6 @@ bool isEnabled = true;
       ),
     );
   }
-
 }
 
 class ContactCardWidget extends StatelessWidget {

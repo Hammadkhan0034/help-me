@@ -202,9 +202,6 @@
 //   }
 // }
 
-
-
-
 import 'package:alarm_app/constants/colors.dart';
 import 'package:alarm_app/features/notification/widget/notification_widget.dart';
 import 'package:alarm_app/widgets/elevated_button.dart';
@@ -220,7 +217,8 @@ import '../widget/full_screen_view_image.dart';
 
 class NotificationScreen extends StatelessWidget {
   NotificationScreen({super.key});
-  final NotificationController notificationController = Get.put(NotificationController());
+  final NotificationController notificationController =
+      Get.put(NotificationController());
 
   @override
   Widget build(BuildContext context) {
@@ -242,332 +240,272 @@ class NotificationScreen extends StatelessWidget {
       ),
       body: GradientContainer(
         child: Padding(
-          padding: const EdgeInsets.all(15),
-          child:
-          Obx(() {
-            if (notificationController.notifications.isEmpty) {
-              return const Center(
-                child: Text(
-                  "No notifications",
-                  style: TextStyle(fontSize: 28, color: AColors.white),
-                ),
-              );
-            }
-
-            return ListView.builder(
-              itemCount: notificationController.notifications.length,
-              itemBuilder: (context, index) {
-                final notification = notificationController.notifications[index];
-
-                // Check if the notification is of type 'emergency'
-                bool isEmergency = notification.notificationType == 'emergency';
-
-                return Dismissible(
-                  key: Key(notification.id), // Unique key for each notification
-                  direction: DismissDirection.endToStart, // Allow swipe to the right
-                  onDismissed: (direction) {
-                    // Remove the notification from the list
-                    notificationController.deleteNotification(notification.id);
-                     notificationController.rejectInvitation(notification.notificationFrom, notification.notificationFor);
-
-
-                    // Show a snackbar or a message if desired
-                    Utils.showSuccessSnackBar(
-                      title: 'Deleted',
-                      description: 'Notification has been deleted.',
-                    );
-                  },
-                  background: Container(
-                    color: CupertinoColors.destructiveRed, // Background color when swiped
-                    alignment: Alignment.centerLeft,
-                    child: const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 20.0),
-                      child: Icon(
-                        Icons.delete,
-                        color: Colors.white,
-                      ),
-                    ),
+            padding: const EdgeInsets.all(15),
+            child: Obx(() {
+              if (notificationController.notifications.isEmpty) {
+                return const Center(
+                  child: Text(
+                    "No notifications",
+                    style: TextStyle(fontSize: 28, color: AColors.white),
                   ),
-                  child: isEmergency?  Padding(
-                    padding: const EdgeInsets.only(bottom: 8.0),
-                    child: ARoundedContainer(
-                      padding: 15,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          NotificationWidget(title:  "From: ${notification.data?['name'] ?? 'Unknown'}"),
-                          const SizedBox(height: 8),
-                          if (notification.data?['address'] != null)
-                            GestureDetector(
-                                onTap: (){
-                                  notificationController.openMap(notification.address!['latitude']!, notification.address!['longitude']!);
-                                },
+                );
+              }
 
-                                child: NotificationWidget(title:   "Address: ${notification.data?['address'] ?? 'Address not provided'}")),
-                          const SizedBox(height: 15),
-                          if (notification.data?['message'] != null)
-                            NotificationWidget(title:"Message: ${notification.data?['message'] ?? 'No message'}"),
-                          const SizedBox(height: 15),
-                          if (isEmergency && notification.data?['imageUrl'] != null && notification.data?['imageUrl'].isNotEmpty)
-                            Center(
-                              child: Container(
-                                width: Get.width * 0.7,
-                                height: 200,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(12),
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      Get.to(() => FullScreenImageView(imageUrl: notification.data?['imageUrl']));
-                                    },
-                                    child: Image.network(
-                                      notification.data?['imageUrl'] ?? '',
-                                      fit: BoxFit.cover,
-                                      errorBuilder: (context, error, stackTrace) {
-                                        return Container(
+              return ListView.builder(
+                itemCount: notificationController.notifications.length,
+                itemBuilder: (context, index) {
+                  final notification =
+                      notificationController.notifications[index];
+
+                  // Check if the notification is of type 'emergency'
+                  bool isEmergency =
+                      notification.notificationType == 'emergency';
+
+                  return Dismissible(
+                      key: Key(
+                          notification.id), // Unique key for each notification
+                      direction: DismissDirection
+                          .endToStart, // Allow swipe to the right
+                      onDismissed: (direction) {
+                        // Remove the notification from the list
+                        notificationController
+                            .deleteNotification(notification.id);
+                        if (notification.notificationType == "invitation") {
+                          notificationController.rejectInvitation(
+                              notification.notificationFrom,
+                              notification.notificationFor);
+                        }
+
+                        // Show a snackbar or a message if desired
+                        Utils.showSuccessSnackBar(
+                          title: 'Deleted',
+                          description: 'Notification has been deleted.',
+                        );
+                      },
+                      background: Container(
+                        color: CupertinoColors
+                            .destructiveRed, // Background color when swiped
+                        alignment: Alignment.centerLeft,
+                        child: const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 20.0),
+                          child: Icon(
+                            Icons.delete,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                      child: isEmergency
+                          ? Padding(
+                              padding: const EdgeInsets.only(bottom: 8.0),
+                              child: ARoundedContainer(
+                                padding: 15,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    NotificationWidget(
+                                        title:
+                                            "From: ${notification.data?['name'] ?? 'Unknown'}"),
+                                    const SizedBox(height: 8),
+                                    if (notification.data?['address'] != null)
+                                      GestureDetector(
+                                          onTap: () {
+                                            Utils.openMap(
+                                                notification
+                                                    .address!['latitude']!,
+                                                notification
+                                                    .address!['longitude']!);
+                                          },
+                                          child: NotificationWidget(
+                                              title:
+                                                  "Address: ${notification.data?['address'] ?? 'Address not provided'}")),
+                                    const SizedBox(height: 15),
+                                    if (notification.data?['message'] != null)
+                                      NotificationWidget(
+                                          title:
+                                              "Message: ${notification.data?['message'] ?? 'No message'}"),
+                                    const SizedBox(height: 15),
+                                    if (isEmergency &&
+                                        notification.data?['imageUrl'] !=
+                                            null &&
+                                        notification
+                                            .data?['imageUrl'].isNotEmpty)
+                                      Center(
+                                        child: Container(
+                                          width: Get.width * 0.7,
+                                          height: 200,
                                           decoration: BoxDecoration(
-                                            color: Colors.grey, // Background color for the placeholder
-                                            borderRadius: BorderRadius.circular(12),
+                                            borderRadius:
+                                                BorderRadius.circular(12),
                                           ),
-                                          child: const Center(
-                                            child: Text(
-                                              'Image not available',
-                                              style: TextStyle(color: Colors.white),
+                                          child: ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(12),
+                                            child: GestureDetector(
+                                              onTap: () {
+                                                Get.to(() =>
+                                                    FullScreenImageView(
+                                                        imageUrl:
+                                                            notification.data?[
+                                                                'imageUrl']));
+                                              },
+                                              child: Image.network(
+                                                notification
+                                                        .data?['imageUrl'] ??
+                                                    '',
+                                                fit: BoxFit.cover,
+                                                errorBuilder: (context, error,
+                                                    stackTrace) {
+                                                  return Container(
+                                                    decoration: BoxDecoration(
+                                                      color: Colors
+                                                          .grey, // Background color for the placeholder
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              12),
+                                                    ),
+                                                    child: const Center(
+                                                      child: Text(
+                                                        'Image not available',
+                                                        style: TextStyle(
+                                                            color:
+                                                                Colors.white),
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
+                                              ),
                                             ),
                                           ),
-                                        );
-                                      },
-                                    ),
-                                  ),
+                                        ),
+                                      )
+                                    else
+                                      const SizedBox.shrink(),
+                                  ],
                                 ),
                               ),
                             )
-                          else
-                            const SizedBox.shrink(),
-
-                        ],
-                      ),
-                    ),
-                  ):Padding(
-                    padding: const EdgeInsets.only(bottom: 8.0),
-                    child: ARoundedContainer(
-                      padding: 15,
-                      child: Column(
-                        children: [
-                          Row(
-                            children: [
-                              const Text(
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                "From: ",
-                                style: TextStyle(
-                                    fontWeight: FontWeight.w600,
-                                    color: AColors.white),
-                              ),
-                              SizedBox(
-                                width: Get.width * 0.35,
-                                child: Text(
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  notification.data?['name'] ?? 'Unknown',
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      color: AColors.white),
+                          : Padding(
+                              padding: const EdgeInsets.only(bottom: 8.0),
+                              child: ARoundedContainer(
+                                padding: 15,
+                                child: Column(
+                                  children: [
+                                    Row(
+                                      children: [
+                                        const Text(
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          "From: ",
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w600,
+                                              color: AColors.white),
+                                        ),
+                                        SizedBox(
+                                          width: Get.width * 0.35,
+                                          child: Text(
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            notification.data?['name'] ??
+                                                'Unknown',
+                                            style: const TextStyle(
+                                                fontWeight: FontWeight.w600,
+                                                color: AColors.white),
+                                          ),
+                                        ),
+                                        const SizedBox(
+                                          width: 10,
+                                        ),
+                                        SizedBox(
+                                          width: Get.width * 0.3,
+                                          child: Text(
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            notification.data?['phone'] ??
+                                                'Unknown',
+                                            style: const TextStyle(
+                                                fontWeight: FontWeight.w600,
+                                                color: AColors.white),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 8),
+                                    notification.data?['message'] != null
+                                        ? Row(
+                                            children: [
+                                              const Text(
+                                                "Message: ",
+                                                style: TextStyle(
+                                                    fontWeight: FontWeight.w600,
+                                                    color: AColors.white),
+                                              ),
+                                              SizedBox(
+                                                width: Get.width * 0.5,
+                                                child: Text(
+                                                  notification
+                                                          .data?['message'] ??
+                                                      'No message',
+                                                  maxLines: 2,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  style: const TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      color: AColors.white),
+                                                ),
+                                              ),
+                                            ],
+                                          )
+                                        : const SizedBox.shrink(),
+                                    const SizedBox(height: 15),
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: AElevatedButton(
+                                              bgColor:
+                                                  CupertinoColors.activeGreen,
+                                              title: "Accept",
+                                              padding: 0,
+                                              onPress: () async {
+                                                await notificationController
+                                                    .acceptInvitation(
+                                                        notification
+                                                            .notificationFrom,
+                                                        notification
+                                                            .notificationFor);
+                                                notificationController
+                                                    .deleteNotification(
+                                                        notification.id);
+                                              }),
+                                        ),
+                                        const SizedBox(width: 20),
+                                        Expanded(
+                                          child: AElevatedButton(
+                                              bgColor: CupertinoColors
+                                                  .destructiveRed,
+                                              title: "Reject",
+                                              padding: 0,
+                                              onPress: () async {
+                                                await notificationController
+                                                    .rejectInvitation(
+                                                        notification
+                                                            .notificationFrom,
+                                                        notification
+                                                            .notificationFor);
+                                                notificationController
+                                                    .deleteNotification(
+                                                        notification.id);
+                                              }),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
                                 ),
                               ),
-                              const SizedBox(width: 10,),
-                              SizedBox(
-                                width: Get.width * 0.3,
-                                child: Text(
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  notification.data?['phone'] ?? 'Unknown',
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      color: AColors.white),
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 8),
-                          notification.data?['message'] !=null? Row(
-                            children: [
-                              const Text(
-                                "Message: ",
-                                style: TextStyle(
-                                    fontWeight: FontWeight.w600,
-                                    color: AColors.white),
-                              ),
-                              SizedBox(
-                                width: Get.width * 0.5,
-                                child: Text(
-                                  notification.data?['message']?? 'No message',
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      color: AColors.white),
-                                ),
-                              ),
-                            ],
-                          ):const SizedBox.shrink(),
-                          const SizedBox(height: 15),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: AElevatedButton(
-                                    bgColor: CupertinoColors.activeGreen,
-                                    title: "Accept",
-                                    padding: 0,
-                                    onPress: () async{
-                                      await notificationController.acceptInvitation(notification.notificationFrom, notification.notificationFor);
-                                      notificationController.deleteNotification(notification.id);
-
-                                    }),
-                              ),
-                              const SizedBox(width: 20),
-                              Expanded(
-                                child: AElevatedButton(
-                                    bgColor: CupertinoColors.destructiveRed,
-                                    title: "Reject",
-                                    padding: 0,
-                                    onPress: ()async {
-                                      await notificationController.rejectInvitation(notification.notificationFrom, notification.notificationFor);
-                                      notificationController.deleteNotification(notification.id);
-
-                                    }),
-                              ),
-                            ],
-                          ),
-
-                        ],
-                      ),
-                    ),
-                  )
-                );
-
-              },
-            );
-          })
-
-
-
-          // Obx(() {
-          //   if (notificationController.notifications.isEmpty) {
-          //     return const Center(
-          //       child: Text(
-          //         "No notifications",
-          //         style: TextStyle(fontSize: 28,color: AColors.white),
-          //       ),
-          //     );
-          //   }
-          //
-          //   return ListView.builder(
-          //     itemCount: notificationController.notifications.length,
-          //     itemBuilder: (context, index) {
-          //       final notification = notificationController.notifications[index];
-          //       return Padding(
-          //         padding: const EdgeInsets.only(bottom: 8.0),
-          //         child: ARoundedContainer(
-          //           padding: 15,
-          //           child: Column(
-          //             children: [
-          //               Row(
-          //                 children: [
-          //                   const Text(
-          //                     maxLines: 1,
-          //                     overflow: TextOverflow.ellipsis,
-          //                     "From: ",
-          //                     style: TextStyle(
-          //                         fontWeight: FontWeight.w600,
-          //                         color: AColors.white),
-          //                   ),
-          //                   SizedBox(
-          //                     width: Get.width * 0.35,
-          //                     child: Text(
-          //                       maxLines: 1,
-          //                       overflow: TextOverflow.ellipsis,
-          //                       notification.data?['name'] ?? 'Unknown',
-          //                       style: const TextStyle(
-          //                           fontWeight: FontWeight.w600,
-          //                           color: AColors.white),
-          //                     ),
-          //                   ),
-          //                   const SizedBox(width: 10,),
-          //                   SizedBox(
-          //                     width: Get.width * 0.3,
-          //                     child: Text(
-          //                       maxLines: 1,
-          //                       overflow: TextOverflow.ellipsis,
-          //                       notification.data?['phone'] ?? 'Unknown',
-          //                       style: const TextStyle(
-          //                           fontWeight: FontWeight.w600,
-          //                           color: AColors.white),
-          //                     ),
-          //                   ),
-          //                 ],
-          //               ),
-          //               const SizedBox(height: 8),
-          //              notification.data?['message'] !=null? Row(
-          //                 children: [
-          //                   const Text(
-          //                     "Message: ",
-          //                     style: TextStyle(
-          //                         fontWeight: FontWeight.w600,
-          //                         color: AColors.white),
-          //                   ),
-          //                   SizedBox(
-          //                     width: Get.width * 0.5,
-          //                     child: Text(
-          //                       notification.data?['message']?? 'No message',
-          //                       maxLines: 2,
-          //                       overflow: TextOverflow.ellipsis,
-          //                       style: const TextStyle(
-          //                           fontWeight: FontWeight.w600,
-          //                           color: AColors.white),
-          //                     ),
-          //                   ),
-          //                 ],
-          //               ):const SizedBox.shrink(),
-          //               const SizedBox(height: 15),
-          //               Row(
-          //                 children: [
-          //                   Expanded(
-          //                     child: AElevatedButton(
-          //                         bgColor: CupertinoColors.activeGreen,
-          //                         title: "Accept",
-          //                         padding: 0,
-          //                         onPress: () async{
-          //                          await notificationController.acceptInvitation(notification.notificationFrom, notification.notificationFor);
-          //                         notificationController.deleteNotification(notification.id);
-          //
-          //                         }),
-          //                   ),
-          //                   const SizedBox(width: 20),
-          //                   Expanded(
-          //                     child: AElevatedButton(
-          //                         bgColor: CupertinoColors.destructiveRed,
-          //                         title: "Reject",
-          //                         padding: 0,
-          //                         onPress: ()async {
-          //                          await notificationController.rejectInvitation(notification.notificationFrom, notification.notificationFor);
-          //                         notificationController.deleteNotification(notification.id);
-          //
-          //                         }),
-          //                   ),
-          //                 ],
-          //               ),
-          //
-          //             ],
-          //           ),
-          //         ),
-          //       );
-          //     },
-          //   );
-          // }),
-        ),
+                            ));
+                },
+              );
+            })),
       ),
     );
   }

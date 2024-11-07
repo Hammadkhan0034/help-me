@@ -1,11 +1,6 @@
-import 'package:alarm_app/common/widgets/rounded_container.dart';
-import 'package:alarm_app/constants/colors.dart';
 import 'package:alarm_app/features/plans/controllers/payment_controller.dart';
-import 'package:alarm_app/features/plans/screens/widgets/basic_plan.dart';
-import 'package:alarm_app/features/plans/screens/widgets/daily_plan.dart';
-import 'package:alarm_app/features/plans/screens/widgets/monthly_plan.dart';
 import 'package:alarm_app/features/plans/screens/widgets/yearly_plan.dart';
-
+import 'package:alarm_app/widgets/background_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -19,13 +14,13 @@ class PaymentScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text("Plans"),
       ),
-      body: SingleChildScrollView(
-        child: Padding(
+      body: BackgroundWidget(
+        widget: Padding(
           padding: const EdgeInsets.all(10.0),
           child: Column(
             children: [
               // BasicPlan(paymentController: paymentController),
-              // SizedBox(height: 15),
+              SizedBox(height: 110),
               // DailyPlan(paymentController: paymentController),
               // SizedBox(height: 15),
               // MonthlyPlan(paymentController: paymentController),
@@ -38,8 +33,6 @@ class PaymentScreen extends StatelessWidget {
     );
   }
 }
-
-
 
 class MPlanTile extends StatelessWidget {
   const MPlanTile({
@@ -66,7 +59,7 @@ class MPlanTile extends StatelessWidget {
               style: Theme.of(context)
                   .textTheme
                   .headlineSmall!
-                  .apply(fontWeightDelta: 2, color:up? Colors.white:null),
+                  .apply(fontWeightDelta: 2, color: up ? Colors.white : null),
             ),
             const Spacer(),
             Icon(

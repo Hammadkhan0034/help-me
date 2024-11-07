@@ -12,6 +12,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
 import '../../../servies/notification_service.dart';
 import '../screen/otp_screen.dart';
 
@@ -19,17 +20,22 @@ class AuthController extends GetxController {
   var phoneNumber = ''.obs;
   final TextEditingController nameController = TextEditingController();
   final SupabaseClient supabaseClient = Supabase.instance.client;
-  Rx<UserModel> userModel =
-      UserModel(id: 'id', name: 'name', phone: 'phone', fcm: 'fcm').obs;
+  Rx<UserModel> userModel = UserModel(
+          id: 'id',
+          name: 'name',
+          phone: 'phone',
+          fcm: 'fcm',
+          isLocationEnabled: false)
+      .obs;
   Rx<ContactsModel> contactModel = const ContactsModel(phone: '').obs;
   Future<void> signUp() async {
-
     print("PHONE NUMBER : ${phoneNumber.value}");
     try {
       await supabaseClient.auth.signInWithOtp(
         phone: phoneNumber.value,
       );
-      Utils.showSuccessSnackBar(title: "OTP send", description: "OTP send to ${phoneNumber.value}");
+      Utils.showSuccessSnackBar(
+          title: "OTP send", description: "OTP send to ${phoneNumber.value}");
       Get.to(OtpScreen());
     } on AuthException catch (error) {
       if (kDebugMode) {
@@ -51,8 +57,6 @@ class AuthController extends GetxController {
       }
     }
   }
-
-
 
   // Future<String?> verifyOtp(String otp) async {
   //   NotificationService notificationService = NotificationService();
@@ -112,13 +116,12 @@ class AuthController extends GetxController {
   //   }
   // }
 
-
   Future<String?> verifyOtp(String otp) async {
     NotificationService notificationService = NotificationService();
     String? fcmToken = await notificationService.getDeviceToken();
 
     try {
-      final AuthResponse  res = await supabaseClient.auth.verifyOTP(
+      final AuthResponse res = await supabaseClient.auth.verifyOTP(
         type: OtpType.sms,
         token: otp,
         phone: phoneNumber.value,
@@ -137,31 +140,31 @@ class AuthController extends GetxController {
       final User? user = supabaseClient.auth.currentUser;
       final Session? session = supabaseClient.auth.currentSession;
 
-
       userModel.value = UserModel(
         id: user!.id,
         name: nameController.text.trim(),
         phone: user.phone!,
         fcm: fcmToken ?? "",
+        isLocationEnabled: false,
       );
 
       await UserCrud.insertUserData(user.id, userModel.value);
-      Get.to(() =>  HelpMeScreen());
+      Get.to(() => HelpMeScreen());
       await getProfile();
 
-      contactModel.value = ContactsModel(phone: userModel.value.phone.toString());
-       await GroupContacts.addUserToContactModel(userModel.value);
+      contactModel.value =
+          ContactsModel(phone: userModel.value.phone.toString());
+      await GroupContacts.addUserToContactModel(userModel.value);
 
       return user.id;
     } catch (error, st) {
-      log("ERROR verofing otp lof", error:error ,stackTrace:st);
+      log("ERROR verofing otp lof", error: error, stackTrace: st);
       if (kDebugMode) {
         print("Error verifying OTP: $error");
       }
       return null;
     }
   }
-
 
   Future<int> getProfile() async {
     try {
@@ -196,15 +199,13 @@ class AuthController extends GetxController {
     return 0; // Return 0 in case of failure
   }
 
-
   void checkUserSubscription() async {
     try {
       // await UserCrud.updateUserSubscription(userModel.value);
       Utils.showSuccessSnackBar(
           title: 'Success', description: 'Profile updated successfully');
     } on PostgrestException catch (error) {
-      Utils.showErrorSnackBar(
-          title: 'Error', description: error.message);
+      Utils.showErrorSnackBar(title: 'Error', description: error.message);
     } catch (error) {
       Utils.showErrorSnackBar(
           title: 'Error', description: 'An unexpected error occurred');

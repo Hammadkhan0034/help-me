@@ -1,4 +1,3 @@
-
 import 'dart:io';
 
 import 'package:alarm_app/constants/colors.dart';
@@ -7,13 +6,28 @@ import 'package:get/get.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-
-
-
-
-
+import 'package:url_launcher/url_launcher.dart';
 
 class Utils {
+  static String getPhoneWithoutCode(String num) {
+    String number = num.replaceAll(RegExp(r'[^0-9]'), '');
+    return number.substring(number.length - 10);
+  }
+
+  static Future<void> openMap(double latitude, double longitude) async {
+    String googleUrl =
+        'https://www.google.com/maps/search/?api=1&query=$latitude,$longitude';
+    String appleUrl = 'https://maps.apple.com/?q=$latitude,$longitude';
+
+    if (await canLaunchUrl(Uri.parse(googleUrl))) {
+      await launchUrl(Uri.parse(googleUrl));
+    } else if (await launchUrl(Uri.parse(appleUrl))) {
+      await canLaunchUrl(Uri.parse(appleUrl));
+    } else {
+      throw 'Could not launch map';
+    }
+  }
+
   static showSuccessSnackBar({
     required String title,
     required String description,
@@ -36,7 +50,6 @@ class Utils {
     );
   }
 
-
   static showErrorSnackBar(
       {required String title, required String description}) {
     Get.snackbar(
@@ -56,8 +69,6 @@ class Utils {
       snackPosition: SnackPosition.BOTTOM,
     );
   }
-
-
 
   static String formatPhoneNumber(String number) {
     number = number.replaceAll(" ", "");
@@ -100,9 +111,11 @@ class Utils {
     // Return null if no file was picked
     return null;
   }
+
   static Future<File?> imagePickerBottomSheet(BuildContext context) async {
     File? imageFile = await showModalBottomSheet<File>(
       context: context,
+      backgroundColor: AColors.primary,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(20),
@@ -137,10 +150,11 @@ class Utils {
                           ),
                           decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(10),
-                              border: Border.all(color: Colors.black)),
+                              border: Border.all(color: Colors.white)),
                           child: const Icon(
                             Icons.camera_alt_outlined,
                             size: 40,
+                            color: Colors.white,
                           ),
                         ),
                         const SizedBox(
@@ -148,7 +162,10 @@ class Utils {
                         ),
                         const Text(
                           "CAMERA",
-                          style: TextStyle(fontWeight: FontWeight.w600),
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
                         ),
                       ],
                     ),
@@ -169,10 +186,13 @@ class Utils {
                           ),
                           decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(10),
-                              border: Border.all(color: Colors.black)),
+                              border: Border.all(
+                                color: Colors.white,
+                              )),
                           child: const Icon(
                             Icons.image,
                             size: 40,
+                            color: Colors.white,
                           ),
                         ),
                         const SizedBox(
@@ -180,7 +200,10 @@ class Utils {
                         ),
                         const Text(
                           "GALLERY",
-                          style: TextStyle(fontWeight: FontWeight.w600),
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
                         ),
                       ],
                     ),
@@ -195,8 +218,7 @@ class Utils {
   }
 
   static Future<bool> askForConfirmation(
-      BuildContext context, String action, String title) async
-  {
+      BuildContext context, String action, String title) async {
     bool isConfirmed = false;
     isConfirmed = await showDialog(
         context: context,
@@ -249,8 +271,7 @@ class Utils {
   }
 
   static DateTime convertTo24HourFormat(
-      String time12Hour, DateTime selectedDate)
-  {
+      String time12Hour, DateTime selectedDate) {
     String period = time12Hour.substring(time12Hour.length - 2);
     String time = time12Hour.substring(0, time12Hour.length - 3);
 
@@ -269,8 +290,7 @@ class Utils {
   }
 
   static Offset getTapPosition(
-      TapDownDetails tapDownDetails, BuildContext context)
-  {
+      TapDownDetails tapDownDetails, BuildContext context) {
     final RenderBox renderBox = context.findRenderObject() as RenderBox;
     Offset offset = renderBox.globalToLocal(tapDownDetails.globalPosition);
     return offset;
@@ -292,8 +312,7 @@ class Utils {
   }
 
   static String getFormattedDateAndTime(
-      DateTime dateTime, TimeOfDay timeOfDay)
-  {
+      DateTime dateTime, TimeOfDay timeOfDay) {
     final formatter = DateFormat('dd.MM.yyyy');
     return "${formatter.format(dateTime)} - ${timeOfDay.hour.toString().padLeft(2, '0')}:${timeOfDay.minute.toString().padLeft(2, '0')}";
   }

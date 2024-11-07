@@ -1,4 +1,6 @@
-import 'package:alarm_app/features/contact/add_contacts_controller/add_contact_controller.dart';
+import 'dart:developer';
+
+import 'package:alarm_app/models/friends_profile_model.dart';
 import 'package:get/get.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -8,10 +10,8 @@ class FriendsService {
   final SupabaseClient client = Supabase.instance.client;
   Future<void> addFriend(FriendsModel friend) async {
     try {
-      final response = await client
-          .from('friends')
-          .upsert(friend.toMap()).select()
-          ;
+      final response =
+          await client.from('friends').upsert(friend.toMap()).select();
 
       if (response == null) {
         throw Exception('Response is null, no data received from Supabase.');
@@ -25,32 +25,66 @@ class FriendsService {
     }
   }
 
-
-
   Future<void> updateFriend(String name, String friendId, String userId) async {
-  await client
+    await client
         .from('friends')
         .update({
-      'edited_name': name,
-      'updated_at': DateTime.now().toIso8601String(),
-    })
+          'edited_name': name,
+          'updated_at': DateTime.now().toIso8601String(),
+        })
         .eq('friend_id', friendId)
         .eq('user_id', userId)
         .select();
     print("Updated Friend's Name");
   }
 
+  Future<bool> canSeeFriendLocationById(String userId, String friendId) async {
+    try {
+      final response = await client
+          .from('friends')
+          .select('*')
+          .eq('user_id', userId)
+          .eq('friend_id', friendId)
+          .maybeSingle();
+
+      if (response == null) {
+        return false;
+      }
+      return response["can_see_location"];
+    } catch (e, st) {
+      log("message", error: e, stackTrace: st);
+      return false;
+    }
+  }
+
+  Future<bool> updateCanFriendSeeLocation(
+      bool status, String friendId, String rowId) async {
+    try {
+      await client
+          .from('friends')
+          .update({
+            'can_see_location': status,
+            'updated_at': DateTime.now().toIso8601String(),
+          })
+          .eq('friend_id', friendId)
+          .eq('id', rowId);
+      return true;
+    } catch (e, st) {
+      log("updateCanFriendSeeLocation", error: e, stackTrace: st);
+      return false;
+    }
+  }
 
   // Delete Implemented
   Future<void> deleteFriend(String friendId, String userId) async {
-   await client
+    await client
         .from('friends')
         .delete()
         .eq('friend_id', friendId)
-        .eq('user_id', userId)
-        ;
+        .eq('user_id', userId);
     print("Deleted Friend");
   }
+
   //Implemented
   Future<String?> fetchFriendFcm(String friendRequestId, String userId) async {
     print("Fetching FCM for Friend ID: $friendRequestId and User ID: $userId");
@@ -63,7 +97,8 @@ class FriendsService {
           .maybeSingle();
 
       if (friendResponse == null || friendResponse['friend_id'] == null) {
-        print("No friend found with the provided request ID: $friendRequestId and user ID: $userId");
+        print(
+            "No friend found with the provided request ID: $friendRequestId and user ID: $userId");
         return null;
       }
 
@@ -89,9 +124,9 @@ class FriendsService {
     }
   }
 
-
-static  bool isValidUUID(String uuid) {
-    final regex = RegExp(r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$');
+  static bool isValidUUID(String uuid) {
+    final regex = RegExp(
+        r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$');
     return regex.hasMatch(uuid);
   }
 
@@ -133,7 +168,8 @@ static  bool isValidUUID(String uuid) {
   //   }
   // }
 
-  void subscribeToFriends(String userId, RxList<FriendsModel> requestedFriends) {
+  void subscribeToFriends(
+      String userId, RxList<FriendsModel> requestedFriends) {
     if (!isValidUUID(userId)) {
       throw Exception('Invalid UUID format for userId: $userId');
     }
@@ -145,43 +181,55 @@ static  bool isValidUUID(String uuid) {
           .stream(primaryKey: ["id"])
           .eq('user_id', userId) // Filter by user_id
           .listen((snapshot) async {
-        if (snapshot.isEmpty) {
-          print('No friends found for user: $userId');
-          requestedFriends.clear(); // Clear list if no friends found
-          return;
-        }
+            if (snapshot.isEmpty) {
+              print('No friends found for user: $userId');
+              requestedFriends.clear(); // Clear list if no friends found
+              return;
+            }
 
-        // Handle the updated friend data
-        List<dynamic> friendsData = snapshot;
+            // Handle the updated friend data
+            List<dynamic> friendsData = snapshot;
 
-        List<Future<FriendsModel>> friendFutures = friendsData.map((friend) async {
-          Map<String, dynamic> friendMap = friend as Map<String, dynamic>;
+            List<Future<FriendsModel>> friendFutures =
+                friendsData.map((friend) async {
+              Map<String, dynamic> friendMap = friend as Map<String, dynamic>;
 
-          final profileResponse = await client
-              .from('profiles')
-              .select('phone')
-              .eq('id', friendMap['friend_id'])
-              .single();
+              final profileResponse = await client
+                  .from('profiles')
+                  .select('phone')
+                  .eq('id', friendMap['friend_id'])
+                  .single();
 
-          String? phoneNumber = profileResponse['phone'] as String?;
+              String? phoneNumber = profileResponse['phone'] as String?;
 
-          return FriendsModel.fromMap(friendMap)..friendPhone = phoneNumber;
-        }).toList();
+              return FriendsModel.fromMap(friendMap)..friendPhone = phoneNumber;
+            }).toList();
 
-        List<FriendsModel> friends = await Future.wait(friendFutures);
+            List<FriendsModel> friends = await Future.wait(friendFutures);
 
-        // Update the requestedFriends list
-        requestedFriends.value = friends;
-      });
-
+            // Update the requestedFriends list
+            requestedFriends.value = friends;
+          });
     } catch (e) {
       print('Error subscribing to friends: $e');
     }
   }
 
+  Future<List<FriendsProfileModel>> fetchFriends(String id) async {
+    // String id = "5abbbfd5-dacf-47c4-ba14-8ce863989740";
+    try {
+      final List<Map<String, dynamic>> response = await client
+          .rpc('get_friends_profiles', params: {'user_id_param': id});
 
-
-
+      return response
+          .map((element) => FriendsProfileModel.fromMap(element))
+          .toList();
+    } catch (e, st) {
+      log("fetchFriends from LocationManage Controller",
+          error: e, stackTrace: st);
+      return [];
+    }
+  }
 
   // Future<String?> fetchFriendPhoneByNumber(String userId, String friendPhoneNumber) async {
   //   try {
@@ -210,7 +258,8 @@ static  bool isValidUUID(String uuid) {
   //   }
   // }
 
-  Future<List<String>?> fetchFriendPhoneByNumber(String userId, String friendPhoneNumber) async {
+  Future<List<String>?> fetchFriendPhoneByNumber(
+      String userId, String friendPhoneNumber) async {
     try {
       final response = await client
           .from('friends')
@@ -224,29 +273,30 @@ static  bool isValidUUID(String uuid) {
       }
 
       // Map response to a list of friend phone numbers with null checks
-      List<String> friendPhones = response.map<String>((friend) {
-        final profile = friend['profiles']; // Access profiles object
-        if (profile != null && profile['phone'] != null) {
-          return profile['phone'] as String; // Extract phone number
-        }
-        return ''; // Return empty string if phone number is null
-      }).where((phone) => phone.isNotEmpty).toList(); // Filter out empty phone numbers
+      List<String> friendPhones = response
+          .map<String>((friend) {
+            final profile = friend['profiles']; // Access profiles object
+            if (profile != null && profile['phone'] != null) {
+              return profile['phone'] as String; // Extract phone number
+            }
+            return ''; // Return empty string if phone number is null
+          })
+          .where((phone) => phone.isNotEmpty)
+          .toList(); // Filter out empty phone numbers
 
-      return friendPhones.isNotEmpty ? friendPhones : null; // Return list of matching friend phone numbers
+      return friendPhones.isNotEmpty
+          ? friendPhones
+          : null; // Return list of matching friend phone numbers
     } catch (e) {
       print('Error fetching friends: $e');
       return null;
     }
   }
 
-
-  void handleRealTimeUpdates(List<Map<String, dynamic>> event,  List requestedFriends) {
-    final updatedFriends = event.map((data) => FriendsModel.fromMap(data)).toList();
+  void handleRealTimeUpdates(
+      List<Map<String, dynamic>> event, List requestedFriends) {
+    final updatedFriends =
+        event.map((data) => FriendsModel.fromMap(data)).toList();
     requestedFriends.assignAll(updatedFriends); // Update the friendsList
-
   }
 }
-
-
-
-

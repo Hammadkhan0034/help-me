@@ -1,8 +1,6 @@
 import 'package:alarm_app/constants/colors.dart';
-import 'package:alarm_app/features/door/screens/door_screen.dart';
-import 'package:alarm_app/features/notification/screens/notification_screen.dart';
+import 'package:alarm_app/features/contact/add_contacts_controller/add_contact_controller.dart';
 import 'package:alarm_app/features/plans/screens/plans_screen.dart';
-
 import 'package:alarm_app/features/settings/screens/widgets/primary_group.dart';
 import 'package:alarm_app/widgets/elevated_button.dart';
 import 'package:alarm_app/widgets/gradient_container.dart';
@@ -43,9 +41,9 @@ class SettingsScreen extends StatelessWidget {
                 // mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   const SizedBox(height: 100),
-                   Center(
+                  Center(
                     child: Text(
-                      Supabase.instance.client.auth.currentUser?.phone?? "",
+                      Supabase.instance.client.auth.currentUser?.phone ?? "",
                       style: TextStyle(
                           color: AColors.white,
                           fontSize: 25,
@@ -56,14 +54,16 @@ class SettingsScreen extends StatelessWidget {
                   AElevatedButton(
                       title: "Subscribe",
                       onPress: () {
-                      Get.to(PaymentScreen());
+                        Get.to(PaymentScreen());
                       }),
                   const SizedBox(height: 15),
                   AElevatedButton(
                       title: "Contacts",
                       onPress: () {
                         Get.to(
-                          AddContactScreen(),
+                          AddContactScreen(
+                            addContactController: Get.find<ContactController>(),
+                          ),
                         );
                         // Get.to(DoorScreen());
                       }),
@@ -71,7 +71,7 @@ class SettingsScreen extends StatelessWidget {
                   AElevatedButton(
                       title: "Groups",
                       onPress: () {
-                        Get.to( () => CreateGroupScreen());
+                        Get.to(() => CreateGroupScreen());
                         // Get.to(const SettingsScreen());
                       }),
                   const SizedBox(height: 15),
