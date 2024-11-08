@@ -13,27 +13,27 @@ class PinField extends StatefulWidget {
 
 class _PinFieldState extends State<PinField> with CodeAutoFill {
   final TextEditingController _pinController = TextEditingController();
-  final FocusNode _pinFocusNode = FocusNode(); // FocusNode for autofocusing
+  final FocusNode _pinFocusNode = FocusNode();
 
   @override
   void initState() {
     super.initState();
     listenForCode();
-    _pinFocusNode.requestFocus(); // Automatically focus on the PIN field
+    _pinFocusNode.requestFocus();
   }
 
   @override
   void codeUpdated() {
     setState(() {
-      _pinController.text = code!; // Automatically populate the pin field
-      widget.onCompleted(code!); // Trigger the onCompleted callback
+      _pinController.text = code!;
+      widget.onCompleted(code!);
     });
   }
 
   @override
   void dispose() {
-    _pinFocusNode.dispose(); // Dispose of the focus node when the widget is disposed
-    cancel(); // Stop listening for OTP when the widget is disposed
+    _pinFocusNode.dispose();
+    cancel();
     super.dispose();
   }
 
@@ -42,7 +42,8 @@ class _PinFieldState extends State<PinField> with CodeAutoFill {
     final defaultPinTheme = PinTheme(
       width: 56,
       height: 56,
-      textStyle: TextStyle(color: Colors.white,fontWeight: FontWeight.w500,fontSize: 18),
+      textStyle: TextStyle(
+          color: Colors.white, fontWeight: FontWeight.w500, fontSize: 18),
       decoration: BoxDecoration(
         border: Border.all(
           color: Colors.white,
@@ -62,16 +63,16 @@ class _PinFieldState extends State<PinField> with CodeAutoFill {
       length: 6,
       controller: _pinController,
       focusNode: _pinFocusNode,
-      defaultPinTheme: defaultPinTheme.copyDecorationWith(color: Colors.white30),
-      focusedPinTheme: focusedPinTheme.copyDecorationWith(color: Colors.white30),
+      defaultPinTheme:
+          defaultPinTheme.copyDecorationWith(color: Colors.white30),
+      focusedPinTheme:
+          focusedPinTheme.copyDecorationWith(color: Colors.white30),
       submittedPinTheme: submittedPinTheme,
       showCursor: true,
-
       pinputAutovalidateMode: PinputAutovalidateMode.onSubmit,
       onCompleted: (pin) {
         widget.onCompleted(pin);
       },
-
     );
   }
 }
