@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl_phone_field/phone_number.dart';
+import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 
 import '../../../widgets/elevated_button.dart';
 import '../../../widgets/gradient_container.dart';
@@ -37,9 +37,9 @@ class AuthScreen extends StatelessWidget {
                       SizedBox(height: 10),
                       PhoneAuthFieldWidget(
                         onChanged: (PhoneNumber value) {
-                          authController.phoneNumber.value = value.completeNumber;
+                          authController.phoneNumber.value = value.phoneNumber!;
                           if (kDebugMode) {
-                            print(value.completeNumber);
+                            print(value.phoneNumber);
                           }
                         },
                       ),

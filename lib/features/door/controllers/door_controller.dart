@@ -178,7 +178,7 @@ class DoorController extends GetxController {
           address: {'longitude': longitude.value, 'latitude': latitude.value},
         );
       }
-
+         Get.back();
       Utils.showSuccessSnackBar(
         title: 'Success',
         description: 'Notifications sent successfully!',

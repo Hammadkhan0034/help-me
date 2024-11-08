@@ -68,32 +68,36 @@ class DoorScreen extends StatelessWidget {
                               padding: EdgeInsets.all(10.0),
                               child: Obx(() {
                                 return DropdownButton<GroupModel>(
+                                  borderRadius: BorderRadius.circular(16),
+                                  iconEnabledColor: Colors.white,
                                   isExpanded: true,
                                   value: ctrl.selectedGroup
-                                      .value, // It will be null after type change, so the hint will be displayed
+                                      .value,
                                   hint: Text(
                                     ctrl.selectedGroup.value != null
                                         ? ctrl.selectedGroup.value!.name
-                                        : "Select a Group", // This will be shown after the group is reset
+                                        : "Select a Group",
                                     style: const TextStyle(color: Colors.white),
                                   ),
                                   items: ctrl.groups.map((GroupModel group) {
                                     return DropdownMenuItem<GroupModel>(
                                       value: group,
-                                      child: Text(group.name),
+                                      child: Text(group.name,),
                                     );
                                   }).toList(),
                                   onChanged: (GroupModel? selectedGroup) {
                                     ctrl.selectedGroup.value =
-                                        selectedGroup; // Update the selected group
+                                        selectedGroup;
                                   },
+                                  style: TextStyle(color: Colors.white),
+                                  dropdownColor: AColors.darkGrey,
                                 );
                               }),
                             ),
                           ],
                         ),
                       ),
-                      GroupNameDropDown(ctrl: ctrl),
+                      GroupNameDropDown(ctrl: ctrl,),
                     ],
                   ),
                   const SizedBox(height: 10),
@@ -199,6 +203,7 @@ class DoorScreen extends StatelessWidget {
                                   backgroundColor: Color(0xff9E3030)),
                               onPressed: () {
                                 ctrl.onPress();
+
                               },
                               child: Text(
                                 "SEND",

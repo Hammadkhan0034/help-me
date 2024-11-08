@@ -25,50 +25,52 @@ class NotificationController extends GetxController {
           .from('notifications')
           .stream(primaryKey: ["id"])
           .eq('notification_for', userId)
-          .order("timestamp")
+          .order("timestamp", ascending: false)
           .listen((snapshot) async {
-            print("Notifications SnapShot of against my ID :  $snapshot");
+        print("Notifications SnapShot of against my ID :  $snapshot");
 
-            if (snapshot.isEmpty) {
-              print('No pending friend requests for user: $userId');
-              return;
-            }
-            // notifications.refresh();
-            notifications.clear();
+        if (snapshot.isEmpty) {
+          print('No pending friend requests for user: $userId');
+          return;
+        }
 
-            for (var friendData in snapshot) {
-              final notificationFromId = friendData['notification_from'];
+        // Clear the notifications list before refreshing
+        notifications.clear();
 
-              if (notificationFromId != null) {
-                print(
-                    "Pending Notification from friend request from user ID: $notificationFromId");
+        for (var friendData in snapshot) {
+          final notificationFromId = friendData['notification_from'];
 
-                final user = await fetchUserDetails(notificationFromId);
+          if (notificationFromId != null) {
+            print(
+                "Pending Notification from friend request from user ID: $notificationFromId");
 
-                if (user != null) {
-                  print(
-                      "Pending friend request from: ${user['name']}, Phone: ${user['phone']}");
+            final user = await fetchUserDetails(notificationFromId);
 
-                  final notification = NotificationModel.fromMap(friendData);
-                  notification.data?['name'] = user['name'];
-                  notification.data?['phone'] = user['phone'];
-                  bool alreadyExists =
-                      notifications.any((n) => n.id == notification.id);
-                  if (!alreadyExists) {
-                    notifications.add(notification);
-                  }
+            if (user != null) {
+              print(
+                  "Pending friend request from: ${user['name']}, Phone: ${user['phone']}");
 
-                  notifications.refresh();
-                }
-              } else {
-                print("notification_from is null for friend data: $friendData");
+              final notification = NotificationModel.fromMap(friendData);
+              notification.data?['name'] = user['name'];
+              notification.data?['phone'] = user['phone'];
+
+              bool alreadyExists =
+              notifications.any((n) => n.id == notification.id);
+              if (!alreadyExists) {
+                notifications.add(notification);
               }
+              notifications.refresh();
             }
-          });
+          } else {
+            print("notification_from is null for friend data: $friendData");
+          }
+        }
+      });
     } catch (e) {
       print('Error subscribing to pending friend requests: $e');
     }
   }
+
 
   Future<Map<String, dynamic>?> fetchUserDetails(String userId) async {
     try {

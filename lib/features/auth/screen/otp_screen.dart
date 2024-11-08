@@ -14,7 +14,6 @@ import 'package:alarm_app/widgets/warning_circle_icon.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl_phone_field/phone_number.dart';
 class OtpScreen extends StatelessWidget {
    OtpScreen({super.key});
 

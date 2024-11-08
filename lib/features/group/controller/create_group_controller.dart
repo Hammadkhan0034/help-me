@@ -59,7 +59,7 @@ class CreateGroupController extends GetxController {
         createdBy: addContactController.authController.userModel.value.id,
         totalMembers: memberCount,
       ));
-
+Get.back();
       Utils.showSuccessSnackBar(
         title: "Group ${name.text}",
         description: "Created Successfully",

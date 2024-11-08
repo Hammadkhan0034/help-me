@@ -1,9 +1,6 @@
 import 'package:alarm_app/constants/colors.dart';
 import 'package:flutter/material.dart';
-import 'package:intl_phone_field/countries.dart';
-import 'package:intl_phone_field/country_picker_dialog.dart';
-import 'package:intl_phone_field/intl_phone_field.dart';
-import 'package:intl_phone_field/phone_number.dart';
+import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 
 class PhoneAuthFieldWidget extends StatelessWidget {
   final ValueChanged<PhoneNumber>? onChanged;
@@ -11,25 +8,28 @@ class PhoneAuthFieldWidget extends StatelessWidget {
     super.key,
     required this.onChanged,
   });
-
   @override
   Widget build(BuildContext context) {
-    return IntlPhoneField(
+    return InternationalPhoneNumberInput(
+      onInputChanged: onChanged,
+      selectorConfig: const SelectorConfig(
+        showFlags: false,
+        trailingSpace:false ,
+
+        setSelectorButtonAsPrefixIcon: true,
+        selectorType: PhoneInputSelectorType.BOTTOM_SHEET,
+        // backgroundColor: AColors.primary,
+      ),
+      ignoreBlank: true,
+
+      initialValue: PhoneNumber(isoCode: 'PK'),
+      formatInput: true,
+      selectorTextStyle: TextStyle(color: Colors.white),
+      textStyle: TextStyle(color: Colors.white),
+      autoValidateMode: AutovalidateMode.onUserInteraction,
       keyboardType: TextInputType.phone,
-      pickerDialogStyle: PickerDialogStyle(
-          backgroundColor: AColors.primary,
-          countryNameStyle: const TextStyle(color: Colors.white),
-          searchFieldCursorColor: Colors.white,
-          countryCodeStyle: const TextStyle(color: Colors.white)),
-      dropdownTextStyle: const TextStyle(fontSize: 18, color: Colors.white),
-      style: const TextStyle(fontSize: 18, color: Colors.white),
-      decoration: const InputDecoration(
-        helperStyle: TextStyle(fontSize: 14, color: Color(0xffF4F4F9)),
-        fillColor: AColors.darkGrey, //Color(0xffF4F4F9),
-        focusColor: Color(0xffF4F4F9),
-        suffixIconColor: Color(0xffF4F4F9),
-        iconColor: Color(0xffF4F4F9),
-        errorStyle: TextStyle(color: Colors.white),
+      inputDecoration: const InputDecoration(
+        fillColor: AColors.darkGrey,
         filled: true,
         hintText: 'Phone Number',
         hintStyle: TextStyle(color: Colors.white),
@@ -39,17 +39,19 @@ class PhoneAuthFieldWidget extends StatelessWidget {
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.all(Radius.circular(30)),
-          borderSide: BorderSide(color: AColors.darkGrey),
+          borderSide: BorderSide(color: Colors.transparent),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.all(Radius.circular(30)),
-          borderSide: BorderSide(color: AColors.darkGrey),
+          borderSide: BorderSide(color: Colors.transparent),
         ),
+        errorStyle: TextStyle(color: Colors.white)
       ),
-      initialCountryCode: 'PK',
-      onChanged: onChanged,
+      inputBorder: const OutlineInputBorder(
+        borderRadius: BorderRadius.all(Radius.circular(30)),
+      ),
       validator: (value) {
-        if (value == null || value.completeNumber == value.countryCode) {
+        if (value == null || value.isEmpty) {
           return 'Enter a valid phone number';
         }
         return null;
@@ -57,3 +59,4 @@ class PhoneAuthFieldWidget extends StatelessWidget {
     );
   }
 }
+

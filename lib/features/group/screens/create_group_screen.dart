@@ -219,7 +219,7 @@ class CreateGroupScreen extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 30.0),
                       child: AElevatedButton(title: "Save", onPress: () {
-                createGroupController.createGroup();
+                        createGroupController.createGroup();
                         //createGroupController.createGroup(id: id, members: members, createdBy: createdBy, createdAt: createdAt)
                 
                       }),
