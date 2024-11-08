@@ -42,7 +42,7 @@ class _PinFieldState extends State<PinField> with CodeAutoFill {
     final defaultPinTheme = PinTheme(
       width: 56,
       height: 56,
-      textStyle: Theme.of(context).textTheme.headlineLarge,
+      textStyle: TextStyle(color: Colors.white,fontWeight: FontWeight.w500,fontSize: 18),
       decoration: BoxDecoration(
         border: Border.all(
           color: Colors.white,
@@ -61,15 +61,17 @@ class _PinFieldState extends State<PinField> with CodeAutoFill {
     return Pinput(
       length: 6,
       controller: _pinController,
-      focusNode: _pinFocusNode, // Set the focus node to automatically focus the field
+      focusNode: _pinFocusNode,
       defaultPinTheme: defaultPinTheme.copyDecorationWith(color: Colors.white30),
       focusedPinTheme: focusedPinTheme.copyDecorationWith(color: Colors.white30),
       submittedPinTheme: submittedPinTheme,
       showCursor: true,
+
       pinputAutovalidateMode: PinputAutovalidateMode.onSubmit,
       onCompleted: (pin) {
         widget.onCompleted(pin);
       },
+
     );
   }
 }
