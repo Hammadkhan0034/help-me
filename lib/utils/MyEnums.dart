@@ -1,0 +1,1 @@
+enum NotificationTypes { normal, alert }

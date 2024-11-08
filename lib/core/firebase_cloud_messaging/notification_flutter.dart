@@ -1,15 +1,12 @@
 import 'dart:convert';
+import 'dart:math' as math;
 
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
-import 'dart:math' as math;
-
-
 class NotificationServices {
-
   //initialising firebase message plugin
   FirebaseMessaging messaging = FirebaseMessaging.instance;
 
@@ -94,35 +91,55 @@ class NotificationServices {
     String body = message.notification!.body ?? '';
     String type = message.notification!.body ?? '';
     AndroidNotificationDetails androidNotificationDetails;
-    String androidChannelId = message.notification!.android?.channelId ??
-        'nexcab_common_notification';
-    AndroidNotificationChannel channel = AndroidNotificationChannel(
-      message.notification!.android == null
-          ? ""
-          : message.notification!.android!.channelId.toString(),
-      message.notification!.android == null
-          ? ""
-          : message.notification!.android!.channelId.toString(),
-      importance: Importance.max,
-      showBadge: true,
-      playSound: true,
-      // sound: const RawResourceAndroidNotificationSound('pop')
-    );
+
+    AndroidNotificationChannel channel;
+    // = AndroidNotificationChannel(
+    //   message.notification!.android == null
+    //       ? ""
+    //       : message.notification!.android!.channelId.toString(),
+    //   message.notification!.android == null
+    //       ? ""
+    //       : message.notification!.android!.channelId.toString(),
+    //   importance: Importance.max,
+    //   showBadge: true,
+    //   playSound: true,
+    //   // sound: const RawResourceAndroidNotificationSound('pop')
+    // );
+
+    if (message.data["notificationType"] == "0") {
+      channel = AndroidNotificationChannel(
+        'helpme_normal', // id
+        'Casual Notifications', // title.00
+        description:
+            'This channel is used for casual notifications.', // description
+        importance: Importance.high,
+        showBadge: true,
+        // sound: RawResourceAndroidNotificationSound(
+        //     message.notification?.android?.sound),
+        playSound: true,
+      );
+    } else {
+      channel = AndroidNotificationChannel(
+        'helpme_alert', // id
+        'High Importance Notifications', // title
+        description:
+            'This channel is used for important notifications.', // description
+        sound: RawResourceAndroidNotificationSound(
+            message.notification?.android?.sound),
+        importance: Importance.max,
+        showBadge: true,
+        playSound: true,
+      );
+    }
 
     androidNotificationDetails = AndroidNotificationDetails(
-      channel.id.toString(),
-      channel.name.toString(),
-      channelDescription: 'your channel description',
-
-      importance: Importance.high,
-      priority: Priority.high,
-      playSound: true,
-
-      ticker: 'ticker',
-      // sound: channel.sound
-      //sound: RawResourceAndroidNotificationSound('pop')
-      //  icon: largeIconPath
-    );
+        channel.id.toString(), channel.name.toString(),
+        channelDescription: channel.description,
+        importance: Importance.high,
+        priority: Priority.high,
+        playSound: true,
+        ticker: 'ticker',
+        sound: channel.sound);
 
     const DarwinNotificationDetails darwinNotificationDetails =
         DarwinNotificationDetails(

@@ -1,19 +1,33 @@
-import 'package:alarm_app/servies/get_services_key.dart';
 import 'dart:convert';
 import 'dart:developer';
-import 'package:http/http.dart' as http;
-class SendNotificationService {
-  static Future<void> sendNotificationUsingApi({
-    required List<String> fcmList,
-    required String? title,
-    required String? body,
-    required Map<String, dynamic>? data,
 
-  }) async
-  {
+import 'package:alarm_app/servies/get_services_key.dart';
+import 'package:alarm_app/utils/MyEnums.dart';
+import 'package:http/http.dart' as http;
+
+class SendNotificationService {
+  static Future<void> sendNotificationUsingApi(
+      {required List<String> fcmList,
+      required String? title,
+      required String? body,
+      required Map<String, dynamic>? data,
+      NotificationTypes notificationType = NotificationTypes.alert}) async {
     try {
+      if (data == null) {
+        data = {
+          "notificationType":
+              notificationType == NotificationTypes.normal ? " 0" : "1"
+        };
+      } else {
+        data.addAll({
+          "notificationType":
+              notificationType == NotificationTypes.normal ? "0" : "1"
+        });
+      }
+
       String serverKey = await GetServicesKey().getServerToken();
-      String url = "https://fcm.googleapis.com/v1/projects/helpme-bf036/messages:send";
+      String url =
+          "https://fcm.googleapis.com/v1/projects/helpme-bf036/messages:send";
       var headers = <String, String>{
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $serverKey',
@@ -27,15 +41,19 @@ class SendNotificationService {
               "body": body,
             },
             "android": {
+              "priority": "high",
               "notification": {
-                "sound": "raw_alarm"
+                "channelId": notificationType == NotificationTypes.normal
+                    ? "helpme_normal"
+                    : "helpme_alert",
+                "sound": notificationType == NotificationTypes.normal
+                    ? "normal"
+                    : "raw_alarm"
               }
             },
             "apns": {
               "payload": {
-                "aps": {
-                  "sound": "raw_alarm.wav"
-                }
+                "aps": {"sound": "raw_alarm.wav"}
               }
             },
             "data": data,
@@ -59,4 +77,6 @@ class SendNotificationService {
       }
     } catch (e) {
       log('Error in sendNotificationUsingApi: $e');
-    }}}
+    }
+  }
+}
