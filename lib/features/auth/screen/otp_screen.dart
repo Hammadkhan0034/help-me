@@ -19,6 +19,7 @@ class OtpScreen extends StatelessWidget {
   OtpScreen({super.key});
 
   final AuthController authController = Get.put(AuthController());
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -51,14 +52,22 @@ class OtpScreen extends StatelessWidget {
                     SizedBox(
                       height: Get.height * 0.2,
                     ),
-                    AElevatedButton(
-                      borderRadius: 25,
-                      title: "Verify",
-                      onPress: () {
-                        authController
-                            .verifyOtp(authController.pinController.text);
-                      },
-                    )
+                    Obx(() {
+                      return  authController.isVerifyingOtp.value ?SizedBox(
+                        height: 24,
+                        width: 24,
+                        child: const CircularProgressIndicator(
+                          color: Colors.white,
+                        ),
+                      ) :  AElevatedButton(
+                        borderRadius: 25,
+                        title: "Verify",
+                        onPress: () {
+                          authController
+                              .verifyOtp(authController.pinController.text);
+                        },
+                      );
+                    })
                   ],
                 ),
               ),
@@ -67,28 +76,29 @@ class OtpScreen extends StatelessWidget {
             Positioned(
               right: 10,
               top: Get.height * 0.40,
-              child: Obx(() => TextButton(
+              child: Obx(() =>
+                  TextButton(
                     onPressed: authController.isResendingOtp.value
                         ? null // Disable button when loading
                         : () {
-                            authController
-                                .resendOtp(authController.phoneNumber.value);
-                          },
+                      authController
+                          .resendOtp(authController.phoneNumber.value);
+                    },
                     child: authController.isResendingOtp.value
                         ? SizedBox(
-                            height: 24,
-                            width: 24,
-                            child: const CircularProgressIndicator(
-                              color: Colors.white,
-                            ),
-                          )
+                      height: 24,
+                      width: 24,
+                      child: const CircularProgressIndicator(
+                        color: Colors.white,
+                      ),
+                    )
                         : const Text(
-                            "Resend OTP",
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w500,
-                                fontSize: 16),
-                          ),
+                      "Resend OTP",
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w500,
+                          fontSize: 16),
+                    ),
                   )),
             ),
           ],
