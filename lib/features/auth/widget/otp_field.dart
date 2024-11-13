@@ -3,16 +3,16 @@ import 'package:pinput/pinput.dart';
 import 'package:sms_autofill/sms_autofill.dart';
 
 class PinField extends StatefulWidget {
-  final Function(String) onCompleted;
+  // final Function(String) onCompleted;
+  final TextEditingController pinController ;
 
-  const PinField({super.key, required this.onCompleted});
+  const PinField({super.key,  required this.pinController});
 
   @override
   _PinFieldState createState() => _PinFieldState();
 }
 
 class _PinFieldState extends State<PinField> with CodeAutoFill {
-  final TextEditingController _pinController = TextEditingController();
   final FocusNode _pinFocusNode = FocusNode();
 
   @override
@@ -25,8 +25,8 @@ class _PinFieldState extends State<PinField> with CodeAutoFill {
   @override
   void codeUpdated() {
     setState(() {
-      _pinController.text = code!;
-      widget.onCompleted(code!);
+      widget.pinController.text = code!;
+      // widget.onCompleted(code!);
     });
   }
 
@@ -61,7 +61,7 @@ class _PinFieldState extends State<PinField> with CodeAutoFill {
 
     return Pinput(
       length: 6,
-      controller: _pinController,
+      controller: widget.pinController,
       focusNode: _pinFocusNode,
       defaultPinTheme:
           defaultPinTheme.copyDecorationWith(color: Colors.white30),
@@ -70,9 +70,9 @@ class _PinFieldState extends State<PinField> with CodeAutoFill {
       submittedPinTheme: submittedPinTheme,
       showCursor: true,
       pinputAutovalidateMode: PinputAutovalidateMode.onSubmit,
-      onCompleted: (pin) {
-        widget.onCompleted(pin);
-      },
+      // onCompleted: (pin) {
+      //   widget.onCompleted(pin);
+      // },
     );
   }
 }

@@ -19,7 +19,11 @@ import '../screen/otp_screen.dart';
 class AuthController extends GetxController {
   var phoneNumber = ''.obs;
   final TextEditingController nameController = TextEditingController();
+  final TextEditingController pinController = TextEditingController();
   final SupabaseClient supabaseClient = Supabase.instance.client;
+  var isResendingOtp = false.obs;
+  var isVerifyingOtp=false.obs;
+
   Rx<UserModel> userModel = UserModel(
           id: 'id',
           name: 'name',
@@ -31,26 +35,24 @@ class AuthController extends GetxController {
   Future<void> signUp() async {
     print("PHONE NUMBER : ${phoneNumber.value}");
     try {
-      await supabaseClient.auth.signInWithOtp(
+       await supabaseClient.auth.signInWithOtp(
         phone: phoneNumber.value,
       );
       Utils.showSuccessSnackBar(
           title: "OTP send", description: "OTP send to ${phoneNumber.value}");
-      Get.to(OtpScreen());
+       Get.to(OtpScreen());
     } on AuthException catch (error) {
+      Utils.showErrorSnackBar(title: "message", description: error.message);
       if (kDebugMode) {
         print('AuthException during sign-up: ${error.message}');
       }
 
-      Utils.showErrorSnackBar(
-          title: "Authentication Error", description: error.message);
     } catch (error) {
       if (kDebugMode) {
+        Utils.showErrorSnackBar(title: "message", description: error.toString());
+
         print('Unexpected error during sign-up: $error');
       }
-      Utils.showErrorSnackBar(
-          title: "Error",
-          description: "An unexpected error occurred. Please try again later.");
     } finally {
       if (kDebugMode) {
         print("OTP request completed for ${phoneNumber.value}");
@@ -58,65 +60,27 @@ class AuthController extends GetxController {
     }
   }
 
-  // Future<String?> verifyOtp(String otp) async {
-  //   NotificationService notificationService = NotificationService();
-  //   String? fcmToken = await notificationService.getDeviceToken();
-  //
-  //   try {
-  //     final AuthResponse? res = await supabaseClient.auth.verifyOTP(
-  //       type: OtpType.sms,
-  //       token: otp,
-  //       phone: phoneNumber.value, // phone number from your controller
-  //     );
-  //
-  //     if (res == null) {
-  //       print("AuthResponse is null");
-  //       Utils.showErrorSnackBar(
-  //         title: "Verification Failed",
-  //         description: "Unable to verify OTP. Please try again later",
-  //       );
-  //       return null;
-  //     }
-  //
-  //     final User? user = res.user;
-  //     final Session? session = res.session;
-  //
-  //     if (session != null && user != null) {
-  //       // Create UserModel from response
-  //       userModel.value = UserModel(
-  //         id: user.id,
-  //         name: nameController.text.trim(),
-  //         phone: user.phone!,
-  //         fcm: fcmToken ?? "",
-  //       );
-  //
-  //       // Insert user data into the database
-  //       await UserCrud.insertUserData(user.id, userModel.value);
-  //
-  //       // Navigate to the next screen after successful OTP verification
-  //       Get.to(() => const HelpMeScreen());
-  //
-  //       // Fetch profile information
-  //         await getProfile();
-  //
-  //       // Update contact model and add user to contacts
-  //       contactModel.value = ContactsModel(phone: userModel.value.phone.toString());
-  //       await GroupContacts.addUserToContactModel(userModel.value);
-  //
-  //       return user.id;
-  //     } else {
-  //       return null;
-  //     }
-  //   } catch (error) {
-  //
-  //     if (kDebugMode) {
-  //       print("Error verifying OTP: $error");
-  //     }
-  //     return null;
-  //   }
-  // }
+  Future<void> resendOtp(String phone) async {
+    isResendingOtp.value = true;
+    try {
+      await supabaseClient.auth.signInWithOtp(phone: phone);
 
+      Utils.showSuccessSnackBar(
+          title: "OTP Sent", description: "OTP has been sent to $phone");
+    } on AuthException catch (error) {
+      Utils.showErrorSnackBar(
+          title: "Authentication Error", description: error.message);
+    } catch (error) {
+      Utils.showErrorSnackBar(
+          title: "Error",
+          description: "An unexpected error occurred. Please try again.");
+    }
+    finally{
+      isResendingOtp.value = false;
+    }
+  }
   Future<String?> verifyOtp(String otp) async {
+    isVerifyingOtp.value=true;
     NotificationService notificationService = NotificationService();
     String? fcmToken = await notificationService.getDeviceToken();
 
@@ -126,6 +90,7 @@ class AuthController extends GetxController {
         token: otp,
         phone: phoneNumber.value,
       );
+      isVerifyingOtp.value=false;
 
       // Ensure both user and session are available
       if (res.user == null || res.session == null) {
@@ -158,11 +123,12 @@ class AuthController extends GetxController {
 
       return user.id;
     } catch (error, st) {
-      log("ERROR verofing otp lof", error: error, stackTrace: st);
-      if (kDebugMode) {
-        print("Error verifying OTP: $error");
-      }
+       Utils.showErrorSnackBar(title: "message", description: error.toString());
+       log("ERROR verifying otp ", error: error, stackTrace: st);
+
       return null;
+    }finally{
+      isVerifyingOtp.value=false;
     }
   }
 

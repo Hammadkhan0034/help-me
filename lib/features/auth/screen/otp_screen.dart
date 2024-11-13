@@ -14,19 +14,24 @@ import 'package:alarm_app/widgets/warning_circle_icon.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
 class OtpScreen extends StatelessWidget {
-   OtpScreen({super.key});
+  OtpScreen({super.key});
 
   final AuthController authController = Get.put(AuthController());
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         leading: GestureDetector(
-            onTap: (){
+            onTap: () {
               Get.back();
             },
-            child: const Icon(Icons.arrow_back,color: Colors.black,)),
+            child: const Icon(
+              Icons.arrow_back,
+              color: Colors.black,
+            )),
         // centerTitle: true,
       ),
       body: Padding(
@@ -40,24 +45,52 @@ class OtpScreen extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    PinField( onCompleted: (pin) {
-                      authController.verifyOtp(pin);
-                      print("OTP Entered: $pin");
-                      // ctrl.verifyPin(pin);
-                    },),
-                    // SizedBox(
-                    //   height: 35,
-                    // ),
-                    // AElevatedButton(
-                    //   borderRadius: 25,
-                    //   title: "Enter",
-                    //   onPress: () {},
-                    // )
+                    PinField(
+                      pinController: authController.pinController,
+                    ),
+                    SizedBox(
+                      height: Get.height * 0.2,
+                    ),
+                    AElevatedButton(
+                      borderRadius: 25,
+                      title: "Verify",
+                      onPress: () {
+                        authController
+                            .verifyOtp(authController.pinController.text);
+                      },
+                    )
                   ],
                 ),
               ),
             ),
             const WarningCircleIcon(),
+            Positioned(
+              right: 10,
+              top: Get.height * 0.40,
+              child: Obx(() => TextButton(
+                    onPressed: authController.isResendingOtp.value
+                        ? null // Disable button when loading
+                        : () {
+                            authController
+                                .resendOtp(authController.phoneNumber.value);
+                          },
+                    child: authController.isResendingOtp.value
+                        ? SizedBox(
+                            height: 24,
+                            width: 24,
+                            child: const CircularProgressIndicator(
+                              color: Colors.white,
+                            ),
+                          )
+                        : const Text(
+                            "Resend OTP",
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w500,
+                                fontSize: 16),
+                          ),
+                  )),
+            ),
           ],
         ),
       ),
