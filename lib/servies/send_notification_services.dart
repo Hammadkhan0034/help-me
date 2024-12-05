@@ -16,7 +16,7 @@ class SendNotificationService {
       if (data == null) {
         data = {
           "notificationType":
-              notificationType == NotificationTypes.normal ? " 0" : "1"
+              notificationType == NotificationTypes.normal ? "0" : "1"
         };
       } else {
         data.addAll({
@@ -53,7 +53,9 @@ class SendNotificationService {
             },
             "apns": {
               "payload": {
-                "aps": {"sound": "raw_alarm.wav"}
+                "aps": {"sound": notificationType == NotificationTypes.normal
+                    ? "normal"
+                    : "raw_alarm"}
               }
             },
             "data": data,

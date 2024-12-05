@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:alarm_app/models/friends_profile_model.dart';
@@ -82,6 +83,11 @@ class FriendsService {
         .delete()
         .eq('friend_id', friendId)
         .eq('user_id', userId);
+    await client
+        .from('friends')
+        .delete()
+        .eq('user_id', friendId)
+        .eq('friend_id', userId);
     print("Deleted Friend");
   }
 
@@ -168,51 +174,12 @@ class FriendsService {
   //   }
   // }
 
-  void subscribeToFriends(
-      String userId, RxList<FriendsModel> requestedFriends) {
-    if (!isValidUUID(userId)) {
-      throw Exception('Invalid UUID format for userId: $userId');
-    }
-
-    try {
-      // Subscribe to real-time changes in the 'friends' table for the given user_id
-      final subscription = client
+  SupabaseStreamBuilder subscribeToFriends(
+      String userId) {
+       return client
           .from('friends')
-          .stream(primaryKey: ["id"])
-          .eq('user_id', userId) // Filter by user_id
-          .listen((snapshot) async {
-            if (snapshot.isEmpty) {
-              print('No friends found for user: $userId');
-              requestedFriends.clear(); // Clear list if no friends found
-              return;
-            }
-
-            // Handle the updated friend data
-            List<dynamic> friendsData = snapshot;
-
-            List<Future<FriendsModel>> friendFutures =
-                friendsData.map((friend) async {
-              Map<String, dynamic> friendMap = friend as Map<String, dynamic>;
-
-              final profileResponse = await client
-                  .from('profiles')
-                  .select('phone')
-                  .eq('id', friendMap['friend_id'])
-                  .single();
-
-              String? phoneNumber = profileResponse['phone'] as String?;
-
-              return FriendsModel.fromMap(friendMap)..friendPhone = phoneNumber;
-            }).toList();
-
-            List<FriendsModel> friends = await Future.wait(friendFutures);
-
-            // Update the requestedFriends list
-            requestedFriends.value = friends;
-          });
-    } catch (e) {
-      print('Error subscribing to friends: $e');
-    }
+          .stream(primaryKey: ['id'])
+          .eq('user_id', userId); // Filter by user_id
   }
 
   Future<List<FriendsProfileModel>> fetchFriends(String id) async {

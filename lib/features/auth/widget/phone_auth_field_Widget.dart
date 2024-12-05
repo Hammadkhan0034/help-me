@@ -22,7 +22,7 @@ class PhoneAuthFieldWidget extends StatelessWidget {
       ),
       ignoreBlank: true,
 
-      initialValue: PhoneNumber(isoCode: 'PK'),
+      initialValue: PhoneNumber(isoCode: 'MY'),
       formatInput: true,
       selectorTextStyle: TextStyle(color: Colors.white),
       textStyle: TextStyle(color: Colors.white),

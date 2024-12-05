@@ -4,11 +4,13 @@ class UserModel {
   final String phone;
   final String fcm;
   final bool? isPremium;
+
   final bool isLocationEnabled;
   final double? latitude;
   final double? longitude;
   final DateTime? subscriptionExpiryDate;
-  UserModel({
+  final String? primaryIndoor,primaryOutdoor;
+  UserModel( {
     required this.isLocationEnabled,
     required this.id,
     required this.name,
@@ -18,6 +20,7 @@ class UserModel {
     this.longitude,
     this.isPremium,
     this.subscriptionExpiryDate,
+    this.primaryIndoor, this.primaryOutdoor,
   });
   Map<String, dynamic> toMap() {
     return {
@@ -30,6 +33,8 @@ class UserModel {
       'subscription_expiry_date': subscriptionExpiryDate?.toIso8601String(),
       'latitude': latitude,
       'longitude': longitude,
+      'primary_indoor':primaryIndoor,
+      'primary_outdoor':primaryOutdoor,
     };
   }
 
@@ -43,11 +48,42 @@ class UserModel {
         latitude: map['latitude'],
         longitude: map['longitude'],
         subscriptionExpiryDate: map['subscription_expiry_date'],
+        primaryIndoor: map['primary_indoor'],
+        primaryOutdoor: map['primary_outdoor'],
         isLocationEnabled: map['is_location_enabled'] ?? false);
   }
 
   @override
   String toString() {
     return 'UserModel{id: $id, name: $name, phone: $phone, fcm: $fcm, isPremium: $isPremium, latitude: $latitude, longitude: $longitude, subscriptionExpiryDate: $subscriptionExpiryDate}';
+  }
+
+  UserModel copyWith({
+    String? id,
+    String? name,
+    String? phone,
+    String? fcm,
+    bool? isPremium,
+    bool? isLocationEnabled,
+    double? latitude,
+    double? longitude,
+    DateTime? subscriptionExpiryDate,
+    String? primaryIndoor,
+    String? primaryOutdoor,
+  }) {
+    return UserModel(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      phone: phone ?? this.phone,
+      fcm: fcm ?? this.fcm,
+      isPremium: isPremium ?? this.isPremium,
+      isLocationEnabled: isLocationEnabled ?? this.isLocationEnabled,
+      latitude: latitude ?? this.latitude,
+      longitude: longitude ?? this.longitude,
+      subscriptionExpiryDate:
+          subscriptionExpiryDate ?? this.subscriptionExpiryDate,
+      primaryIndoor: primaryIndoor ?? this.primaryIndoor,
+      primaryOutdoor: primaryOutdoor ?? this.primaryOutdoor,
+    );
   }
 }

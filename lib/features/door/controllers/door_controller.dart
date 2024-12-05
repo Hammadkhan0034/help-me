@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:alarm_app/features/auth/controller/auth_controller.dart';
-import 'package:alarm_app/features/group/controller/create_group_controller.dart';
+import 'package:alarm_app/features/group/controller/group_controller.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
@@ -17,7 +17,7 @@ import '../../../utils/utils.dart';
 import 'package:http/http.dart' as http;
 
 class DoorController extends GetxController {
-  final groupController = Get.put(CreateGroupController());
+  final groupController = Get.put(GroupController());
   final authController = Get.find<AuthController>();
   final message = TextEditingController();
   final items = ['Indoor', 'Outdoor'].obs;
@@ -31,12 +31,29 @@ class DoorController extends GetxController {
   var isLoading = false.obs;
   RxString currentAddress = ''.obs; // To hold the user's current address
 
+  TextEditingController addressTextController = TextEditingController();
   void setSelected(String value) {
     selectedType.value = value;
-    selectedGroup.value = null;
+    final groupController = Get.find<GroupController>();
+
+    if(selectedType.value == 'Indoor'){
+      selectedGroup.value = groupController.primaryIndoor;
+    }
+    else{
+      selectedGroup.value = groupController.primaryOutdoor;
+    }
     loadGroups();
   }
+  void selectGroup(GroupModel groupModel) {
+    selectedGroup.value = groupModel;
+    if(selectedGroup.value?.type == 'Indoor'){
+      addressTextController.text = selectedGroup.value?.defaultAddress ?? "";
+      latitude.value = selectedGroup.value?.defaultLatitude ?? 0.0;
+      longitude.value = selectedGroup.value?.defaultLongitude ?? 0.0;
 
+    }
+
+  }
   Future<void> loadGroups() async {
     final fetchedGroups = await GroupCrud.fetchGroupsByType(
         selectedType.value, authController.userModel.value.id);
@@ -136,10 +153,13 @@ class DoorController extends GetxController {
       );
       return; // Exit early if message is empty
     }
+
     List<String> fcmList = [];
     isLoading.value = true; // Set loading to true
     try {
-      await getCurrentAddress();
+      if(selectedType.value == "Outdoor"){
+        await getCurrentAddress();
+      }
       print(selectedGroup.value?.id);
 
       for (var user in selectedGroup.value!.members) {
@@ -161,7 +181,7 @@ class DoorController extends GetxController {
         fcmList: fcmList,
         title: authController.userModel.value.name,
         body: message.text,
-        data: {'imageUrl': imageUrl.value, 'address': currentAddress.value},
+        data: {'imageUrl': imageUrl.value, 'address': addressTextController.text.isNotEmpty ? addressTextController.text : currentAddress.value},
       );
 
       // Create notifications for each user in the group
@@ -169,15 +189,16 @@ class DoorController extends GetxController {
         await NotificationCrud.createNotification(
           notificationFrom: authController.userModel.value.id,
           notificationFor: user, // Create a notification for each member
-          notificationType: 'emergency',
+           notificationType: selectedType.value,
           data: {
             'message': message.text,
             'imageUrl': imageUrl.value,
-            'address': currentAddress.value
+            'address': addressTextController.text.isNotEmpty ? addressTextController.text : currentAddress.value
           },
-          address: {'longitude': longitude.value, 'latitude': latitude.value},
+          address:  {'longitude': longitude.value, 'latitude': latitude.value},
         );
       }
+      addressTextController.text = "";
          Get.back();
       Utils.showSuccessSnackBar(
         title: 'Success',
@@ -194,6 +215,21 @@ class DoorController extends GetxController {
     }
   }
 
+
+  init()async{
+    await loadGroups();
+    final groupController = Get.find<GroupController>();
+
+    if(selectedType.value == 'Indoor'){
+      selectedGroup.value = groupController.primaryIndoor;
+    }
+    else{
+      selectedGroup.value = groupController.primaryOutdoor;
+    }
+  }
+
+
+
   @override
   void onClose() {
     message.dispose();
@@ -202,9 +238,11 @@ class DoorController extends GetxController {
     super.onClose();
   }
 
+
+
   @override
   void onInit() {
-    loadGroups();
+init();
     super.onInit();
   }
 }

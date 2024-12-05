@@ -60,4 +60,28 @@ class FriendsModel {
   String toString() {
     return 'FriendsModel{id: $id, createdAt: $createdAt, friendId: $friendId,friendPhone: $friendPhone ,editedName: $editedName, userId: $userId, acceptedAt: $acceptedAt, updatedAt: $updatedAt, requestStatus: $requestStatus}';
   }
+
+  FriendsModel copyWith({
+    String? id,
+    DateTime? createdAt,
+    String? friendId,
+    String? editedName,
+    String? userId,
+    String? friendPhone,
+    DateTime? acceptedAt,
+    DateTime? updatedAt,
+    int? requestStatus,
+  }) {
+    return FriendsModel(
+      id: id ?? this.id,
+      createdAt: createdAt ?? this.createdAt,
+      friendId: friendId ?? this.friendId,
+      editedName: editedName ?? this.editedName,
+      userId: userId ?? this.userId,
+      friendPhone: friendPhone ?? this.friendPhone,
+      acceptedAt: acceptedAt ?? this.acceptedAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      requestStatus: requestStatus ?? this.requestStatus,
+    );
+  }
 }

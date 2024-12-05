@@ -1,10 +1,13 @@
 import 'package:alarm_app/constants/colors.dart';
+import 'package:alarm_app/core/subscription_controller.dart';
 import 'package:alarm_app/features/auth/controller/auth_controller.dart';
 import 'package:alarm_app/features/door/screens/door_screen.dart';
 import 'package:alarm_app/features/notification/screens/notification_screen.dart';
+import 'package:alarm_app/features/plans/screens/plans_screen.dart';
 import 'package:alarm_app/features/settings/screens/settings_screen.dart';
 import 'package:alarm_app/features/trail_location/controller/LocationManageController.dart';
 import 'package:alarm_app/features/trail_location/screen/location_manage_screen.dart';
+import 'package:alarm_app/utils/connection_listener.dart';
 import 'package:alarm_app/widgets/elevated_button.dart';
 import 'package:alarm_app/widgets/gradient_container.dart';
 import 'package:alarm_app/widgets/notification_icon_with_count.dart';
@@ -13,23 +16,32 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../contact/add_contacts_controller/add_contact_controller.dart';
+import '../../group/controller/group_controller.dart';
 import '../controller/alar_controller.dart';
 
 class HelpMeScreen extends StatelessWidget {
   final AlarmController alarmController = Get.put(AlarmController());
 
   final ContactController addContactController =
-      Get.put(ContactController(), permanent: true);
+  Get.put(ContactController(), permanent: true);
   final LocationManageController locationManageController =
-      Get.put(LocationManageController(), permanent: true);
+  Get.put(LocationManageController(), permanent: true);
+
+  final GroupController createGroupController =
+  Get.put(GroupController());
+  final InAppPurchaseUtils inAppPurchaseUtils = Get.find<InAppPurchaseUtils>();
 
   HelpMeScreen({super.key});
+void goToSubscription(){
+  Get.to(()=> PaymentScreen());
+}
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         leading: NotificationIconWithCount(
           onPress: () {
+            ConnectionStatusListener.isOnHomePage = false;
             Get.to(() => NotificationScreen());
           },
         ),
@@ -66,17 +78,34 @@ class HelpMeScreen extends StatelessWidget {
                         // Get.to(const NotificationScreen());
                       }),
                   const SizedBox(height: 15),
-                  AElevatedButton(
-                      title: "DOOR",
-                      onPress: () {
-                        Get.to(() => DoorScreen());
-                      }),
+                  Obx(() {
+                    return AElevatedButton(
+                        bgColor: inAppPurchaseUtils.isSubscriptionActive.value
+                            ? AColors.dark
+                            : Colors.grey,
+                        title: "DOOR",
+                        onPress: inAppPurchaseUtils.isSubscriptionActive.value
+                            ? () {
+                          ConnectionStatusListener.isOnHomePage = false;
+                          Get.to(() => DoorScreen());
+                        }
+                            : goToSubscription);
+                  }),
                   const SizedBox(height: 15),
-                  AElevatedButton(
-                      title: "SETTINGS",
-                      onPress: () {
-                        Get.to(() => const SettingsScreen());
-                      }),
+                  Obx(() {
+                    return AElevatedButton(
+                        bgColor: inAppPurchaseUtils.isSubscriptionActive.value
+                            ? AColors.dark
+                            : Colors.grey,
+
+                        title: "SETTINGS",
+                        onPress: inAppPurchaseUtils.isSubscriptionActive.value
+                            ? () {
+                          ConnectionStatusListener.isOnHomePage = false;
+                          Get.to(() => const SettingsScreen());
+                        }
+                            : goToSubscription);
+                  }),
                   // const SizedBox(height: 15),
                   // AElevatedButton(
                   //   title: "Add Contact",
@@ -93,18 +122,32 @@ class HelpMeScreen extends StatelessWidget {
                   //       Get.to( () => CreateGroupScreen());
                   //     }),
                   const SizedBox(height: 15),
-                  AElevatedButton(
-                    title: "Location Trail",
-                    onPress: () {
-                      locationManageController.getFriends(
-                          Get.find<AuthController>().userModel.value.id);
-                      Get.to(() => LocationManageScreen(
-                          locationManageController: locationManageController));
-                      // Get.dialog(
-                      //   LocationTrailScreen(),
-                      // );
-                    },
-                  ),
+                  Obx(() {
+                    return AElevatedButton(
+                      bgColor: inAppPurchaseUtils.isSubscriptionActive.value
+                          ? AColors.dark
+                          : Colors.grey,
+                      title: "Location Trail",
+                      onPress: inAppPurchaseUtils.isSubscriptionActive.value
+                          ? () {
+                        locationManageController.getFriends(
+                            Get
+                                .find<AuthController>()
+                                .userModel
+                                .value
+                                .id);
+                        Get.to(() =>
+                            LocationManageScreen(
+                                locationManageController: locationManageController));
+                        ConnectionStatusListener.isOnHomePage = false;
+
+                        // Get.dialog(
+                        //   LocationTrailScreen(),
+                        // );
+                      }
+                          : goToSubscription,
+                    );
+                  }),
                 ],
               ),
             ),

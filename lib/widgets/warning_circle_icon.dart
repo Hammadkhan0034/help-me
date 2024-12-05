@@ -9,19 +9,14 @@ class WarningCircleIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Positioned(
-      right: 1,
-      top: 10,
-      left: 1,
-      child: ACircularContainer(
-        child: Center(
-          child: CircleAvatar(
-            radius: 50,
-            backgroundColor: AColors.primary,
-            child: Text(
-              "!",
-              style: TextStyle(color: Colors.white, fontSize: 50),
-            ),
+    return ACircularContainer(
+      child: Center(
+        child: CircleAvatar(
+          radius: 40,
+          backgroundColor: AColors.primary,
+          child: Text(
+            "!",
+            style: TextStyle(color: Colors.white, fontSize: 50),
           ),
         ),
       ),

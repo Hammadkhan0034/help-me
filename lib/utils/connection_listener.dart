@@ -12,6 +12,7 @@ class ConnectionStatusListener {
   ConnectionStatusListener._internal();
 
   bool hasShownNoInternet = false;
+  static bool isOnHomePage = true;
   final Connectivity _connectivity = Connectivity();
   static ConnectionStatusListener getInstance() => _singleton;
 
@@ -44,7 +45,7 @@ class ConnectionStatusListener {
     }
 
     if (previousConnection != hasConnection) {
-      connectionChangeController.add(hasConnection);
+      connectionChangeController.add(hasConnection || isOnHomePage );
     }
 
     return hasConnection;
@@ -66,8 +67,7 @@ void updateConnectivity(
     bool hasConnection,
     ConnectionStatusListener connectionStatus,
     ) {
-  if (!hasConnection) {
-    // Show the No Internet dialog only if not already shown
+  if (!hasConnection && !ConnectionStatusListener.isOnHomePage) {
     if (!connectionStatus.hasShownNoInternet) {
       connectionStatus.hasShownNoInternet = true;
       Get.dialog(

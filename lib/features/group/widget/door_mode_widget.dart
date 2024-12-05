@@ -1,7 +1,7 @@
 import 'package:alarm_app/constants/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../controller/create_group_controller.dart';
+import '../controller/group_controller.dart';
 
 class DoorModeWidget extends StatelessWidget {
   final String label;
@@ -15,8 +15,8 @@ class DoorModeWidget extends StatelessWidget {
     required this.onChanged,
   });
 
-  final CreateGroupController dropdownController =
-      Get.put(CreateGroupController());
+  final GroupController dropdownController =
+      Get.put(GroupController());
 
   @override
   Widget build(BuildContext context) {

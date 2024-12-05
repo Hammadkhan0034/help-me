@@ -9,28 +9,19 @@ class PaymentScreen extends StatelessWidget {
   final PaymentController paymentController = Get.put(PaymentController());
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: Text("Plans"),
-      ),
-      body: BackgroundWidget(
-        widget: Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: Column(
-            children: [
-              // BasicPlan(paymentController: paymentController),
-              SizedBox(height: 110),
-              // DailyPlan(paymentController: paymentController),
-              // SizedBox(height: 15),
-              // MonthlyPlan(paymentController: paymentController),
-              // SizedBox(height: 15),
-              YearlyPlan(paymentController: paymentController)
-            ],
-          ),
-        ),
-      ),
+    return       BackgroundWidget(
+      appBarTitle: "Plans",
+      widgets: [
+        // BasicPlan(paymentController: paymentController),
+        SizedBox(height: 50),
+        // DailyPlan(paymentController: paymentController),
+        // SizedBox(height: 15),
+        // MonthlyPlan(paymentController: paymentController),
+        // SizedBox(height: 15),
+        YearlyPlan(paymentController: paymentController)
+      ]
     );
+
   }
 }
 

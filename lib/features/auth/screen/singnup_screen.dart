@@ -20,6 +20,7 @@ class AuthScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
+      backgroundColor: Colors.white,
       body: Padding(
         padding: EdgeInsets.only(top: Get.height * 0.15),
         child: Stack(

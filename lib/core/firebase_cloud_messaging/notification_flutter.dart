@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:math' as math;
 
+import 'package:app_settings/app_settings.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -21,7 +22,7 @@ class NotificationServices {
     messaging.onTokenRefresh.listen((event) {
       event.toString();
       if (kDebugMode) {
-        print('refresh ' + event.toString());
+        print('refresh $event');
       }
     });
   }
@@ -78,7 +79,7 @@ class NotificationServices {
         print('user granted provisional permission');
       }
     } else {
-      //appsetting.AppSettings.openNotificationSettings();
+      AppSettings.openAppSettings();
       if (kDebugMode) {
         print('user denied permission');
       }
@@ -87,9 +88,7 @@ class NotificationServices {
 
 //function to show visible notification when app is active
   Future<void> showNotification(RemoteMessage message) async {
-    String title = message.notification!.title ?? '';
-    String body = message.notification!.body ?? '';
-    String type = message.notification!.body ?? '';
+
     AndroidNotificationDetails androidNotificationDetails;
 
     AndroidNotificationChannel channel;
@@ -114,6 +113,7 @@ class NotificationServices {
             'This channel is used for casual notifications.', // description
         importance: Importance.high,
         showBadge: true,
+        sound: RawResourceAndroidNotificationSound("default"),
         // sound: RawResourceAndroidNotificationSound(
         //     message.notification?.android?.sound),
         playSound: true,
@@ -160,4 +160,5 @@ class NotificationServices {
           payload: jsonEncode(message.data));
     });
   }
+
 }

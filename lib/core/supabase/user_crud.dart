@@ -74,6 +74,14 @@ class UserCrud {
     }
   }
 
+  static Future<void> primaryGroup(
+      String userId, Map<String,dynamic> data) async {
+
+    final response = await Supabase.instance.client.from('profiles').update(data).eq('id', userId);
+
+
+  }
+
   static Future<bool> updateUserLocationStatus(
       String userId, bool status) async {
     try {
@@ -83,6 +91,18 @@ class UserCrud {
       return true;
     } catch (e, st) {
       log("updateUserLocationStatus", error: e, stackTrace: st);
+      return false;
+    }
+  }
+  static Future<bool> updateUserActiveStatus(
+      String userId, bool status) async {
+    try {
+      final response = await Supabase.instance.client.from('profiles').update({
+        'is_active': status,
+      }).eq('id', userId);
+      return true;
+    } catch (e, st) {
+      log("updateUserActiveStatus", error: e, stackTrace: st);
       return false;
     }
   }

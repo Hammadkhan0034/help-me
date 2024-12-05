@@ -1,5 +1,6 @@
 import 'package:alarm_app/common/widgets/rounded_container.dart';
 import 'package:alarm_app/constants/colors.dart';
+import 'package:alarm_app/core/subscription_controller.dart';
 import 'package:alarm_app/features/plans/controllers/payment_controller.dart';
 import 'package:alarm_app/features/plans/screens/plans_screen.dart';
 import 'package:flutter/material.dart';
@@ -40,7 +41,7 @@ class YearlyPlan extends StatelessWidget {
                       const Divider(color: Colors.white),
                       SizedBox(height: 10),
                       Text(
-                        "There is a fee of 1 RM only per month to be paid 12 RM for 1 year subscription if you want to use both the Indoor and Outdoor functions.",
+                        "When you download Help Me, you can use the Alarm function for free.\nThere is a fee of  rm12.99 including tax for 1 year subscription if you want to use both the Indoor and Outdoor functions together with Location Trail.",
                         style: TextStyle(color: Colors.white),
                       ),
                       SizedBox(height: 15),
@@ -66,7 +67,8 @@ class YearlyPlan extends StatelessWidget {
                                   color: Colors.black),
                             ),
                             onPressed: () {
-                              paymentController.makePayment("12");
+                               Get.find<InAppPurchaseUtils>().purchaseProduct();
+                              // paymentController.makePayment("12");
                               // settingsController.updateAccountPrivacy();
                             },
                           ),

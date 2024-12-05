@@ -5,9 +5,10 @@ class GroupModel {
   final String type;
   final int? totalMembers;
   final DateTime? createdAt;
-  final String? createdBy;
+  final String? createdBy, defaultAddress;
+  final double? defaultLongitude, defaultLatitude;
 
-  GroupModel({
+  GroupModel( {
     required this.id,
     required this.name,
     required this.members,
@@ -15,6 +16,7 @@ class GroupModel {
     this.totalMembers,
     required this.createdAt,
     required this.createdBy,
+    this.defaultAddress, this.defaultLongitude, this.defaultLatitude,
   });
 
   factory GroupModel.fromMap(Map<String, dynamic> json) {
@@ -35,6 +37,9 @@ class GroupModel {
           ? DateTime.tryParse(json["created_at"]) ?? DateTime.now()
           : DateTime.now(),
       createdBy: json["created_by"] ?? "",
+      defaultAddress: json["default_address"] ,
+      defaultLatitude: json["default_latitude"] ,
+      defaultLongitude: json["default_longitude"] ,
     );
   }
 
@@ -47,6 +52,9 @@ class GroupModel {
       "totalMembers": totalMembers,
       "createdAt": createdAt?.toIso8601String(),
       "createdBy": createdBy,
+      "default_address": defaultAddress,
+      "default_longitude": defaultLongitude,
+      "default_latitude": defaultLatitude,
     };
   }
 
@@ -70,4 +78,30 @@ class GroupModel {
     createdAt,
     createdBy,
   ];
+
+  GroupModel copyWith({
+    String? id,
+    String? name,
+    List<String>? members,
+    String? type,
+    int? totalMembers,
+    DateTime? createdAt,
+    String? createdBy,
+    String? defaultAddress,
+    double? defaultLongitude,
+    double? defaultLatitude,
+  }) {
+    return GroupModel(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      members: members ?? this.members,
+      type: type ?? this.type,
+      totalMembers: totalMembers ?? this.totalMembers,
+      createdAt: createdAt ?? this.createdAt,
+      createdBy: createdBy ?? this.createdBy,
+      defaultAddress: defaultAddress ?? this.defaultAddress,
+      defaultLongitude: defaultLongitude ?? this.defaultLongitude,
+      defaultLatitude: defaultLatitude ?? this.defaultLatitude,
+    );
+  }
 }

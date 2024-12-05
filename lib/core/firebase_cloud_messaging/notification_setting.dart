@@ -1,3 +1,5 @@
+import 'dart:nativewrappers/_internal/vm/lib/typed_data_patch.dart';
+
 import 'package:path/path.dart' as path;
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -66,16 +68,18 @@ class FirebaseNotificationSetting {
     }
     DarwinNotificationDetails iosNotificationDetails =
         const DarwinNotificationDetails();
+    final isAlert = message.data["notificationType"] == "1";
     AndroidNotificationDetails androidNotificationDetails =
         AndroidNotificationDetails(
-      'com.example.arduino_bt_application',
-      'com.example.arduino_bt_application',
-      importance: Importance.max,
-      priority: Priority.max,
+      isAlert ? 'helpme_alert' : "helpme_normal",
+      isAlert? "Alert Notification" : "Casual Notification",
+      importance: isAlert? Importance.max : Importance.high,
+      priority: isAlert? Priority.max : Priority.high,
       enableLights: true,
       playSound: true,
-      sound: const RawResourceAndroidNotificationSound(
-          "notification_sound_android.mp3"),
+
+          sound: isAlert ? const RawResourceAndroidNotificationSound(
+          "notification_sound_android.mp3") : null,
       ticker: 'ticker',
       largeIcon: FilePathAndroidBitmap(imageUrl),
       styleInformation: styleInformation,

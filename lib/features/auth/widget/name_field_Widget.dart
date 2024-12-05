@@ -12,7 +12,6 @@ class NameFieldWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
-
       controller: controller,
       keyboardType: TextInputType.name,
       style: const TextStyle(fontSize: 18, color: Colors.white),

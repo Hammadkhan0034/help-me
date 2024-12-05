@@ -3,23 +3,30 @@ import 'package:alarm_app/features/help/screens/help_me_screen.dart';
 import 'package:alarm_app/servies/get_services_key.dart';
 import 'package:alarm_app/servies/notification_service.dart';
 import 'package:alarm_app/utils/connection_listener.dart';
+import 'package:alarm_app/utils/shared_prefs.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:get/get.dart';
+import 'package:purchases_flutter/models/purchases_configuration.dart';
+import 'package:purchases_flutter/purchases_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'core/subscription_controller.dart';
 import 'features/auth/screen/singnup_screen.dart';
 import 'firebase_options.dart';
+import 'dart:io' show Platform;
 
 @pragma("vm:entry-point")
 Future<void> _firebaseBackgroundHandler(RemoteMessage message) async {
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+
 }
+
+
+
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,8 +34,12 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  MySharedPrefs mySharedPrefs = MySharedPrefs();
+  mySharedPrefs.sharedPreferences = await SharedPreferences.getInstance();
+  // MySharedPrefs().sharedPreferences.setBool("isLoggedIn", true);
+
   await dotenv.load(fileName: ".env");
-  Stripe.publishableKey = dotenv.env['STRIPE_PUBLISHABLE_KEY']!;
+
   await Supabase.initialize(
     url: dotenv.env['PROJECT_URL']!,
     anonKey: dotenv.env['ANON_KEY']!,
@@ -37,7 +48,10 @@ void main() async {
     ),
   );
 
+  // final inAppPurchaseUtils = Get.put(InAppPurchaseUtils());
   FirebaseMessaging.onBackgroundMessage(_firebaseBackgroundHandler);
+
+
   runApp(const AlarmApp());
 }
 
@@ -50,6 +64,9 @@ class AlarmApp extends StatefulWidget {
 class _AlarmAppState extends State<AlarmApp> {
   NotificationService notificationService = NotificationService();
   GetServicesKey getServicesKey = GetServicesKey();
+  final InAppPurchaseUtils inAppPurchaseUtils = InAppPurchaseUtils.inAppPurchaseUtilsInstance;
+
+
   @override
   void initState() {
     super.initState();
@@ -70,6 +87,11 @@ class _AlarmAppState extends State<AlarmApp> {
               backgroundColor: Colors.white, surfaceTintColor: Colors.white)),
       debugShowCheckedModeBanner: false,
       home: const SessionController(),
+      initialBinding: BindingsBuilder(()async{
+        final inAppController = Get.put<InAppPurchaseUtils>(inAppPurchaseUtils);
+        await inAppController.initInApp();
+
+      }),
     );
   }
 }
@@ -78,6 +100,8 @@ class SessionController extends StatelessWidget {
   const SessionController({super.key});
   @override
   Widget build(BuildContext context) {
+    bool isLoggedIn = MySharedPrefs().sharedPreferences.getBool("isLoggedIn") ?? false;
+
     final authController = Get.find<AuthController>();
     final session = Supabase.instance.client.auth.currentSession;
     if (session != null) {
@@ -87,7 +111,7 @@ class SessionController extends StatelessWidget {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
-            return AuthScreen();
+            return isLoggedIn ? HelpMeScreen() : AuthScreen();
           } else if (snapshot.hasData) {
             if (snapshot.data == 1) {
               return HelpMeScreen();

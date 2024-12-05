@@ -1,9 +1,13 @@
+import 'dart:async';
+import 'dart:developer';
+
 import 'package:alarm_app/core/supabase/FriendsService.dart';
 import 'package:alarm_app/core/supabase/user_crud.dart';
 import 'package:alarm_app/features/auth/controller/auth_controller.dart';
 import 'package:alarm_app/models/notification_model.dart';
 import 'package:alarm_app/models/user_model.dart';
 import 'package:alarm_app/utils/utils.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
@@ -13,64 +17,60 @@ import '../../../models/friends_model.dart';
 
 class NotificationController extends GetxController {
   AuthController authController = Get.find<AuthController>();
-  RxList<NotificationModel> notifications = <NotificationModel>[].obs;
+  List<NotificationModel> notifications = [];
+  final int pageSize = 5;
+  int currentPage = 0;
+  bool isLoading = false;
+  bool hasMore = true;
+  final ScrollController scrollController = ScrollController();
 
-  void subscribeToPendingFriendNotifications(String userId) {
-    if (!FriendsService.isValidUUID(userId)) {
-      throw Exception('Invalid UUID format for userId: $userId');
-    }
-    print('UUID format for userId: $userId');
-    try {
-      final subscription = Supabase.instance.client
-          .from('notifications')
-          .stream(primaryKey: ["id"])
-          .eq('notification_for', userId)
-          .order("timestamp", ascending: false)
-          .listen((snapshot) async {
-        print("Notifications SnapShot of against my ID :  $snapshot");
-
-        if (snapshot.isEmpty) {
-          print('No pending friend requests for user: $userId');
-          return;
-        }
-
-        // Clear the notifications list before refreshing
-        notifications.clear();
-
-        for (var friendData in snapshot) {
-          final notificationFromId = friendData['notification_from'];
-
-          if (notificationFromId != null) {
-            print(
-                "Pending Notification from friend request from user ID: $notificationFromId");
-
-            final user = await fetchUserDetails(notificationFromId);
-
-            if (user != null) {
-              print(
-                  "Pending friend request from: ${user['name']}, Phone: ${user['phone']}");
-
-              final notification = NotificationModel.fromMap(friendData);
-              notification.data?['name'] = user['name'];
-              notification.data?['phone'] = user['phone'];
-
-              bool alreadyExists =
-              notifications.any((n) => n.id == notification.id);
-              if (!alreadyExists) {
-                notifications.add(notification);
-              }
-              notifications.refresh();
-            }
-          } else {
-            print("notification_from is null for friend data: $friendData");
-          }
-        }
-      });
-    } catch (e) {
-      print('Error subscribing to pending friend requests: $e');
-    }
+  Future refreshNotifications() async {
+    currentPage = 0;
+    await getNotifications(isRefresh: true);
   }
 
+  Future getNotifications({bool isRefresh = false}) async {
+    String userId = authController.userModel.value.id;
+    if (isLoading || !hasMore) return;
+    isLoading = true;
+
+    try {
+      final rawNotificationList = await Supabase.instance.client
+          .from('notifications')
+          .select()
+          .eq('notification_for', userId)
+          .order("timestamp", ascending: false)
+          .range(currentPage * pageSize, (currentPage + 1) * pageSize - 1);
+
+      hasMore = rawNotificationList.length == pageSize;
+      currentPage++;
+
+      if (isRefresh) {
+        notifications.clear();
+      }
+      for (var friendData in rawNotificationList) {
+        final notification = NotificationModel.fromMap(friendData);
+
+        // if(notifications.firstWhereOrNull((noti) => noti.notificationFor  == notification.notificationFor &&
+        // noti.notificationFrom == notification.notificationFrom && notification.notificationType ==
+        // noti.notificationType && notification.notificationType == "invitation" ) != null){
+        //   continue;
+        // }
+        //
+        final String notificationFromId = friendData['notification_from'];
+        final user = await fetchUserDetails(notificationFromId);
+        if (user != null) {
+          notification.data?['name'] = user['name'];
+          notification.data?['phone'] = user['phone'];
+          notifications.add(notification);
+        }
+      }
+    } catch (e, st) {
+      log('Error subscribing to notification: ', error: e, stackTrace: st);
+    }
+    isLoading = false;
+    update();
+  }
 
   Future<Map<String, dynamic>?> fetchUserDetails(String userId) async {
     try {
@@ -80,7 +80,7 @@ class NotificationController extends GetxController {
           .eq('id', userId)
           .single();
 
-      if (response == null) {
+      if (response.isEmpty) {
         print('Error fetching user details: ${response}');
         return null;
       }
@@ -92,24 +92,23 @@ class NotificationController extends GetxController {
     }
   }
 
-  Future<void> createNotification({
-    required String notificationFrom,
-    required String notificationFor,
-    required String notificationType,
-    required Map<String, dynamic>? data,
-    required Map<String, double> address,
-  }) async {
-    await NotificationCrud.createNotification(
-      notificationFrom: notificationFrom,
-      notificationFor: notificationFor,
-      notificationType: notificationType,
-      data: data,
-      address: address,
-    );
-  }
+  // Future<void> createNotification({
+  //   required String notificationFrom,
+  //   required String notificationFor,
+  //   required String notificationType,
+  //   required Map<String, dynamic>? data,
+  //   required Map<String, double> address,
+  // }) async {
+  //   await NotificationCrud.createNotification(
+  //     notificationFrom: notificationFrom,
+  //     notificationFor: notificationFor,
+  //     notificationType: notificationType,
+  //     data: data,
+  //     address: address,
+  //   );
+  // }
 
   Future<void> deleteNotification(String notificationId) async {
-    print("Delting Noptification id");
     print(notificationId);
     try {
       notifications.removeWhere((n) => n.id == notificationId);
@@ -117,7 +116,6 @@ class NotificationController extends GetxController {
     } catch (e) {
       print('Error deleting notification: $e');
     }
-    notifications.refresh();
     update();
   }
 
@@ -150,7 +148,21 @@ class NotificationController extends GetxController {
 
   @override
   void onInit() {
-    subscribeToPendingFriendNotifications(authController.userModel.value.id);
+    getNotifications();
+    scrollController.addListener(() {
+      if (scrollController.position.pixels ==
+              scrollController.position.maxScrollExtent &&
+          !isLoading &&
+          hasMore) {
+        getNotifications();
+      }
+    });
     super.onInit();
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
   }
 }

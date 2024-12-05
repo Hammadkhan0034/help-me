@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:alarm_app/constants/colors.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
@@ -13,6 +14,41 @@ class Utils {
     String number = num.replaceAll(RegExp(r'[^0-9]'), '');
     return number.substring(number.length - 10);
   }
+
+
+  static Future<Position?> getCurrentLatLng() async {
+    try {
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+      if (permission == LocationPermission.deniedForever) {
+        Utils.showErrorSnackBar(
+          title: 'Location Permission Denied',
+          description: 'Please enable location permissions in settings.',
+        );
+        return null;
+      }
+
+      // Define location accuracy and obtain current position
+      LocationSettings locationSettings = LocationSettings(
+        accuracy: LocationAccuracy.best,
+        distanceFilter: 10,
+      );
+      Position position = await Geolocator.getCurrentPosition(
+          locationSettings: locationSettings);
+      return position;
+    } catch (e) {
+
+      print("Error retrieving location: $e");
+      Utils.showErrorSnackBar(
+          title: 'Location Error', description: e.toString());
+    }
+    return null;
+  }
+
+
+
 
   static Future<void> openMap(double latitude, double longitude) async {
     String googleUrl =

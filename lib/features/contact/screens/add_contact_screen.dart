@@ -78,7 +78,7 @@ class AddContactScreen extends StatelessWidget {
                                   addContactController.matchedContacts[index];
                               return ContactCardWidget(
                                 name: Text(
-                                  matchedContacts['name']!,
+                                  matchedContacts.name,
                                   style: const TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
@@ -86,7 +86,7 @@ class AddContactScreen extends StatelessWidget {
                                   ),
                                   overflow: TextOverflow.ellipsis,
                                 ),
-                                phoneNumber: matchedContacts['phone']!,
+                                phoneNumber: matchedContacts.phone,
                                 suffixIcon: IconButton(
                                   icon: const Icon(Icons.add,
                                       color: Colors.white),
@@ -147,37 +147,15 @@ class AddContactScreen extends StatelessWidget {
                                             .requestedFriends[index];
 
                                     return ContactCardWidget(
-                                      name: addContactController.isEditing.value
-                                          ? TextField(
-                                              controller: TextEditingController(
-                                                  text: friend.editedName),
-                                              style: const TextStyle(
-                                                  color: Colors.white),
-                                              onSubmitted: (newName) {
-                                                addContactController
-                                                    .updateContactName(
-                                                  index: index,
-                                                  newName: newName,
-                                                  friendId: friend.friendId,
-                                                );
-                                                addContactController
-                                                    .isEditing.value = false;
-                                              },
-                                              decoration: const InputDecoration(
-                                                border: InputBorder.none,
-                                                contentPadding:
-                                                    EdgeInsets.all(0),
-                                              ),
-                                            )
-                                          : Text(
-                                              friend.editedName,
-                                              style: const TextStyle(
-                                                fontSize: 18,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.white,
-                                              ),
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
+                                      name: Text(
+                                        friend.editedName,
+                                        style: const TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
                                       phoneNumber:
                                           friend.friendPhone.toString(),
                                       suffixIcon: friend.requestStatus == 1
@@ -187,8 +165,126 @@ class AddContactScreen extends StatelessWidget {
                                                   icon: const Icon(Icons.edit,
                                                       color: Colors.white),
                                                   onPressed: () {
-                                                    addContactController
-                                                        .isEditing.value = true;
+                                                    String name =
+                                                        friend.editedName;
+                                                    Get.dialog(
+                                                      Column(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .center,
+                                                        children: [
+                                                          SizedBox(
+                                                            height: 200,
+                                                            width:
+                                                                Get.width * 0.8,
+                                                            child: Card(
+                                                              color: AColors
+                                                                  .primary,
+                                                              child: Padding(
+                                                                padding: const EdgeInsets
+                                                                    .symmetric(
+                                                                    horizontal:
+                                                                        10),
+                                                                child: Column(
+                                                                  mainAxisSize:
+                                                                      MainAxisSize
+                                                                          .min,
+                                                                  mainAxisAlignment:
+                                                                      MainAxisAlignment
+                                                                          .center,
+                                                                  crossAxisAlignment:
+                                                                      CrossAxisAlignment
+                                                                          .start,
+                                                                  children: [
+                                                                    // Text(
+                                                                    //   "User Name",
+                                                                    //   style: const TextStyle(
+                                                                    //     fontSize: 18,
+                                                                    //     fontWeight: FontWeight.bold,
+                                                                    //     color: Colors.white,
+                                                                    //   ),
+                                                                    //   overflow: TextOverflow.ellipsis,
+                                                                    // ),
+                                                                    SizedBox(
+                                                                      width: Get
+                                                                              .width *
+                                                                          0.8,
+                                                                      child:
+                                                                          TextField(
+                                                                        controller:
+                                                                            TextEditingController(text: name),
+                                                                        style: const TextStyle(
+                                                                            color:
+                                                                                Colors.white),
+                                                                        onChanged:
+                                                                            (val) {
+                                                                          name =
+                                                                              val;
+                                                                        },
+                                                                        decoration:
+                                                                            const InputDecoration(
+                                                                          border:
+                                                                              OutlineInputBorder(borderSide: BorderSide(color: Colors.white, width: 1)),
+                                                                          label:
+                                                                              Text(
+                                                                            "Name",
+                                                                            style:
+                                                                                TextStyle(color: Colors.white),
+                                                                          ),
+                                                                          enabledBorder:
+                                                                              OutlineInputBorder(borderSide: BorderSide(color: Colors.white, width: 1)),
+                                                                          focusedBorder:
+                                                                              OutlineInputBorder(borderSide: BorderSide(color: Colors.white, width: 1)),
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                    SizedBox(
+                                                                        height:
+                                                                            20),
+
+                                                                    SizedBox(
+                                                                      height:
+                                                                          50,
+                                                                      width: Get
+                                                                              .width *
+                                                                          0.8,
+                                                                      child:
+                                                                          ElevatedButton(
+                                                                        style: ElevatedButton.styleFrom(
+                                                                            elevation:
+                                                                                3,
+                                                                            backgroundColor:
+                                                                                Color(0xff9E3030)),
+                                                                        onPressed:
+                                                                            () {
+                                                                          addContactController
+                                                                              .updateContactName(
+                                                                            index:
+                                                                                index,
+                                                                            newName:
+                                                                                name,
+                                                                            friendId:
+                                                                                friend.friendId,
+                                                                          );
+                                                                        },
+                                                                        child:
+                                                                            Text(
+                                                                          "SAVE",
+                                                                          style: TextStyle(
+                                                                              color: Colors.white,
+                                                                              fontSize: 17,
+                                                                              fontWeight: FontWeight.w600),
+                                                                        ),
+                                                                      ),
+                                                                    )
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    );
                                                   },
                                                 ),
                                                 IconButton(

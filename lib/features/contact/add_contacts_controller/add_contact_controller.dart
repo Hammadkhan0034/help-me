@@ -1,27 +1,39 @@
+import 'dart:async';
+import 'dart:developer';
+
 import 'package:alarm_app/core/supabase/group_contacts.dart';
 import 'package:alarm_app/core/supabase/notification_crud.dart';
 import 'package:alarm_app/features/auth/controller/auth_controller.dart';
+import 'package:alarm_app/models/phone_number_model.dart';
+import 'package:alarm_app/utils/MyEnums.dart';
 import 'package:alarm_app/utils/utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:get/get.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../core/supabase/FriendsService.dart';
 import '../../../models/friends_model.dart';
+import '../../../servies/send_notification_services.dart';
 
 class ContactController extends GetxController {
   var groupContacts = <String>[].obs;
-  var phoneContacts = <Map<String, String>>[].obs;
-  var matchedContacts = <Map<String, String>>[].obs;
+  var phoneContacts = <PhoneNumberModel>[].obs;
+  var matchedContacts = <PhoneNumberModel>[].obs;
   var isLoading = false.obs;
   var requestedFriends = <FriendsModel>[].obs;
-  AuthController authController = Get.put(AuthController());
+  AuthController authController = Get.find<AuthController>();
   var isEditing = false.obs;
   GroupContacts groupServices = GroupContacts();
   TextEditingController editedName = TextEditingController();
   final friendsService = FriendsService();
+  late StreamSubscription friendStream;
+
+  List<FriendsModel> getFriendsFromIds(List<String> ids){
+    return requestedFriends.where((val)=> ids.contains(val.friendId)).toList();
+  }
 
   Future<void> fetchGroupContacts() async {
     isLoading(true);
@@ -42,7 +54,7 @@ class ContactController extends GetxController {
 
   void findMatchedContacts() {
     matchedContacts.value = phoneContacts.where((contact) {
-      String? phoneNumber = contact['phone'];
+      String phoneNumber = contact.phone;
       if (phoneNumber!.length >= 10) {
         String phoneNumberWithoutCode =
             phoneNumber.substring(phoneNumber.length - 10);
@@ -68,12 +80,12 @@ class ContactController extends GetxController {
               !contact.phones.first.number
                   .replaceAll(RegExp(r'[^0-9]'), '')
                   .contains(userNumber))
-          .map((contact) => {
-                'phone': contact.phones.first.number
+          .map((contact) => PhoneNumberModel(
+                phone: contact.phones.first.number
                     .replaceAll(RegExp(r'[^0-9]'), ''),
-                'name': contact.displayName,
-              })
-          .toList();
+                name: contact.displayName,
+      ))
+          .toList().toSet().toList();
       findMatchedContacts();
     } else {
       Get.snackbar('Permission Denied',
@@ -85,8 +97,8 @@ class ContactController extends GetxController {
     return phone.replaceAll(RegExp(r'[^0-9]'), '');
   }
 
-  Future sendFriendRequestToUser(Map<String, String> contact) async {
-    String phoneNumber = contact['phone']!;
+  Future sendFriendRequestToUser(PhoneNumberModel contact) async {
+    String phoneNumber = contact.phone;
     String phoneWithoutCode = normalizePhoneNumber(phoneNumber);
     phoneWithoutCode = phoneWithoutCode.substring(phoneWithoutCode.length - 10);
     final isDuplicateInApp = requestedFriends
@@ -121,13 +133,22 @@ class ContactController extends GetxController {
     await friendsService.addFriend(FriendsModel(
       id: const Uuid().v4(),
       friendId: userProfile['id']!,
-      editedName: contact['name']!,
+      editedName: contact.name,
       userId: authController.userModel.value.id,
       requestStatus: 0,
       createdAt: DateTime.now(),
       friendPhone: phoneWithoutCode,
     ));
 
+    // requestedFriends.add(FriendsModel(
+    //   id: const Uuid().v4(),
+    //   friendId: userProfile['id']!,
+    //   editedName: contact.name,
+    //   userId: authController.userModel.value.id,
+    //   requestStatus: 0,
+    //   createdAt: DateTime.now(),
+    //   friendPhone: phoneWithoutCode,
+    // ));
     // Send notification to the friend if FCM is available
     // final fcm = await friendsService.fetchFriendFcm(userProfile['id']!, authController.userModel.value.id);
     // if (fcm != null && fcm.isNotEmpty) {
@@ -144,6 +165,13 @@ class ContactController extends GetxController {
     //   print("Failed to send notification: Invalid FCM token");
     // }
 
+    await SendNotificationService.sendNotificationUsingApi(
+      fcmList: [userProfile['fcm']!],
+      title: "Friend Request",
+      body: "You got a friend request from ${authController.userModel.value.name}",
+      data: null,
+      notificationType: NotificationTypes.normal
+    );
     await NotificationCrud.createNotification(
         notificationFrom: authController.userModel.value.id,
         notificationFor: userProfile['id']!,
@@ -152,39 +180,60 @@ class ContactController extends GetxController {
         address: {});
     // Add the contact to the local list of added friends
 
-    requestedFriends.add(FriendsModel(
-      id: const Uuid().v4(),
-      friendId: userProfile['id']!,
-      editedName: contact['name']!,
-      userId: authController.userModel.value.id,
-      requestStatus: 0,
-      createdAt: DateTime.now(),
-      friendPhone: phoneWithoutCode,
-    ));
     if (kDebugMode) {
       print('Contact added to Supabase and local list.');
     }
   }
 
   void removeContact(int index, var friendId) async {
+    // requestedFriends.removeAt(index);
     await friendsService.deleteFriend(
         friendId, authController.userModel.value.id);
-    requestedFriends.removeAt(index);
   }
 
   void updateContactName(
       {required int index,
       required String newName,
       required var friendId}) async {
-    await friendsService.updateFriend(
-        newName, friendId, authController.userModel.value.id);
-    update();
+    try {
+      await friendsService.updateFriend(
+          newName, friendId, authController.userModel.value.id);
+      requestedFriends[index] = requestedFriends[index].copyWith(editedName: newName);
+      Get.back();
+      // update();
+    }catch(e,st){
+      log("Update user contact name",error: e,stackTrace: st);
+    }
   }
 
-  void fetchFriends() {
+  void subscribeToFriends() {
     var userId = Get.find<AuthController>().userModel.value.id;
-    print(userId);
-    friendsService.subscribeToFriends(userId, requestedFriends);
+    friendStream = friendsService.subscribeToFriends(userId).listen((snapshot) async {
+      print("aaaaaaagsgkhfdkhfdskjhfkjhfdkhfgkhghfgdkhfgdkhgdfkjhfgkhdfgkjgfd");
+      if (snapshot.isEmpty) {
+        requestedFriends.clear(); // Clear list if no friends found
+      }
+      List<dynamic> friendsData = snapshot;
+
+      List<Future<FriendsModel>> friendFutures =
+      friendsData.map((friend) async {
+        Map<String, dynamic> friendMap = friend as Map<String, dynamic>;
+
+        final profileResponse = await Supabase.instance.client
+            .from('profiles')
+            .select('phone')
+            .eq('id', friendMap['friend_id'])
+            .single();
+
+        String? phoneNumber = profileResponse['phone'] as String?;
+
+        return FriendsModel.fromMap(friendMap)..friendPhone = phoneNumber;
+      }).toList();
+
+      List<FriendsModel> friends = await Future.wait(friendFutures);
+      requestedFriends.clear();
+      requestedFriends.addAll( friends);
+    });
   }
 
   // Future<void> fetchFriends() async {
@@ -253,8 +302,14 @@ class ContactController extends GetxController {
     super.onInit();
     fetchGroupContacts();
     fetchPhoneContacts();
-    fetchFriends();
+    subscribeToFriends();
     // listenToFriendUpdates(); // Listen to real-time updates on initialization
     // fetchInitialFriends(); // Fetch initial data
+  }
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    friendStream.cancel();
+    super.dispose();
   }
 }

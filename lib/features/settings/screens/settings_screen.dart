@@ -1,7 +1,11 @@
 import 'package:alarm_app/constants/colors.dart';
+import 'package:alarm_app/features/auth/controller/auth_controller.dart';
 import 'package:alarm_app/features/contact/add_contacts_controller/add_contact_controller.dart';
+import 'package:alarm_app/features/group/controller/group_controller.dart';
+import 'package:alarm_app/features/group/screens/groups_screen.dart';
 import 'package:alarm_app/features/plans/screens/plans_screen.dart';
 import 'package:alarm_app/features/settings/screens/widgets/primary_group.dart';
+import 'package:alarm_app/widgets/background_widget.dart';
 import 'package:alarm_app/widgets/elevated_button.dart';
 import 'package:alarm_app/widgets/gradient_container.dart';
 import 'package:alarm_app/widgets/warning_circle_icon.dart';
@@ -9,82 +13,83 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../../utils/connection_listener.dart';
 import '../../contact/screens/add_contact_screen.dart';
 import '../../group/screens/create_group_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        leading: InkWell(
-            onTap: () {
-              Get.back();
-            },
-            child: const Icon(Icons.arrow_back_ios_new)),
-        title: const Text(
-          "Settings",
-          style: TextStyle(fontWeight: FontWeight.w600),
-        ),
-        // actions: const [Icon(Icons.person), SizedBox(width: 10)],
-        centerTitle: true,
-      ),
-      body: Stack(
-        children: [
-          GradientContainer(
-            mTop: 110,
-            child: Padding(
-              padding: const EdgeInsets.all(15),
-              child: ListView(
-                // mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 100),
-                  Center(
-                    child: Text(
-                      Supabase.instance.client.auth.currentUser?.phone ?? "",
-                      style: TextStyle(
-                          color: AColors.white,
-                          fontSize: 25,
-                          fontWeight: FontWeight.w500),
-                    ),
-                  ),
-                  const SizedBox(height: 25),
-                  AElevatedButton(
-                      title: "Subscribe",
-                      onPress: () {
-                        Get.to(PaymentScreen());
-                      }),
-                  const SizedBox(height: 15),
-                  AElevatedButton(
-                      title: "Contacts",
-                      onPress: () {
-                        Get.to(
-                          AddContactScreen(
-                            addContactController: Get.find<ContactController>(),
-                          ),
-                        );
-                        // Get.to(DoorScreen());
-                      }),
-                  const SizedBox(height: 15),
-                  AElevatedButton(
-                      title: "Groups",
-                      onPress: () {
-                        Get.to(() => CreateGroupScreen());
-                        // Get.to(const SettingsScreen());
-                      }),
-                  const SizedBox(height: 15),
-                  const PrimaryGroup(title: "Primary Indoor Group"),
-                  const SizedBox(height: 15),
-                  const PrimaryGroup(title: "Primary Outdoor Group"),
-                ],
+    return PopScope(
+      onPopInvokedWithResult: (val,res){
+        ConnectionStatusListener.isOnHomePage = true;
+
+      },
+      child:  GetBuilder<GroupController>(builder: (logic) {
+          return BackgroundWidget(
+              appBarTitle: "Settings",
+            trailingData: Icons.delete,
+            onClick: Get.find<AuthController>().deleteAccount,
+            widgets: [
+            const SizedBox(height: 10),
+            Center(
+              child: Text(
+                Supabase.instance.client.auth.currentUser?.phone ?? "",
+                style: TextStyle(
+                    color: AColors.white,
+                    fontSize: 25,
+                    fontWeight: FontWeight.w500),
               ),
             ),
-          ),
-          const WarningCircleIcon(),
-        ],
-      ),
+            const SizedBox(height: 25),
+            AElevatedButton(
+                title: "Subscribe",
+                onPress: () {
+                  Get.to(PaymentScreen());
+                }).paddingSymmetric(horizontal: 20),
+            const SizedBox(height: 15),
+            AElevatedButton(
+                title: "Contacts",
+                onPress: () {
+                  Get.to(
+                    AddContactScreen(
+                      addContactController: Get.find<
+                          ContactController>(),
+                    ),
+                  );
+                  // Get.to(DoorScreen());
+                }).paddingSymmetric(horizontal: 20),
+            const SizedBox(height: 15),
+            AElevatedButton(
+                title: "Groups",
+                onPress: () {
+                  Get.to(() =>
+                      GroupsScreen(
+                        groupController: Get.find<GroupController>(),));
+                  // Get.to(const SettingsScreen());
+                }).paddingSymmetric(horizontal: 20),
+            const SizedBox(height: 15),
+            PrimaryGroup(title: "Primary Indoor Group", groups: Get
+                .find<GroupController>()
+                .indoorGroups, onChange: Get
+                .find<AuthController>()
+                .updatePrimaryIndoorGroup, selectedGroup: Get
+                .find<GroupController>()
+                .primaryIndoor,).paddingSymmetric(horizontal: 20),
+            const SizedBox(height: 15),
+            PrimaryGroup(title: "Primary Outdoor Group", groups: Get
+                .find<GroupController>()
+                .outdoorGroups, onChange: Get
+                .find<AuthController>()
+                .updatePrimaryOutdoorGroup, selectedGroup: Get
+                .find<GroupController>()
+                .primaryOutdoor).paddingSymmetric(horizontal: 20),
+          ],);
+        }),
+
     );
   }
 }

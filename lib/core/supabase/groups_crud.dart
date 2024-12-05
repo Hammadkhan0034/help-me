@@ -16,7 +16,10 @@ class GroupCrud{
       'created_by': groupModel.createdBy,
       'type': groupModel.type,
       'members': groupModel.members,
-      'total_members':groupModel.totalMembers
+      'total_members':groupModel.totalMembers,
+      "default_address": groupModel.defaultAddress,
+      "default_longitude": groupModel.defaultLongitude,
+      "default_latitude": groupModel.defaultLatitude,
     }).select()
         ;
 
@@ -26,6 +29,38 @@ class GroupCrud{
       throw Exception('Error creating group: Unable to fetch response.');
     }
   }
+
+
+
+  static Future<bool> updateGroup(GroupModel groupModel) async {
+    final supabase = Supabase.instance.client;
+
+    try {
+      final response = await supabase
+          .from('groups')
+          .update({
+        'name': groupModel.name,
+        'created_by': groupModel.createdBy,
+        'type': groupModel.type,
+        'members': groupModel.members,
+        'total_members': groupModel.totalMembers,
+        "default_address": groupModel.defaultAddress,
+        "default_longitude": groupModel.defaultLongitude,
+        "default_latitude": groupModel.defaultLatitude,
+      })
+          .eq('id', groupModel.id!) // filter by the group's id
+          .select();
+      print('Group updated successfully');
+
+      return true;
+    } catch (e) {
+      print('Failed to update group: $e');
+      return false;
+    }
+  }
+
+
+
 
   static Future<List<GroupModel>> fetchGroupsByType(String type, String userId) async {
     final response = await Supabase.instance.client
@@ -44,17 +79,41 @@ class GroupCrud{
         .map((item) => GroupModel.fromMap(item)) // Convert to your model
         .toList();
   }
+  static Future<List<GroupModel>> getAllGroups(String userId) async {
+    try {
+      final response = await Supabase.instance.client
+          .from('groups')
+          .select()
+          .eq('created_by', userId) // Assuming 'group_type' is your column name
+          .select();
+      if (response.isEmpty) {
+        print('NO Groups ');
+        return []; // Return an empty list in case of error
+      }
+      print("Groups");
+      print(response);
+      return (response as List<dynamic>)
+          .map((item) => GroupModel.fromMap(item)) // Convert to your model
+          .toList();
+    }catch(e,st){
+      log("",error: e,stackTrace: st);
+      return [];
+    }
+  }
 
 
-  static Future<void> deleteGroup(String groupId) async {
-    final response = await Supabase.instance.client
-        .from('groups')
-        .delete()
-        .eq('id', groupId)
-        ;
+  static Future<bool> deleteGroup(String groupId) async {
+    try {
+      final response = await Supabase.instance.client
+          .from('groups')
+          .delete()
+          .eq('id', groupId)
+      ;
 
-    if (response.error != null) {
-      throw Exception('Error deleting group: ${response.error!.message}');
+      return true;
+    }catch(e,st){
+      log("Delete Group", error: e,stackTrace: st);
+      return false;
     }
   }
 
