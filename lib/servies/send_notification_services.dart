@@ -48,14 +48,14 @@ class SendNotificationService {
                     : "helpme_alert",
                 "sound": notificationType == NotificationTypes.normal
                     ? "normal"
-                    : "raw_alarm"
+                    : "raw_alarm.wav"
               }
             },
             "apns": {
               "payload": {
                 "aps": {"sound": notificationType == NotificationTypes.normal
                     ? "normal"
-                    : "raw_alarm"}
+                    : "raw_alarm.aiff"}
               }
             },
             "data": data,

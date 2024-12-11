@@ -1,11 +1,4 @@
-
 import 'package:get/get.dart';
-
-
-
-
-
-
 class PaymentController extends GetxController {
   // Observable variables to control plan visibility
   RxBool showBasicPlan = false.obs;

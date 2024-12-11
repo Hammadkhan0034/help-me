@@ -41,14 +41,14 @@ class YearlyPlan extends StatelessWidget {
                       const Divider(color: Colors.white),
                       SizedBox(height: 10),
                       Text(
-                        "When you download Help Me, you can use the Alarm function for free.\nThere is a fee of  rm12.99 including tax for 1 year subscription if you want to use both the Indoor and Outdoor functions together with Location Trail.",
+                        "When you download Help Me, you can use the Alarm function for free.\nThere is a fee of  RM12.99 for 1 year subscription if you want to use both the Indoor and Outdoor functions together with Location Trail.",
                         style: TextStyle(color: Colors.white),
                       ),
                       SizedBox(height: 15),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text("12 RM/Year",
+                          Text("12.99 RM/Year",
                               style: TextStyle(
                                   fontWeight: FontWeight.w600,
                                   fontSize: 25,
@@ -67,7 +67,8 @@ class YearlyPlan extends StatelessWidget {
                                   color: Colors.black),
                             ),
                             onPressed: () {
-                               Get.find<InAppPurchaseUtils>().purchaseProduct();
+
+                               Get.find<InAppPurchaseUtils>().performPurchase();
                               // paymentController.makePayment("12");
                               // settingsController.updateAccountPrivacy();
                             },

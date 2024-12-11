@@ -181,32 +181,26 @@ class DoorScreen extends StatelessWidget {
                             children: [
                               InkWell(
                                 onTap: () async {
-                                  File? selectedImageFile =
-                                      await Utils.imagePickerBottomSheet(
+                                  File? selectedImageFile =                                   await Utils.imagePickerBottomSheet(
                                           context);
 
-                                  // If an image is picked, upload it to Supabase
                                   if (selectedImageFile != null) {
-                                    ctrl.imageUrl.value =
-                                        selectedImageFile.path;
+                                    ctrl.imageUrl.value = "";
                                     ctrl.localImagePath.value =
                                         selectedImageFile.path;
-                                    // Upload the image file to Supabase and get the image URL
                                     String? uploadedImageUrl =
                                         await MySupabaseStorage.uploadImage(
                                             selectedImageFile);
                                     if (uploadedImageUrl != null) {
                                       print(
                                           'Image uploaded successfully: $uploadedImageUrl');
-                                      // Optionally, update your controller or state with the uploaded image URL
                                       ctrl.imageUrl.value =
-                                          uploadedImageUrl; // assuming you have such a field
+                                          uploadedImageUrl;
                                     } else {
-                                      // Handle the upload failure
+                                      Get.snackbar("Upload Image", "Failed to upload image to server. Please try again.");
                                       print('Failed to upload image');
                                     }
                                   } else {
-                                    // Handle the case where no image was selected
                                     print('No image selected');
                                   }
                                 },

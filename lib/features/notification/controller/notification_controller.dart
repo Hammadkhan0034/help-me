@@ -72,6 +72,51 @@ class NotificationController extends GetxController {
     update();
   }
 
+  Future getNotificationsFromNotification() async {
+    String userId = authController.userModel.value.id;
+    int index = 0;
+    print("aaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+    try {
+      final rawNotificationList = await Supabase.instance.client
+          .from('notifications')
+          .select()
+          .eq('notification_for', userId)
+          .order("timestamp", ascending: false)
+          .range(0, pageSize);
+      print("aaaaaaaaaaaaaaaaaaaaaaaaaaaa1");
+
+      for (var friendData in rawNotificationList) {
+        final notification = NotificationModel.fromMap(friendData);
+        if(notifications.firstWhereOrNull((noti) => noti.id == notification.id) != null){
+          continue;
+        }
+        print("aaaaaaaaaaaaaaaaaaaaaaaaaaaa2");
+
+        final String notificationFromId = friendData['notification_from'];
+        final user = await fetchUserDetails(notificationFromId);
+        print("aaaaaaaaaaaaaaaaaaaaaaaaaaaa3");
+
+        if (user != null) {
+          print("aaaaaaaaaaaaaaaaaaaaaaaaaaaa4");
+
+          notification.data?['name'] = user['name'];
+          notification.data?['phone'] = user['phone'];
+          notifications.insert(index, notification);
+          index++;
+          print("aaaaaaaaaaaaaaaaaaaaaaaaaaaa5");
+
+        }
+      }
+      if(index!=0) {
+        update();
+      }
+
+    } catch (e, st) {
+      log('Error subscribing to notification: ', error: e, stackTrace: st);
+    }
+  }
+
+
   Future<Map<String, dynamic>?> fetchUserDetails(String userId) async {
     try {
       final response = await Supabase.instance.client

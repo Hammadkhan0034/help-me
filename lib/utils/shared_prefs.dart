@@ -12,7 +12,7 @@ class MySharedPrefs {
   }
 
   bool getBool(String key) {
-    return sharedPreferences.getBool(key) ?? false;
+    return sharedPreferences.getBool(key) ?? true;
   }
 
   setBool(String key, bool value) {

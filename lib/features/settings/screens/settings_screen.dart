@@ -1,4 +1,5 @@
 import 'package:alarm_app/constants/colors.dart';
+import 'package:alarm_app/core/subscription_controller.dart';
 import 'package:alarm_app/features/auth/controller/auth_controller.dart';
 import 'package:alarm_app/features/contact/add_contacts_controller/add_contact_controller.dart';
 import 'package:alarm_app/features/group/controller/group_controller.dart';
@@ -24,16 +25,17 @@ class SettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PopScope(
-      onPopInvokedWithResult: (val,res){
+      onPopInvokedWithResult: (val, res) {
         ConnectionStatusListener.isOnHomePage = true;
-
       },
-      child:  GetBuilder<GroupController>(builder: (logic) {
-          return BackgroundWidget(
-              appBarTitle: "Settings",
-            trailingData: Icons.delete,
-            onClick: Get.find<AuthController>().deleteAccount,
-            widgets: [
+      child: GetBuilder<GroupController>(builder: (logic) {
+        return BackgroundWidget(
+          appBarTitle: "Settings",
+          trailingData: Icons.delete,
+          onClick: Get
+              .find<AuthController>()
+              .deleteAccount,
+          widgets: [
             const SizedBox(height: 10),
             Center(
               child: Text(
@@ -45,11 +47,14 @@ class SettingsScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 25),
-            AElevatedButton(
-                title: "Subscribe",
-                onPress: () {
-                  Get.to(PaymentScreen());
-                }).paddingSymmetric(horizontal: 20),
+            Obx(() {
+
+              return !Get.find<InAppPurchaseUtils>().isSubscriptionActive.value ?SizedBox.shrink() : AElevatedButton(
+                  title: "Subscribe",
+                  onPress: () {
+                    Get.to(PaymentScreen());
+                  });
+            }).paddingSymmetric(horizontal: 20),
             const SizedBox(height: 15),
             AElevatedButton(
                 title: "Contacts",
@@ -88,7 +93,7 @@ class SettingsScreen extends StatelessWidget {
                 .find<GroupController>()
                 .primaryOutdoor).paddingSymmetric(horizontal: 20),
           ],);
-        }),
+      }),
 
     );
   }

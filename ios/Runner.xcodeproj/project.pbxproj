@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */ = {isa = PBXBuildFile; fileRef = 1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */; };
+		2C3FE34F2D0289CE0030473F /* raw_alarm.aiff in Resources */ = {isa = PBXBuildFile; fileRef = 2C3FE34E2D0289CE0030473F /* raw_alarm.aiff */; };
 		2C934B012CF5318A009EE038 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2C934B002CF5318A009EE038 /* StoreKit.framework */; };
 		331C808B294A63AB00263BE5 /* RunnerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 331C807B294A618700263BE5 /* RunnerTests.swift */; };
 		3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */; };
@@ -47,6 +48,8 @@
 		065DCC821F918812C6066274 /* Pods_RunnerTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RunnerTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		1498D2321E8E86230040F4C2 /* GeneratedPluginRegistrant.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GeneratedPluginRegistrant.h; sourceTree = "<group>"; };
 		1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GeneratedPluginRegistrant.m; sourceTree = "<group>"; };
+		2C3FE34E2D0289CE0030473F /* raw_alarm.aiff */ = {isa = PBXFileReference; lastKnownFileType = audio.aiff; path = raw_alarm.aiff; sourceTree = "<group>"; };
+		2C6428582D021B8D00648302 /* HelpMeRevenueCatConfig.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = HelpMeRevenueCatConfig.storekit; sourceTree = "<group>"; };
 		2C934B002CF5318A009EE038 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		2CEF6FC02D00B17300CE60FF /* Runner.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Runner.entitlements; sourceTree = "<group>"; };
 		331C807B294A618700263BE5 /* RunnerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunnerTests.swift; sourceTree = "<group>"; };
@@ -93,6 +96,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		2C3FE34D2D0289B70030473F /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				2C3FE34E2D0289CE0030473F /* raw_alarm.aiff */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
 		2C934AFF2CF5318A009EE038 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -147,6 +158,7 @@
 		97C146F01CF9000F007C117D /* Runner */ = {
 			isa = PBXGroup;
 			children = (
+				2C3FE34D2D0289B70030473F /* Resources */,
 				2CEF6FC02D00B17300CE60FF /* Runner.entitlements */,
 				97C146FA1CF9000F007C117D /* Main.storyboard */,
 				97C146FD1CF9000F007C117D /* Assets.xcassets */,
@@ -156,6 +168,7 @@
 				1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */,
 				74858FAE1ED2DC5600515810 /* AppDelegate.swift */,
 				74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */,
+				2C6428582D021B8D00648302 /* HelpMeRevenueCatConfig.storekit */,
 			);
 			path = Runner;
 			sourceTree = "<group>";
@@ -272,6 +285,7 @@
 				97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */,
 				3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */,
 				97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */,
+				2C3FE34F2D0289CE0030473F /* raw_alarm.aiff in Resources */,
 				97C146FC1CF9000F007C117D /* Main.storyboard in Resources */,
 				F7069E2C2CFFDBD4831D3587 /* GoogleService-Info.plist in Resources */,
 			);

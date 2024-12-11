@@ -43,11 +43,20 @@
     &lt;string&gt;To scan cards&lt;/string&gt;</key>
 	<string>To scan cards</string>
 	<key>NSContactsUsageDescription</key>
-	<string>We need access to your contacts to let you select them.</string>
+	<string>Help Me require contacts permission to view and add users to friend list</string>
 	<key>NSLocationAlwaysUsageDescription</key>
-	<string>We need your location to provide better services.</string>
+	<string>Help me require location permission to get your location and share it with your friends. It wil only share the location with people you have allowed the app.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>We need your location to provide better services.</string>
+	<string>Help me require location permission to get your location and share it with your friends. It wil only share the location with people you have allowed the app.</string>
+
+
+	<key>NSPhotoLibraryUsageDescription</key>
+    <string>This app requires access to your photo library to upload and share images with your friends.</string>
+    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+    <string>Help me require location permission to get your location and share it with your friends. It wil only share the location with people you have allowed the app.</string>
+
+
+
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UIBackgroundModes</key>

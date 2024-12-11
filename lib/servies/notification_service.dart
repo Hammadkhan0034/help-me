@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:alarm_app/features/notification/screens/notification_screen.dart';
@@ -8,6 +9,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
+
+import '../features/notification/controller/notification_controller.dart';
 
 class NotificationService {
   FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
@@ -105,6 +108,9 @@ class NotificationService {
         print('Message notification: ${notification?.title}');
         print('Message notification: ${notification?.body}');
       }
+      if(Get.isRegistered<NotificationController>()){
+        Get.find<NotificationController>().getNotificationsFromNotification();
+      }
 
       if (Platform.isIOS) {
         iosForegroundMessage();
@@ -144,6 +150,8 @@ class NotificationService {
 
     DarwinNotificationDetails darwinNotificationDetails =
         const DarwinNotificationDetails(
+
+          sound: "raw_alarm.aiff",
             presentAlert: true, presentBadge: true, presentSound: true);
 
     //Combining both setting
@@ -159,7 +167,7 @@ class NotificationService {
           message.notification!.title.toString(),
           message.notification!.body.toString(),
           notificationDetails,
-          payload: "my_payload");
+          payload: jsonEncode(message.data));
     });
   }
 

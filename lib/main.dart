@@ -1,5 +1,6 @@
 import 'package:alarm_app/features/auth/controller/auth_controller.dart';
 import 'package:alarm_app/features/help/screens/help_me_screen.dart';
+import 'package:alarm_app/features/notification/controller/notification_controller.dart';
 import 'package:alarm_app/servies/get_services_key.dart';
 import 'package:alarm_app/servies/notification_service.dart';
 import 'package:alarm_app/utils/connection_listener.dart';
@@ -21,7 +22,9 @@ import 'dart:io' show Platform;
 
 @pragma("vm:entry-point")
 Future<void> _firebaseBackgroundHandler(RemoteMessage message) async {
-
+if(Get.isRegistered<NotificationController>()){
+  Get.find<NotificationController>().getNotificationsFromNotification();
+}
 }
 
 

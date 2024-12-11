@@ -86,7 +86,7 @@ class AuthController extends GetxController {
   Future<String?> verifyOtp(String otp) async {
     isVerifyingOtp.value = true;
     NotificationService notificationService = NotificationService();
-    // String? fcmToken = await notificationService.getDeviceToken();
+     String? fcmToken = await notificationService.getDeviceToken();
 
     try {
       final AuthResponse res = await supabaseClient.auth.verifyOTP(
@@ -112,7 +112,7 @@ class AuthController extends GetxController {
         id: user!.id,
         name: nameController.text.trim(),
         phone: user.phone!,
-        fcm: "fcmToken" ?? "",
+        fcm: fcmToken ?? "",
         isLocationEnabled: false,
       );
 

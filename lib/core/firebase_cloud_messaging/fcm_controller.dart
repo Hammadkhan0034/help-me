@@ -5,6 +5,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 
+import '../../features/notification/controller/notification_controller.dart';
 import 'notification_setting.dart';
 
 class FirebaseCloudMessagingService extends GetxController {
@@ -59,6 +60,7 @@ class FirebaseCloudMessagingService extends GetxController {
       handleNotificationTappedFormNotificationTray(
           jsonDecode(notificationResponse.payload ?? "{}"));
     });
+
     listenFirebaseMessages();
   }
 
