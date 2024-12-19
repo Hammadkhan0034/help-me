@@ -115,7 +115,7 @@ class NotificationService {
       if (Platform.isIOS) {
         iosForegroundMessage();
         // handleMessage(context, message);
-      }
+      }else
       if (Platform.isAndroid) {
         intiLocationNotification(context, message);
         showNotification(message);

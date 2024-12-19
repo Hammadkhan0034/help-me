@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:developer';
 import 'dart:io' show Platform;
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
@@ -84,16 +83,20 @@ class InAppPurchaseUtils extends GetxController {
     // }
   }
   Future<void> purchaseProduct() async {
-    try {
-      Get.showOverlay(asyncFunction: ()async{},loadingWidget: Center(child: SizedBox(height: 60,width: 60,child: CircularProgressIndicator(color: Colors.white,),),));
-      await fetchOffers();
-      final purchaserInfo = await Purchases.purchasePackage(package!);
-      if (purchaserInfo.entitlements.active.containsKey('premium_annual')) {
-        await checkSubscription();
+    Get.showOverlay(asyncFunction: ()async{
+      try {
+        await fetchOffers();
+        final purchaserInfo = await Purchases.purchasePackage(package!);
+        if (purchaserInfo.entitlements.active.containsKey('premium_annual')) {
+          await checkSubscription();
+        }
+      }  catch (e,st) {
+        log('Error purchasing product',error: e,stackTrace: st);
       }
-    }  catch (e,st) {
-      log('Error purchasing product',error: e,stackTrace: st);
-    }
+
+    },loadingWidget: Center(child: SizedBox(height: 60,width: 60,child: CircularProgressIndicator(color: Colors.white,),),));
+
+
   }
 
 
@@ -117,7 +120,7 @@ class InAppPurchaseUtils extends GetxController {
       } else {
         isSubscriptionActive.value = false;
       }
-      // isSubscriptionActive.value = true;
+
 
     } catch (e) {
       debugPrint('Error checking subscription: $e');

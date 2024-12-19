@@ -18,7 +18,8 @@ class YearlyPlan extends StatelessWidget {
   Widget build(BuildContext context) {
     return Obx(
       () {
-        return Card(
+        return
+          Card(
           elevation: 5,
           color: AColors.primary,
           child: MRoundedContainer(
@@ -29,19 +30,19 @@ class YearlyPlan extends StatelessWidget {
               children: [
                 MPlanTile(
                   onTap: () {
-                    paymentController.showYearlyPlan.value =
-                        !paymentController.showYearlyPlan.value;
+                    // paymentController.showYearlyPlan.value =
+                    //     !paymentController.showYearlyPlan.value;
                   },
                   up: paymentController.showYearlyPlan.value,
                   title: 'Yearly Plan',
                 ),
-                if (paymentController.showYearlyPlan.value)
+                // if (paymentController.showYearlyPlan.value)
                   Column(
                     children: [
                       const Divider(color: Colors.white),
                       SizedBox(height: 10),
                       Text(
-                        "When you download Help Me, you can use the Alarm function for free.\nThere is a fee of  RM12.99 for 1 year subscription if you want to use both the Indoor and Outdoor functions together with Location Trail.",
+                        "You can use the Alarm function for free.\nIf you want to use both the Indoor and Outdoor functions together with Location Trail.",
                         style: TextStyle(color: Colors.white),
                       ),
                       SizedBox(height: 15),

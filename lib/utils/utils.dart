@@ -1,15 +1,55 @@
 import 'dart:io';
 
 import 'package:alarm_app/constants/colors.dart';
+import 'package:alarm_app/utils/shared_prefs.dart';
+import 'package:alarm_app/widgets/no_notifications_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../servies/get_services_key.dart';
+import '../servies/notification_service.dart';
+
 class Utils {
+
+
+  static Future<bool> checkNotificationPermission() async {
+    PermissionStatus status = await Permission.notification.status;
+    if (status == PermissionStatus.granted  && MySharedPrefs().getBool("isNotificationEnabled")) {
+      // Permission granted
+      return true;
+    } else if (status == PermissionStatus.denied || status == PermissionStatus.restricted) {
+      // Permission denied or restricted
+      return false;
+    }
+    return false; // In case of other statuses, assume not granted
+  }
+
+  static Future shouldInitNotification(BuildContext context)async{
+    await Future.delayed(Duration(seconds: 2));
+    if(await checkNotificationPermission()) {
+      NotificationService notificationService = NotificationService();
+      GetServicesKey getServicesKey = GetServicesKey();
+
+      await getServicesKey.getServerToken();
+       notificationService.requestNotificationPermission();
+      await notificationService.getDeviceToken();
+       notificationService.firebaseInit(context);
+      await notificationService.setupInteractMessage(context);
+    }
+    else if(Supabase.instance.client.auth.currentUser!=null){
+      Get.dialog(NoNotificationsDialog());
+    }
+  }
+
+
+
   static String getPhoneWithoutCode(String num) {
     String number = num.replaceAll(RegExp(r'[^0-9]'), '');
     return number.substring(number.length - 10);

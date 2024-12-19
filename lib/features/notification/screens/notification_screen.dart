@@ -245,7 +245,6 @@ class NotificationScreen extends StatelessWidget {
           ),
           actions: [
 
-            NotificationControllerWidget(),
             SizedBox(width: 10,),
             Padding(
               padding: const EdgeInsets.only(right: 10),

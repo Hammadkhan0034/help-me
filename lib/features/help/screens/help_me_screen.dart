@@ -21,7 +21,7 @@ import '../../group/controller/group_controller.dart';
 import '../controller/alar_controller.dart';
 
 class HelpMeScreen extends StatelessWidget {
-  final AlarmController alarmController = Get.put(AlarmController());
+  final AlarmController alarmController = Get.put(AlarmController(),permanent: true);
 
   final ContactController addContactController =
   Get.put(ContactController(), permanent: true);
@@ -29,7 +29,7 @@ class HelpMeScreen extends StatelessWidget {
   Get.put(LocationManageController(), permanent: true);
 
   final GroupController createGroupController =
-  Get.put(GroupController());
+  Get.put(GroupController(),permanent: true);
   final InAppPurchaseUtils inAppPurchaseUtils = Get.find<InAppPurchaseUtils>();
 
   HelpMeScreen({super.key});
@@ -94,20 +94,14 @@ void goToSubscription(){
                             : goToSubscription);
                   }),
                   const SizedBox(height: 15),
-                  Obx(() {
-                    return AElevatedButton(
-                        bgColor: inAppPurchaseUtils.isSubscriptionActive.value
-                            ? AColors.dark
-                            : Colors.grey,
+                  AElevatedButton(
 
                         title: "SETTINGS",
-                        onPress: inAppPurchaseUtils.isSubscriptionActive.value
-                            ? () {
+                        onPress: () {
                           ConnectionStatusListener.isOnHomePage = false;
-                          Get.to(() => const SettingsScreen());
+                          Get.to(() =>  SettingsScreen());
                         }
-                            : goToSubscription);
-                  }),
+    ),
                   // const SizedBox(height: 15),
                   // AElevatedButton(
                   //   title: "Add Contact",

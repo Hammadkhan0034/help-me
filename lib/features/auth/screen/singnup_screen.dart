@@ -1,3 +1,4 @@
+import 'package:alarm_app/features/privacy_policy_and%20_eula%20sidget.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';

@@ -15,13 +15,18 @@ import 'package:get/get.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../utils/connection_listener.dart';
+import '../../../widgets/notification_controller_widget.dart';
 import '../../contact/screens/add_contact_screen.dart';
 import '../../group/screens/create_group_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
-  const SettingsScreen({super.key});
+  SettingsScreen({super.key});
 
+  final InAppPurchaseUtils inAppPurchaseUtils = Get.find<InAppPurchaseUtils>();
 
+  void goToSubscription(){
+    Get.to(()=> PaymentScreen());
+  }
   @override
   Widget build(BuildContext context) {
     return PopScope(
@@ -31,10 +36,7 @@ class SettingsScreen extends StatelessWidget {
       child: GetBuilder<GroupController>(builder: (logic) {
         return BackgroundWidget(
           appBarTitle: "Settings",
-          trailingData: Icons.delete,
-          onClick: Get
-              .find<AuthController>()
-              .deleteAccount,
+
           widgets: [
             const SizedBox(height: 10),
             Center(
@@ -48,34 +50,46 @@ class SettingsScreen extends StatelessWidget {
             ),
             const SizedBox(height: 25),
             Obx(() {
-
-              return !Get.find<InAppPurchaseUtils>().isSubscriptionActive.value ?SizedBox.shrink() : AElevatedButton(
+              return !Get
+                  .find<InAppPurchaseUtils>()
+                  .isSubscriptionActive
+                  .value ? SizedBox.shrink() : AElevatedButton(
                   title: "Subscribe",
                   onPress: () {
                     Get.to(PaymentScreen());
                   });
             }).paddingSymmetric(horizontal: 20),
             const SizedBox(height: 15),
-            AElevatedButton(
-                title: "Contacts",
-                onPress: () {
-                  Get.to(
-                    AddContactScreen(
-                      addContactController: Get.find<
-                          ContactController>(),
-                    ),
-                  );
-                  // Get.to(DoorScreen());
-                }).paddingSymmetric(horizontal: 20),
+            Obx(() {
+              return AElevatedButton(
+                  bgColor: inAppPurchaseUtils.isSubscriptionActive.value
+                      ? AColors.dark
+                      : Colors.grey,
+                  title: "Contacts",
+                  onPress:inAppPurchaseUtils.isSubscriptionActive.value? () {
+                    Get.to(
+                      AddContactScreen(
+                        addContactController: Get.find<
+                            ContactController>(),
+                      ),
+                    );
+                    // Get.to(DoorScreen());
+                  }: goToSubscription);
+            }).paddingSymmetric(horizontal: 20),
             const SizedBox(height: 15),
-            AElevatedButton(
-                title: "Groups",
-                onPress: () {
-                  Get.to(() =>
-                      GroupsScreen(
-                        groupController: Get.find<GroupController>(),));
-                  // Get.to(const SettingsScreen());
-                }).paddingSymmetric(horizontal: 20),
+            Obx(() {
+              return AElevatedButton(
+                  bgColor: inAppPurchaseUtils.isSubscriptionActive.value
+                      ? AColors.dark
+                      : Colors.grey,
+                  title: "Groups",
+                  onPress: inAppPurchaseUtils.isSubscriptionActive.value?() {
+                    Get.to(() =>
+                        GroupsScreen(
+                          groupController: Get.find<GroupController>(),));
+                    // Get.to(const SettingsScreen());
+                  }: goToSubscription);
+            }).paddingSymmetric(horizontal: 20),
             const SizedBox(height: 15),
             PrimaryGroup(title: "Primary Indoor Group", groups: Get
                 .find<GroupController>()
@@ -92,6 +106,19 @@ class SettingsScreen extends StatelessWidget {
                 .updatePrimaryOutdoorGroup, selectedGroup: Get
                 .find<GroupController>()
                 .primaryOutdoor).paddingSymmetric(horizontal: 20),
+            const SizedBox(height: 15),
+            NotificationControllerWidget().paddingSymmetric(horizontal: 20),
+
+            const SizedBox(height: 15),
+
+        AElevatedButton(
+
+        title: "Delete Account",
+        onPress: Get
+            .find<AuthController>()
+            .deleteAccount,).paddingSymmetric(horizontal: 20),
+            const SizedBox(height: 15),
+
           ],);
       }),
 

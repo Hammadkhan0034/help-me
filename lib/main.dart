@@ -5,11 +5,14 @@ import 'package:alarm_app/servies/get_services_key.dart';
 import 'package:alarm_app/servies/notification_service.dart';
 import 'package:alarm_app/utils/connection_listener.dart';
 import 'package:alarm_app/utils/shared_prefs.dart';
+import 'package:alarm_app/utils/utils.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:purchases_flutter/models/purchases_configuration.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -65,8 +68,6 @@ class AlarmApp extends StatefulWidget {
 }
 
 class _AlarmAppState extends State<AlarmApp> {
-  NotificationService notificationService = NotificationService();
-  GetServicesKey getServicesKey = GetServicesKey();
   final InAppPurchaseUtils inAppPurchaseUtils = InAppPurchaseUtils.inAppPurchaseUtilsInstance;
 
 
@@ -74,12 +75,9 @@ class _AlarmAppState extends State<AlarmApp> {
   void initState() {
     super.initState();
     initNoInternetListener();
-    getServicesKey.getServerToken();
-    notificationService.requestNotificationPermission();
-    notificationService.getDeviceToken();
-    notificationService.firebaseInit(context);
-    notificationService.setupInteractMessage(context);
+    Utils.shouldInitNotification(context);
     Get.put(AuthController(), permanent: true);
+
   }
 
   @override
@@ -91,7 +89,7 @@ class _AlarmAppState extends State<AlarmApp> {
       debugShowCheckedModeBanner: false,
       home: const SessionController(),
       initialBinding: BindingsBuilder(()async{
-        final inAppController = Get.put<InAppPurchaseUtils>(inAppPurchaseUtils);
+        final inAppController = Get.put<InAppPurchaseUtils>(inAppPurchaseUtils,permanent: true);
         await inAppController.initInApp();
 
       }),

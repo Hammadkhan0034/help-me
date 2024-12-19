@@ -1,5 +1,6 @@
 import 'package:alarm_app/features/plans/controllers/payment_controller.dart';
 import 'package:alarm_app/features/plans/screens/widgets/yearly_plan.dart';
+import 'package:alarm_app/features/privacy_policy_and%20_eula%20sidget.dart';
 import 'package:alarm_app/widgets/background_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -18,7 +19,8 @@ class PaymentScreen extends StatelessWidget {
         // SizedBox(height: 15),
         // MonthlyPlan(paymentController: paymentController),
         // SizedBox(height: 15),
-        YearlyPlan(paymentController: paymentController)
+        YearlyPlan(paymentController: paymentController),
+        PrivacyPolicyAndEula()
       ]
     );
 

@@ -4,7 +4,7 @@ class PaymentController extends GetxController {
   RxBool showBasicPlan = false.obs;
   RxBool showDailyPlan = false.obs;
   RxBool showMonthlyPlan = false.obs;
-  RxBool showYearlyPlan = false.obs;
+  RxBool showYearlyPlan = true.obs;
 
   // late Map<String, dynamic> paymentIntentData; // Ensures non-null intent data
   //
