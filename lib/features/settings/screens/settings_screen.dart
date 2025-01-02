@@ -49,16 +49,11 @@ class SettingsScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 25),
-            Obx(() {
-              return !Get
-                  .find<InAppPurchaseUtils>()
-                  .isSubscriptionActive
-                  .value ? SizedBox.shrink() : AElevatedButton(
-                  title: "Subscribe",
-                  onPress: () {
-                    Get.to(PaymentScreen());
-                  });
-            }).paddingSymmetric(horizontal: 20),
+            AElevatedButton(
+                title: "Subscribe",
+                onPress: () {
+                  Get.to(PaymentScreen());
+                }).paddingSymmetric(horizontal: 20),
             const SizedBox(height: 15),
             Obx(() {
               return AElevatedButton(

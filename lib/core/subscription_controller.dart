@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:developer';
 import 'dart:io' show Platform;
 
+import 'package:alarm_app/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
@@ -39,7 +40,6 @@ class InAppPurchaseUtils extends GetxController {
       final currentOffer = offerings.current;
       products.clear();
       if (currentOffer != null && currentOffer.availablePackages.isNotEmpty) {
-        print("aaaaaaaaaaahhhhhhhhhhhhhhhhhhh yyyyyeeeeesssss");
         products = offerings.current!.availablePackages
             .map((pkg) => pkg.storeProduct)
             .toList();
@@ -105,7 +105,14 @@ class InAppPurchaseUtils extends GetxController {
     try {
       final purchaserInfo = await Purchases.restorePurchases();
       if (purchaserInfo.entitlements.active.containsKey('premium_annual')) {
-        debugPrint('Restoration successful!');
+        await checkSubscription();
+      }
+      if(purchaserInfo.activeSubscriptions.isEmpty) {
+        Utils.showSuccessSnackBar(title: "Restore Subscription",
+            description: "No subscription active.");
+      }else{
+        Utils.showSuccessSnackBar(title: "Restore Purchase",
+            description: "Purchase successfully restored.");
       }
     } on PurchasesErrorCode catch (e) {
       debugPrint('Error restoring purchases: $e');
@@ -142,7 +149,6 @@ class InAppPurchaseUtils extends GetxController {
   @override
   void onInit() {
     timer = Timer.periodic(Duration(minutes: 1), (val){
-      print("aaaaaaaaaaaaaaaaaaaaaaaaaaa");
        checkSubscription();
     });
     // TODO: implement onInit

@@ -57,7 +57,7 @@ class BackgroundWidget extends StatelessWidget {
             // crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const WarningCircleIcon(),
-              ...widgets
+              ...widgets,
               // GradientContainer(mTop: 110, child: widgets),
             ],
           ),

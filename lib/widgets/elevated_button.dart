@@ -8,9 +8,10 @@ class AElevatedButton extends StatelessWidget {
     required this.onPress,
     this.bgColor = AColors.dark,
     this.padding,
-    this.borderRadius = 10.0, // Default border radius
+    this.borderRadius = 10.0,  this.width = double.infinity, // Default border radius
   });
 
+  final double width;
   final String title;
   final Color bgColor;
   final double? padding;
@@ -20,7 +21,7 @@ class AElevatedButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: double.infinity,
+      width: width,
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
           elevation: 5,

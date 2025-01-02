@@ -46,19 +46,49 @@ class NoNotificationsDialog extends StatelessWidget {
               ],
             ),
           ),
-          // Positioned(
-          //   top: 0,
-          //   right: 0,
-          //   child: IconButton(
-          //     onPressed: () {
-          //       Get.back();
-          //     },
-          //     icon: const Icon(
-          //       Icons.close,
-          //       color: AColors.dark,
-          //     ),
-          //   )
+
         ],
+      ),
+    );
+  }
+}
+
+
+class AElevatedButton extends StatelessWidget {
+  const AElevatedButton({
+    super.key,
+    required this.title,
+    required this.onPress,
+    this.bgColor = AColors.dark,
+    this.padding,
+    this.borderRadius = 10.0,  this.width = double.infinity, // Default border radius
+  });
+
+  final double width;
+  final String title;
+  final Color bgColor;
+  final double? padding;
+  final double borderRadius; // Optional borderRadius with default value
+  final VoidCallback onPress;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: width,
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          elevation: 5,
+          backgroundColor: bgColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(borderRadius), // Apply custom border radius
+          ),
+          padding: EdgeInsets.all(padding ?? 10),
+        ),
+        onPressed: onPress,
+        child: Text(
+          title,
+          style: const TextStyle(fontSize: 20, color: Colors.white),
+        ),
       ),
     );
   }
