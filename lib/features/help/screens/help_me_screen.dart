@@ -10,6 +10,7 @@ import 'package:alarm_app/features/trail_location/screen/location_manage_screen.
 import 'package:alarm_app/utils/connection_listener.dart';
 import 'package:alarm_app/widgets/elevated_button.dart';
 import 'package:alarm_app/widgets/gradient_container.dart';
+import 'package:alarm_app/widgets/no_notifications_dialog.dart';
 import 'package:alarm_app/widgets/notification_controller_widget.dart';
 import 'package:alarm_app/widgets/notification_icon_with_count.dart';
 import 'package:alarm_app/widgets/warning_circle_icon.dart';
@@ -42,6 +43,7 @@ void goToSubscription(){
       appBar: AppBar(
         leading: NotificationIconWithCount(
           onPress: () {
+            Get.dialog(AskPermissionDialog(title: "Notification Service", description: ""));
             ConnectionStatusListener.isOnHomePage = false;
             Get.to(() => NotificationScreen());
           },

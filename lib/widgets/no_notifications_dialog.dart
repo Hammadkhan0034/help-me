@@ -1,5 +1,4 @@
 import 'package:alarm_app/constants/colors.dart';
-import 'package:alarm_app/widgets/elevated_button.dart';
 import 'package:alarm_app/widgets/rounded_container.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -39,7 +38,7 @@ class NoNotificationsDialog extends StatelessWidget {
                     textAlign: TextAlign.center,
                     "Notifications are disabled. Please go to setting and enable notification to fully utilize the app."),
                 const Spacer(),
-                AElevatedButton(
+                AElevatedButtonForNotification(
                     bgColor: AColors.primary,
                     title: "OK",
                     onPress: Get.back)
@@ -54,8 +53,62 @@ class NoNotificationsDialog extends StatelessWidget {
 }
 
 
-class AElevatedButton extends StatelessWidget {
-  const AElevatedButton({
+class AskPermissionDialog extends StatelessWidget {
+
+  const AskPermissionDialog({
+    super.key, required this.title, required this.description,
+  });
+
+  final String title, description;
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      contentPadding: EdgeInsets.zero,
+      backgroundColor: AColors.white.withOpacity(.7),
+      content: Stack(
+        children: [
+          ARoundedContainer(
+            padding: 20,
+            bgColor: Colors.transparent,
+            height: 300,
+            child: Column(
+              children: [
+                const Icon(
+                  Icons.notifications_off_outlined,
+                  size: 50,
+                ),
+                 Text(
+                  textAlign: TextAlign.center,
+                  title,
+                  style: TextStyle(
+                      fontSize: 30,
+                      color: AColors.dark,
+                      fontWeight: FontWeight.w600),
+                ),
+                 Text(
+                    textAlign: TextAlign.center,
+                    description),
+                const Spacer(),
+                AElevatedButtonForNotification(
+                    bgColor: AColors.primary,
+                    title: "OK",
+                    onPress: Get.back)
+              ],
+            ),
+          ),
+
+        ],
+      ),
+    );
+  }
+}
+
+
+
+
+class AElevatedButtonForNotification extends StatelessWidget {
+  const AElevatedButtonForNotification({
     super.key,
     required this.title,
     required this.onPress,
