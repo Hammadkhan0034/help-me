@@ -11,7 +11,6 @@ import 'package:alarm_app/utils/connection_listener.dart';
 import 'package:alarm_app/widgets/elevated_button.dart';
 import 'package:alarm_app/widgets/gradient_container.dart';
 import 'package:alarm_app/widgets/no_notifications_dialog.dart';
-import 'package:alarm_app/widgets/notification_controller_widget.dart';
 import 'package:alarm_app/widgets/notification_icon_with_count.dart';
 import 'package:alarm_app/widgets/warning_circle_icon.dart';
 import 'package:flutter/material.dart';
@@ -22,28 +21,31 @@ import '../../group/controller/group_controller.dart';
 import '../controller/alar_controller.dart';
 
 class HelpMeScreen extends StatelessWidget {
-  final AlarmController alarmController = Get.put(AlarmController(),permanent: true);
+  final AlarmController alarmController =
+      Get.put(AlarmController(), permanent: true);
 
   final ContactController addContactController =
-  Get.put(ContactController(), permanent: true);
+      Get.put(ContactController(), permanent: true);
   final LocationManageController locationManageController =
-  Get.put(LocationManageController(), permanent: true);
+      Get.put(LocationManageController(), permanent: true);
 
   final GroupController createGroupController =
-  Get.put(GroupController(),permanent: true);
+      Get.put(GroupController(), permanent: true);
   final InAppPurchaseUtils inAppPurchaseUtils = Get.find<InAppPurchaseUtils>();
 
   HelpMeScreen({super.key});
-void goToSubscription(){
-  Get.to(()=> PaymentScreen());
-}
+  void goToSubscription() {
+    Get.to(() => PaymentScreen());
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         leading: NotificationIconWithCount(
           onPress: () {
-            Get.dialog(AskPermissionDialog(title: "Notification Service", description: ""));
+            Get.dialog(AskPermissionDialog(
+                title: "Notification Service", description: ""));
             ConnectionStatusListener.isOnHomePage = false;
             Get.to(() => NotificationScreen());
           },
@@ -53,7 +55,6 @@ void goToSubscription(){
           style: TextStyle(fontWeight: FontWeight.w600),
         ),
         centerTitle: true,
-
       ),
       body: Stack(
         children: [
@@ -84,26 +85,24 @@ void goToSubscription(){
                   const SizedBox(height: 15),
                   Obx(() {
                     return AElevatedButton(
-                        bgColor: inAppPurchaseUtils.isSubscriptionActive.value
+                        bgColor: inAppPurchaseUtils.isSubscribed()
                             ? AColors.dark
                             : Colors.grey,
                         title: "DOOR",
-                        onPress: inAppPurchaseUtils.isSubscriptionActive.value
+                        onPress: inAppPurchaseUtils.isSubscribed()
                             ? () {
-                          ConnectionStatusListener.isOnHomePage = false;
-                          Get.to(() => DoorScreen());
-                        }
+                                ConnectionStatusListener.isOnHomePage = false;
+                                Get.to(() => DoorScreen());
+                              }
                             : goToSubscription);
                   }),
                   const SizedBox(height: 15),
                   AElevatedButton(
-
-                        title: "SETTINGS",
-                        onPress: () {
-                          ConnectionStatusListener.isOnHomePage = false;
-                          Get.to(() =>  SettingsScreen());
-                        }
-    ),
+                      title: "SETTINGS",
+                      onPress: () {
+                        ConnectionStatusListener.isOnHomePage = false;
+                        Get.to(() => SettingsScreen());
+                      }),
                   // const SizedBox(height: 15),
                   // AElevatedButton(
                   //   title: "Add Contact",
@@ -122,27 +121,26 @@ void goToSubscription(){
                   const SizedBox(height: 15),
                   Obx(() {
                     return AElevatedButton(
-                      bgColor: inAppPurchaseUtils.isSubscriptionActive.value
+                      bgColor: inAppPurchaseUtils.isSubscribed()
                           ? AColors.dark
                           : Colors.grey,
                       title: "Location Trail",
-                      onPress: inAppPurchaseUtils.isSubscriptionActive.value
+                      onPress: inAppPurchaseUtils.isSubscribed()
                           ? () {
-                        locationManageController.getFriends(
-                            Get
-                                .find<AuthController>()
-                                .userModel
-                                .value
-                                .id);
-                        Get.to(() =>
-                            LocationManageScreen(
-                                locationManageController: locationManageController));
-                        ConnectionStatusListener.isOnHomePage = false;
+                              locationManageController.getFriends(
+                                  Get.find<AuthController>()
+                                      .userModel
+                                      .value
+                                      .id);
+                              Get.to(() => LocationManageScreen(
+                                  locationManageController:
+                                      locationManageController));
+                              ConnectionStatusListener.isOnHomePage = false;
 
-                        // Get.dialog(
-                        //   LocationTrailScreen(),
-                        // );
-                      }
+                              // Get.dialog(
+                              //   LocationTrailScreen(),
+                              // );
+                            }
                           : goToSubscription,
                     );
                   }),

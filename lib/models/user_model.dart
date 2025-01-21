@@ -9,8 +9,8 @@ class UserModel {
   final double? latitude;
   final double? longitude;
   final DateTime? subscriptionExpiryDate;
-  final String? primaryIndoor,primaryOutdoor;
-  UserModel( {
+  final String? primaryIndoor, primaryOutdoor;
+  UserModel({
     required this.isLocationEnabled,
     required this.id,
     required this.name,
@@ -20,7 +20,8 @@ class UserModel {
     this.longitude,
     this.isPremium,
     this.subscriptionExpiryDate,
-    this.primaryIndoor, this.primaryOutdoor,
+    this.primaryIndoor,
+    this.primaryOutdoor,
   });
   Map<String, dynamic> toMap() {
     return {
@@ -33,8 +34,8 @@ class UserModel {
       'subscription_expiry_date': subscriptionExpiryDate?.toIso8601String(),
       'latitude': latitude,
       'longitude': longitude,
-      'primary_indoor':primaryIndoor,
-      'primary_outdoor':primaryOutdoor,
+      'primary_indoor': primaryIndoor,
+      'primary_outdoor': primaryOutdoor,
     };
   }
 
@@ -47,7 +48,9 @@ class UserModel {
         isPremium: map['is_premium'] ?? false as bool?,
         latitude: map['latitude'],
         longitude: map['longitude'],
-        subscriptionExpiryDate: map['subscription_expiry_date'],
+        subscriptionExpiryDate: map['subscription_expiry_date'] == null
+            ? null
+            : DateTime.parse(map['subscription_expiry_date']),
         primaryIndoor: map['primary_indoor'],
         primaryOutdoor: map['primary_outdoor'],
         isLocationEnabled: map['is_location_enabled'] ?? false);

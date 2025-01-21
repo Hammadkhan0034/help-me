@@ -1,38 +1,27 @@
 import 'package:alarm_app/features/auth/controller/auth_controller.dart';
 import 'package:alarm_app/features/help/screens/help_me_screen.dart';
 import 'package:alarm_app/features/notification/controller/notification_controller.dart';
-import 'package:alarm_app/servies/get_services_key.dart';
-import 'package:alarm_app/servies/notification_service.dart';
 import 'package:alarm_app/utils/connection_listener.dart';
 import 'package:alarm_app/utils/shared_prefs.dart';
 import 'package:alarm_app/utils/utils.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:purchases_flutter/models/purchases_configuration.dart';
-import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'core/subscription_controller.dart';
 import 'features/auth/screen/singnup_screen.dart';
 import 'firebase_options.dart';
-import 'dart:io' show Platform;
 
 @pragma("vm:entry-point")
 Future<void> _firebaseBackgroundHandler(RemoteMessage message) async {
-if(Get.isRegistered<NotificationController>()){
-  Get.find<NotificationController>().getNotificationsFromNotification();
+  if (Get.isRegistered<NotificationController>()) {
+    Get.find<NotificationController>().getNotificationsFromNotification();
+  }
 }
-}
-
-
-
-
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -57,7 +46,6 @@ void main() async {
   // final inAppPurchaseUtils = Get.put(InAppPurchaseUtils());
   FirebaseMessaging.onBackgroundMessage(_firebaseBackgroundHandler);
 
-
   runApp(const AlarmApp());
 }
 
@@ -68,8 +56,7 @@ class AlarmApp extends StatefulWidget {
 }
 
 class _AlarmAppState extends State<AlarmApp> {
-  final InAppPurchaseUtils inAppPurchaseUtils = InAppPurchaseUtils.inAppPurchaseUtilsInstance;
-
+  late final InAppPurchaseUtils inAppPurchaseUtils;
 
   @override
   void initState() {
@@ -77,7 +64,7 @@ class _AlarmAppState extends State<AlarmApp> {
     initNoInternetListener();
     Utils.shouldInitNotification(context);
     Get.put(AuthController(), permanent: true);
-
+    inAppPurchaseUtils = InAppPurchaseUtils.inAppPurchaseUtilsInstance;
   }
 
   @override
@@ -88,10 +75,10 @@ class _AlarmAppState extends State<AlarmApp> {
               backgroundColor: Colors.white, surfaceTintColor: Colors.white)),
       debugShowCheckedModeBanner: false,
       home: const SessionController(),
-      initialBinding: BindingsBuilder(()async{
-        final inAppController = Get.put<InAppPurchaseUtils>(inAppPurchaseUtils,permanent: true);
+      initialBinding: BindingsBuilder(() async {
+        final inAppController =
+            Get.put<InAppPurchaseUtils>(inAppPurchaseUtils, permanent: true);
         await inAppController.initInApp();
-
       }),
     );
   }
@@ -101,7 +88,8 @@ class SessionController extends StatelessWidget {
   const SessionController({super.key});
   @override
   Widget build(BuildContext context) {
-    bool isLoggedIn = MySharedPrefs().sharedPreferences.getBool("isLoggedIn") ?? false;
+    bool isLoggedIn =
+        MySharedPrefs().sharedPreferences.getBool("isLoggedIn") ?? false;
 
     final authController = Get.find<AuthController>();
     final session = Supabase.instance.client.auth.currentSession;
