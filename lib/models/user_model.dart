@@ -31,7 +31,7 @@ class UserModel {
       'fcm': fcm,
       'is_location_enabled': isLocationEnabled,
       'is_premium': isPremium,
-      'subscription_expiry_date': subscriptionExpiryDate?.toIso8601String(),
+      // 'subscription_expiry_date': subscriptionExpiryDate?.toIso8601String(),
       'latitude': latitude,
       'longitude': longitude,
       'primary_indoor': primaryIndoor,
