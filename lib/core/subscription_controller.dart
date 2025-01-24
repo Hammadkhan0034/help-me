@@ -23,7 +23,8 @@ class InAppPurchaseUtils extends GetxController {
     if (authController.userModel.value.subscriptionExpiryDate == null) {
       isManuallySubscribed = false;
     } else {
-      isManuallySubscribed = DateTime.now()
+      final dateNow = DateTime.now();
+      isManuallySubscribed = dateNow
           .isBefore(authController.userModel.value.subscriptionExpiryDate!);
     }
 

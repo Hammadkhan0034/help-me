@@ -14,10 +14,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:http/http.dart' as http;
+import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../../../servies/notification_service.dart';
 import '../screen/otp_screen.dart';
 
 class AuthController extends GetxController {
@@ -112,7 +111,7 @@ class AuthController extends GetxController {
         id: user!.id,
         name: nameController.text.trim(),
         phone: user.phone!,
-        fcm:"",
+        fcm: "",
         isLocationEnabled: false,
       );
 
@@ -188,7 +187,7 @@ class AuthController extends GetxController {
     } catch (error) {
       if (MySharedPrefs().sharedPreferences.getBool("isLoggedIn") ?? false) {
         Get.offAll(HelpMeScreen());
-      }else {
+      } else {
         Utils.showErrorSnackBar(
             title: 'Error', description: 'An unexpected error occurred');
       }
@@ -232,23 +231,25 @@ class AuthController extends GetxController {
 
     try {
       final isOk = await deleteUser(userModel.value.id);
-      if(!isOk){
+      if (!isOk) {
         Get.snackbar(
             "Delete User", "Couldn't delete your user account. Try again");
         print("asdfghjklzxcvbnm,qwertyuio");
         return;
       }
-     await UserCrud.updateUserActiveStatus(userModel.value.id, false);
-     Get.offAll(AuthScreen());
+      await UserCrud.updateUserActiveStatus(userModel.value.id, false);
+      Get.offAll(AuthScreen());
     } catch (e, st) {
       Get.snackbar(
           "Delete User", "Couldn't delete your user account. Try again");
       log("Delete user", error: e, stackTrace: st);
     }
   }
+
   Future<bool> deleteUser(String userId) async {
     final supabaseUrl = dotenv.env['PROJECT_URL']!;
-    final serviceRoleKey = dotenv.env['SERVICE_KEY']!; // Use securely in production
+    final serviceRoleKey =
+        dotenv.env['SERVICE_KEY']!; // Use securely in production
 
     print("url: $supabaseUrl\n token: $serviceRoleKey");
     final uri = Uri.parse('$supabaseUrl/auth/v1/admin/users/$userId');
@@ -271,10 +272,8 @@ class AuthController extends GetxController {
         return false;
       }
     } catch (error, st) {
-      log("delete user",error: error,stackTrace: st);
+      log("delete user", error: error, stackTrace: st);
       return false;
     }
   }
 }
-
-

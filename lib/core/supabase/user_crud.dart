@@ -73,19 +73,19 @@ class UserCrud {
       throw Exception('Error updating user: ${response.error!.message}');
     }
   }
-  static Future<void> updateFcm(
-      String userId, String fcm) async {
+
+  static Future<void> updateFcm(String userId, String fcm) async {
     final response = await Supabase.instance.client.from('profiles').update({
       'fcm': fcm,
     }).eq('id', userId);
   }
 
   static Future<void> primaryGroup(
-      String userId, Map<String,dynamic> data) async {
-
-    final response = await Supabase.instance.client.from('profiles').update(data).eq('id', userId);
-
-
+      String userId, Map<String, dynamic> data) async {
+    final response = await Supabase.instance.client
+        .from('profiles')
+        .update(data)
+        .eq('id', userId);
   }
 
   static Future<bool> updateUserLocationStatus(
@@ -100,8 +100,8 @@ class UserCrud {
       return false;
     }
   }
-  static Future<bool> updateUserActiveStatus(
-      String userId, bool status) async {
+
+  static Future<bool> updateUserActiveStatus(String userId, bool status) async {
     try {
       final response = await Supabase.instance.client.from('profiles').update({
         'is_active': status,
