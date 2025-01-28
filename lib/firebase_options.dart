@@ -51,7 +51,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyDQKjz2WHZqql-uYsS6_iSg4zCOO6YFi7o',
-    appId: '1:1004698611646:android:da37068a095166459153ef',
+    appId: '1:1004698611646:android:2c7c6e05ea531f8a9153ef',
     messagingSenderId: '1004698611646',
     projectId: 'helpme-bf036',
     databaseURL: 'https://helpme-bf036-default-rtdb.firebaseio.com',
@@ -60,12 +60,13 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyBp1yee0FXPv-G1ddxuAVR_FFoF0tL1geo',
-    appId: '1:1004698611646:ios:9a9337dd1a81c00b9153ef',
+    appId: '1:1004698611646:ios:f69ec3a5146d800c9153ef',
     messagingSenderId: '1004698611646',
     projectId: 'helpme-bf036',
     databaseURL: 'https://helpme-bf036-default-rtdb.firebaseio.com',
     storageBucket: 'helpme-bf036.appspot.com',
     androidClientId: '1004698611646-1f8bmeqk3bu6icv194qp01mp4qo6v0da.apps.googleusercontent.com',
-    iosBundleId: 'com.example.alarmApp',
+    iosBundleId: 'com.devoasis.help.me',
   );
+
 }

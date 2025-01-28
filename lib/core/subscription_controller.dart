@@ -4,6 +4,7 @@ import 'dart:io' show Platform;
 
 import 'package:alarm_app/features/auth/controller/auth_controller.dart';
 import 'package:alarm_app/utils/utils.dart';
+import 'package:alarm_app/widgets/no_notifications_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
@@ -90,22 +91,20 @@ class InAppPurchaseUtils extends GetxController {
   }
 
   performPurchase() async {
-    if(isSubscribed())  {
+    if (isSubscribed()) {
       Utils.showSuccessSnackBar(
         title: 'Already Subscribed',
         description: 'You are already subscribed to the premium plan.',
       );
       return;
     }
-    // if(Platform.isAndroid){
-    purchaseProduct();
-    // }else{
-    //   purchaseProductIOS();
-    // }
+    Get.dialog(SubscriptionDialog());
+
+    // purchaseProduct();
   }
 
   Future<void> purchaseProduct() async {
-    if(isSubscriptionActive.value){
+    if (isSubscriptionActive.value) {
       return;
     }
     Get.showOverlay(

@@ -44,6 +44,42 @@
     },
     {
       "client_info": {
+        "mobilesdk_app_id": "1:1004698611646:android:2c7c6e05ea531f8a9153ef",
+        "android_client_info": {
+          "package_name": "com.devoasis.help.me"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1004698611646-l7iq0fvvcslngutpebla32idg1vcufsg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDQKjz2WHZqql-uYsS6_iSg4zCOO6YFi7o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1004698611646-l7iq0fvvcslngutpebla32idg1vcufsg.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1004698611646-9mb41t5gqm177sj3kg0kqdpiq1to537q.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.mighoul.helpMe"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:1004698611646:android:36e3153878dc36c79153ef",
         "android_client_info": {
           "package_name": "com.devoasis.helpme"

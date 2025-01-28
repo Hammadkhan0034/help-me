@@ -1,4 +1,4 @@
-package com.devoasis.helpme
+package com.example.newname
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.android.FlutterFragmentActivity
 class MainActivity: FlutterFragmentActivity(){

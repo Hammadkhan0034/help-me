@@ -1,4 +1,4 @@
-package com.example.alarm_app
+package com.devoasis.help.me
 
 import io.flutter.embedding.android.FlutterFragmentActivity
 
