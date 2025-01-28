@@ -23,30 +23,28 @@ class _NotificationControllerWidgetState
     extends State<NotificationControllerWidget> {
   bool _isNotificationsEnabled = false;
 
-
   Future<void> _toggleNotifications(bool isEnabled) async {
     FirebaseMessaging messaging = FirebaseMessaging.instance;
-String token = "";
+    String token = "";
     if (isEnabled) {
       NotificationSettings settings = await messaging.requestPermission();
       if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-       token = await FirebaseMessaging.instance.getToken() ?? "";
-       print("Token: " + token);
-       if(token.isEmpty){
+        token = await FirebaseMessaging.instance.getToken() ?? "";
+        print("Token: " + token);
+        if (token.isEmpty) {
           return;
-       }
+        }
         print("Notifications enabled.");
-       await MySharedPrefs().setBool("isNotificationEnabled", isEnabled);
-       await Utils.shouldInitNotification(context);
-      }
-      else if(settings.authorizationStatus == AuthorizationStatus.denied){
+        await MySharedPrefs().setBool("isNotificationEnabled", isEnabled);
+        await Utils.shouldInitNotification(context);
+      } else if (settings.authorizationStatus == AuthorizationStatus.denied) {
         setState(() {
           _isNotificationsEnabled = false;
           MySharedPrefs().setBool("isNotificationEnabled", isEnabled);
-
         });
         return;
       }
+
     } else {
       await FirebaseMessaging.instance.deleteToken();
       setState(() {
@@ -55,26 +53,24 @@ String token = "";
       MySharedPrefs().setBool("isNotificationEnabled", isEnabled);
 
       print("Notifications disabled.");
-return;
+      return;
     }
-    try{
-      await UserCrud.updateFcm(Get.find<AuthController>().userModel.value.id
-          , token);
+    try {
+      await UserCrud.updateFcm(
+          Get.find<AuthController>().userModel.value.id, token);
 
       setState(() {
         _isNotificationsEnabled = isEnabled;
       });
-    }catch(e,st){
-      log("ToggleNotification",error:e,stackTrace:st);
+    } catch (e, st) {
+      log("ToggleNotification", error: e, stackTrace: st);
     }
-
-
   }
 
   @override
   void initState() {
     // TODO: implement initState
-    _isNotificationsEnabled =       MySharedPrefs().getBool("isNotificationEnabled");
+    _isNotificationsEnabled = MySharedPrefs().getBool("isNotificationEnabled");
 
     super.initState();
   }
@@ -90,10 +86,16 @@ return;
       ),
       child: Row(
         children: [
-          Text('Notifications',style: const TextStyle(fontSize: 20, color: Colors.white),),
+          Text(
+            'Notifications',
+            style: const TextStyle(fontSize: 20, color: Colors.white),
+          ),
           Spacer(),
-          Switch(value: _isNotificationsEnabled, onChanged: _toggleNotifications,
-          activeColor: Colors.white,),
+          Switch(
+            value: _isNotificationsEnabled,
+            onChanged: _toggleNotifications,
+            activeColor: Colors.white,
+          ),
         ],
       ),
     );

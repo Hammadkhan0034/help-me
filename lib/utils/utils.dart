@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:alarm_app/constants/colors.dart';
 import 'package:alarm_app/utils/shared_prefs.dart';
 import 'package:alarm_app/widgets/no_notifications_dialog.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
@@ -20,19 +21,17 @@ class Utils {
 
 
   static Future<bool> checkNotificationPermission() async {
-    PermissionStatus status = await Permission.notification.status;
-    if (status == PermissionStatus.granted  && MySharedPrefs().getBool("isNotificationEnabled")) {
+    final status =  await Permission.notification.isGranted || await Permission.notification.request().isProvisional;
+    if (status  ) {
       // Permission granted
       return true;
-    } else if (status == PermissionStatus.denied || status == PermissionStatus.restricted) {
+    } else  {
       // Permission denied or restricted
       return false;
     }
-    return false; // In case of other statuses, assume not granted
   }
 
   static Future shouldInitNotification(BuildContext context)async{
-    await Future.delayed(Duration(seconds: 2));
     if(await checkNotificationPermission()) {
       NotificationService notificationService = NotificationService();
       GetServicesKey getServicesKey = GetServicesKey();
