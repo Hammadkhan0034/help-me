@@ -90,6 +90,13 @@ class InAppPurchaseUtils extends GetxController {
   }
 
   performPurchase() async {
+    if(isSubscribed())  {
+      Utils.showSuccessSnackBar(
+        title: 'Already Subscribed',
+        description: 'You are already subscribed to the premium plan.',
+      );
+      return;
+    }
     // if(Platform.isAndroid){
     purchaseProduct();
     // }else{
@@ -98,6 +105,9 @@ class InAppPurchaseUtils extends GetxController {
   }
 
   Future<void> purchaseProduct() async {
+    if(isSubscriptionActive.value){
+      return;
+    }
     Get.showOverlay(
         asyncFunction: () async {
           try {

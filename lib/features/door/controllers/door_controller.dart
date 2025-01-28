@@ -160,6 +160,10 @@ class DoorController extends GetxController {
       if(selectedType.value == "Outdoor"){
         await getCurrentAddress();
       }
+      if(selectedType.value == "Indoor"){
+        addressTextController.text = selectedGroup.value?.defaultAddress ?? "";
+        currentAddress.value = selectedGroup.value?.defaultAddress ?? "";
+      }
       print(selectedGroup.value?.id);
 
       for (var user in selectedGroup.value!.members) {
@@ -199,6 +203,7 @@ class DoorController extends GetxController {
         );
       }
       addressTextController.text = "";
+      currentAddress.value = "";
          Get.back();
       Utils.showSuccessSnackBar(
         title: 'Success',

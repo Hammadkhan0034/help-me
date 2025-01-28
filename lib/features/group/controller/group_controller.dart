@@ -11,7 +11,7 @@ import 'package:get/get.dart';
 import 'package:uuid/uuid.dart';
 
 class GroupController extends GetxController {
-  GroupModel? selectedModel,primaryIndoor,primaryOutdoor;
+  GroupModel? selectedModel, primaryIndoor, primaryOutdoor;
   final addContactController = Get.put(ContactController());
   final authController = Get.find<AuthController>();
   var groupContacts = <FriendsModel>[].obs;
@@ -23,9 +23,10 @@ class GroupController extends GetxController {
 
   List<GroupModel> allGroups = <GroupModel>[];
 
-
-  List<GroupModel> get indoorGroups => allGroups.where((val) => val.type == "Indoor").toList();
-  List<GroupModel> get outdoorGroups => allGroups.where((val) => val.type == "Outdoor").toList();
+  List<GroupModel> get indoorGroups =>
+      allGroups.where((val) => val.type == "Indoor").toList();
+  List<GroupModel> get outdoorGroups =>
+      allGroups.where((val) => val.type == "Outdoor").toList();
 
   setSelectedGroup(GroupModel groupModel) {
     selectedModel = groupModel;
@@ -33,15 +34,15 @@ class GroupController extends GetxController {
     groupType.value = groupModel.type;
     groupContacts
         .addAll(addContactController.getFriendsFromIds(groupModel.members));
-    if(groupModel.type == "Indoor") {
+    if (groupModel.type == "Indoor") {
       defaultAddress.text = groupModel.defaultAddress!;
     }
     groupContacts.refresh();
   }
 
-  GroupModel? checkIfGroupISDeleted(GroupModel? model){
-    if(model!=null) {
-      if(allGroups.firstWhereOrNull((val) => val.id == model.id ) == null){
+  GroupModel? checkIfGroupISDeleted(GroupModel? model) {
+    if (model != null) {
+      if (allGroups.firstWhereOrNull((val) => val.id == model.id) == null) {
         return null;
       }
       return model;
@@ -70,11 +71,8 @@ class GroupController extends GetxController {
 
   void updateOption(String option) {
     groupType.value = option;
-    if(option == "Indoor"){
-
-    }else{
-
-    }
+    if (option == "Indoor") {
+    } else {}
   }
 
   int getMemberCount() {
@@ -89,7 +87,7 @@ class GroupController extends GetxController {
     update();
   }
 
-  Future<bool> isValidData() async{
+  Future<bool> isValidData() async {
     if (name.text.isEmpty) {
       Utils.showErrorSnackBar(
         title: "Missing Information",
@@ -112,37 +110,43 @@ class GroupController extends GetxController {
       );
       return false;
     }
-    if(groupType.value == "Indoor"){
+    if (groupType.value == "Indoor") {
       position = await Utils.getCurrentLatLng();
-      if(position == null) return false;
+      if (position == null) return false;
     }
     return true;
   }
 
   Future<void> createGroup() async {
-   if(!(await isValidData())) return;
+    if (!(await isValidData())) return;
 
     try {
       print(
           "MY FRIENDS ID ${groupContacts.map((members) => members.friendId)}");
       int memberCount = getMemberCount();
-      GroupModel groupModel =           GroupModel(
+      GroupModel groupModel = GroupModel(
         id: const Uuid().v4(),
         name: name.text,
-
-        members:
-        groupContacts.map((members) => members.friendId).toList(),
+        members: groupContacts.map((members) => members.friendId).toList(),
         type: groupType.value,
         createdAt: DateTime.now(),
         createdBy: addContactController.authController.userModel.value.id,
         totalMembers: memberCount,
-
       );
-      if(groupType.value == "Indoor"){
-        groupModel = groupModel.copyWith(defaultAddress: defaultAddress.text.trim(),defaultLatitude: position!.latitude,defaultLongitude: position!.longitude);
+      if (groupType.value == "Indoor") {
+        if (defaultAddress.text.isEmpty) {
+          Utils.showErrorSnackBar(
+            title: "Missing Information",
+            description: "Please enter indoor address.",
+          );
+          return;
+        }
+        groupModel = groupModel.copyWith(
+            defaultAddress: defaultAddress.text.trim(),
+            defaultLatitude: position?.latitude,
+            defaultLongitude: position?.longitude);
       }
-      await GroupCrud.createGroup(
-groupModel      );
+      await GroupCrud.createGroup(groupModel);
       loadGroups();
       Get.back();
       Utils.showSuccessSnackBar(
@@ -158,32 +162,38 @@ groupModel      );
     }
   }
 
-
   Future<void> updateGroup() async {
-    if(!(await isValidData())) return;
+    if (!(await isValidData())) return;
 
     try {
       print(
           "MY FRIENDS ID ${groupContacts.map((members) => members.friendId)}");
-      selectedModel = selectedModel!.copyWith(name: name.text,members: groupContacts.map((members) => members.friendId ).toList(),type: groupType.value, totalMembers: groupContacts.length, );
-      if(groupType.value == "Indoor"){
-        selectedModel = selectedModel?.copyWith(defaultAddress: defaultAddress.text.trim(),defaultLatitude: position!.latitude,defaultLongitude: position!.longitude);
+      selectedModel = selectedModel!.copyWith(
+        name: name.text,
+        members: groupContacts.map((members) => members.friendId).toList(),
+        type: groupType.value,
+        totalMembers: groupContacts.length,
+      );
+      if (groupType.value == "Indoor") {
+        selectedModel = selectedModel?.copyWith(
+            defaultAddress: defaultAddress.text.trim(),
+            defaultLatitude: position!.latitude,
+            defaultLongitude: position!.longitude);
       }
       final status = await GroupCrud.updateGroup(selectedModel!);
-      if(status){
+      if (status) {
         loadGroups();
         Get.back();
         Utils.showSuccessSnackBar(
           title: "Group ${name.text}",
           description: "Group updated successfully",
         );
-      }else{
+      } else {
         Utils.showErrorSnackBar(
           title: "Group ${name.text}",
           description: "Error couldn't update group.",
         );
       }
-
     } catch (e) {
       Utils.showErrorSnackBar(
         title: "ERROR: ",
@@ -192,13 +202,13 @@ groupModel      );
       print("ERROR: $e");
     }
   }
-  removeGroupFromPrimaryIfExists(GroupModel group){
 
-    if(group.id == authController.userModel.value.primaryIndoor){
+  removeGroupFromPrimaryIfExists(GroupModel group) {
+    if (group.id == authController.userModel.value.primaryIndoor) {
       authController.updatePrimaryIndoorGroup(null);
       primaryIndoor = null;
     }
-    if(group.id == authController.userModel.value.primaryOutdoor){
+    if (group.id == authController.userModel.value.primaryOutdoor) {
       authController.updatePrimaryOutdoorGroup(null);
       primaryOutdoor = null;
     }
@@ -210,7 +220,6 @@ groupModel      );
       allGroups.removeAt(index);
       removeGroupFromPrimaryIfExists(groupModel);
 
-
       Utils.showSuccessSnackBar(
           title: "Delete Group",
           description: "Group ${groupModel.name} deleted successfully");
@@ -221,14 +230,16 @@ groupModel      );
           description: "Couldn't delete Group ${groupModel.name}.");
     }
   }
-  setPrimaryGroups(){
-    if(authController.userModel.value.primaryIndoor!= null){
-      primaryIndoor = allGroups.firstWhereOrNull((val) => val.id == authController.userModel.value.primaryIndoor);
-    }
-    if(authController.userModel.value.primaryOutdoor!= null){
-      primaryOutdoor = allGroups.firstWhereOrNull((val) => val.id == authController.userModel.value.primaryOutdoor);
-    }
 
+  setPrimaryGroups() {
+    if (authController.userModel.value.primaryIndoor != null) {
+      primaryIndoor = allGroups.firstWhereOrNull(
+          (val) => val.id == authController.userModel.value.primaryIndoor);
+    }
+    if (authController.userModel.value.primaryOutdoor != null) {
+      primaryOutdoor = allGroups.firstWhereOrNull(
+          (val) => val.id == authController.userModel.value.primaryOutdoor);
+    }
   }
 
   @override
