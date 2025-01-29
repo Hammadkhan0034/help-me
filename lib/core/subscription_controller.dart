@@ -49,6 +49,7 @@ class InAppPurchaseUtils extends GetxController {
   }
 
   Future fetchOffers() async {
+    if (Platform.isAndroid) return;
     try {
       final offerings = await Purchases.getOfferings();
       final currentOffer = offerings.current;
@@ -167,7 +168,7 @@ class InAppPurchaseUtils extends GetxController {
   Future initInApp() async {
     try {
       await initPlatformState();
-      if (Platform.isAndroid) {
+      if (Platform.isIOS) {
         await fetchOffers();
       }
       await checkSubscription();
