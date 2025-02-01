@@ -99,9 +99,12 @@ class InAppPurchaseUtils extends GetxController {
       );
       return;
     }
-    Get.dialog(SubscriptionDialog());
+    if(Platform.isAndroid){
+      Get.dialog(SubscriptionDialog());
+      return;
+    }
 
-    // purchaseProduct();
+     purchaseProduct();
   }
 
   Future<void> purchaseProduct() async {

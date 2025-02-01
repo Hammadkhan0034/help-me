@@ -25,41 +25,47 @@ class BackgroundWidget extends StatelessWidget {
         ConnectionStatusListener.isOnHomePage = true;
 
       },
-      child: Scaffold(
-        backgroundColor: AColors.primary,
-        appBar: AppBar(
-          elevation: 5,
-          leading: InkWell(
-              onTap: Get.back, child: const Icon(Icons.arrow_back_ios_new)),
-          title: Text(
-            appBarTitle,
-            style: TextStyle(fontWeight: FontWeight.w600),
-          ),
-          actions: [
-            InkWell(
-              onTap: onClick,
-              child: Padding(
-                padding: const EdgeInsets.only(right: 10),
-                child: Icon(
-                  trailingData,
-                  color: Colors.black,
+      child: GestureDetector(
+        onTap: (){
+          FocusScope.of(context).unfocus();
+
+        },
+        child: Scaffold(
+          backgroundColor: AColors.primary,
+          appBar: AppBar(
+            elevation: 5,
+            leading: InkWell(
+                onTap: Get.back, child: const Icon(Icons.arrow_back_ios_new)),
+            title: Text(
+              appBarTitle,
+              style: TextStyle(fontWeight: FontWeight.w600),
+            ),
+            actions: [
+              InkWell(
+                onTap: onClick,
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 10),
+                  child: Icon(
+                    trailingData,
+                    color: Colors.black,
+                  ),
                 ),
-              ),
-            )
-          ],
-          centerTitle: true,
-        ),
-        body: SizedBox(
-          width: Get.width,
-          height: Get.height,
-          child: ListView(
-            // mainAxisAlignment: MainAxisAlignment.start,
-            // crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const WarningCircleIcon(),
-              ...widgets,
-              // GradientContainer(mTop: 110, child: widgets),
+              )
             ],
+            centerTitle: true,
+          ),
+          body: SizedBox(
+            width: Get.width,
+            height: Get.height,
+            child: ListView(
+              // mainAxisAlignment: MainAxisAlignment.start,
+              // crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const WarningCircleIcon(),
+                ...widgets,
+                // GradientContainer(mTop: 110, child: widgets),
+              ],
+            ),
           ),
         ),
       ),
