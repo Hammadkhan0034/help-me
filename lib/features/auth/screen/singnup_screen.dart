@@ -40,8 +40,10 @@ class AuthScreen extends StatelessWidget {
                             controller: authController.nameController),
                         SizedBox(height: 10),
                         PhoneAuthFieldWidget(
+                          initialPhoneNumber: authController.initialPhoneNumber,
                           onChanged: (PhoneNumber value) {
-                            authController.phoneNumber.value =
+                            authController.initialPhoneNumber = value;
+                            authController.phoneNumber =
                                 value.phoneNumber!;
                           },
                         ),

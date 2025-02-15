@@ -5,6 +5,7 @@ import 'package:alarm_app/core/supabase/FriendsService.dart';
 import 'package:alarm_app/core/supabase/user_crud.dart';
 import 'package:alarm_app/models/friends_profile_model.dart';
 import 'package:alarm_app/utils/utils.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -15,6 +16,7 @@ class LocationManageController extends GetxController {
   List<FriendsProfileModel> friendsList = [];
   final isTracking = false.obs;
   StreamSubscription<Position>? currentLocationStream;
+  final ScrollController scrollController = ScrollController();
 
   getFriends(String id) async {
     // String id = ;

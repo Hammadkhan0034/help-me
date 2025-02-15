@@ -147,11 +147,7 @@ class DoorController extends GetxController {
 
     // Check if the message is empty
     if (message.text.isEmpty) {
-      Utils.showErrorSnackBar(
-        title: 'Empty Message',
-        description: 'Message cannot be empty.',
-      );
-      return; // Exit early if message is empty
+      message.text = 'Help Me!';
     }
 
     List<String> fcmList = [];

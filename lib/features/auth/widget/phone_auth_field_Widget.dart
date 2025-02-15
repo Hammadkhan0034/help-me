@@ -4,7 +4,8 @@ import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 
 class PhoneAuthFieldWidget extends StatelessWidget {
   final ValueChanged<PhoneNumber>? onChanged;
-  const PhoneAuthFieldWidget({super.key, required this.onChanged});
+  final PhoneNumber initialPhoneNumber;
+  const PhoneAuthFieldWidget({super.key, required this.onChanged, required this.initialPhoneNumber});
   @override
   Widget build(BuildContext context) {
     return InternationalPhoneNumberInput(
@@ -18,13 +19,8 @@ class PhoneAuthFieldWidget extends StatelessWidget {
         // backgroundColor: AColors.primary,
       ),
       ignoreBlank: true,
-      onSubmit: () {
-        FocusScope.of(context).unfocus();
-      },
-      onSaved: (v) {
-        FocusScope.of(context).unfocus();
-      },
-      initialValue: PhoneNumber(isoCode: 'MY'),
+
+      initialValue: initialPhoneNumber,
       formatInput: true,
       selectorTextStyle: TextStyle(color: Colors.white),
       textStyle: TextStyle(color: Colors.white),

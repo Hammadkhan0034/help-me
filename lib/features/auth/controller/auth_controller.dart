@@ -15,15 +15,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../screen/otp_screen.dart';
 
 class AuthController extends GetxController {
-  var phoneNumber = ''.obs;
+  var phoneNumber = '';
   final TextEditingController nameController = TextEditingController();
   final TextEditingController pinController = TextEditingController();
   final SupabaseClient supabaseClient = Supabase.instance.client;
+  PhoneNumber initialPhoneNumber =  PhoneNumber(isoCode: 'MY');
   var isResendingOtp = false.obs;
   var isVerifyingOtp = false.obs;
 
@@ -36,13 +38,13 @@ class AuthController extends GetxController {
       .obs;
   Rx<ContactsModel> contactModel = const ContactsModel(phone: '').obs;
   Future<void> signUp() async {
-    print("PHONE NUMBER : ${phoneNumber.value}");
+    print("PHONE NUMBER : ${phoneNumber}");
     try {
       await supabaseClient.auth.signInWithOtp(
-        phone: phoneNumber.value,
+        phone: phoneNumber,
       );
       Utils.showSuccessSnackBar(
-          title: "OTP send", description: "OTP send to ${phoneNumber.value}");
+          title: "OTP send", description: "OTP send to ${phoneNumber}");
       Get.to(OtpScreen());
     } on AuthException catch (error) {
       Utils.showErrorSnackBar(title: "message", description: error.message);
@@ -58,7 +60,7 @@ class AuthController extends GetxController {
       }
     } finally {
       if (kDebugMode) {
-        print("OTP request completed for ${phoneNumber.value}");
+        print("OTP request completed for ${phoneNumber}");
       }
     }
   }
@@ -91,7 +93,7 @@ class AuthController extends GetxController {
       final AuthResponse res = await supabaseClient.auth.verifyOTP(
         type: OtpType.sms,
         token: otp,
-        phone: phoneNumber.value,
+        phone: phoneNumber,
       );
       isVerifyingOtp.value = false;
 

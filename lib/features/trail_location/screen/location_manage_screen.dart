@@ -16,6 +16,7 @@ class LocationManageScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return  BackgroundWidget(
+      scrollController: locationManageController.scrollController,
         trailingData: Icons.help_outline,
         onClick: (){
           AwesomeDialog(
@@ -96,6 +97,8 @@ class LocationManageScreen extends StatelessWidget {
         )
             : ListView.builder(
             itemCount: controller.friendsList.length,
+
+            controller: controller.scrollController,
             shrinkWrap: true,
             itemBuilder: (context, index) {
               return ManageLocationRowWidget(

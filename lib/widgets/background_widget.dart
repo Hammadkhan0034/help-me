@@ -58,6 +58,7 @@ class BackgroundWidget extends StatelessWidget {
             width: Get.width,
             height: Get.height,
             child: ListView(
+              controller: scrollController,
               // mainAxisAlignment: MainAxisAlignment.start,
               // crossAxisAlignment: CrossAxisAlignment.start,
               children: [

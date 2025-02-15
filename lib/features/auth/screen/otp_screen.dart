@@ -83,7 +83,7 @@ class OtpScreen extends StatelessWidget {
                         ? null // Disable button when loading
                         : () {
                       authController
-                          .resendOtp(authController.phoneNumber.value);
+                          .resendOtp(authController.phoneNumber);
                     },
                     child: authController.isResendingOtp.value
                         ? SizedBox(
