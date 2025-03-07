@@ -71,6 +71,7 @@ dependencies:
   shared_preferences: ^2.3.3
   custom_refresh_indicator: ^4.0.1
   rename: ^3.0.2
+  tutorial_coach_mark: ^1.2.13
 
 dev_dependencies:
   flutter_test:

@@ -32,6 +32,55 @@ class CreateGroupScreen extends StatelessWidget {
     return BackgroundWidget(
         scrollController: scrollController,
         widgets: [
+          const SizedBox(height: 10),
+          SizedBox(height: 120,
+            child: Stack(
+              children: [
+                Container(
+                  margin: const EdgeInsets.only(top: 20),
+                  color: AColors.darkGrey,
+                  height: 100,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Obx(() {
+                        return DoorModeWidget(
+                          label: groupController.groupType.value,
+                          value: groupController.groupType
+                              .value, // Default value from controller
+                          onChanged: (newValue) {
+                            // Handle the dropdown selection change
+                            groupController.updateOption(newValue);
+                          },
+                        );
+                      }),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 15),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: AColors.dark,
+                    ),
+                    height: 50,
+                    padding: const EdgeInsets.symmetric(horizontal: 15),
+                    child: const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "Door",
+                          style: TextStyle(
+                              color: Colors.white, fontSize: 20),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ).paddingSymmetric(horizontal: 20),
+          ),
           const SizedBox(height: 20),
           const Text(
             "Group Name",
@@ -207,55 +256,7 @@ class CreateGroupScreen extends StatelessWidget {
               },
             ).paddingSymmetric(horizontal: 20);
           }),
-          const SizedBox(height: 10),
-          SizedBox(height: 120,
-            child: Stack(
-              children: [
-                Container(
-                  margin: const EdgeInsets.only(top: 20),
-                  color: AColors.darkGrey,
-                  height: 100,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Obx(() {
-                        return DoorModeWidget(
-                          label: groupController.groupType.value,
-                          value: groupController.groupType
-                              .value, // Default value from controller
-                          onChanged: (newValue) {
-                            // Handle the dropdown selection change
-                            groupController.updateOption(newValue);
-                          },
-                        );
-                      }),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 15),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      color: AColors.dark,
-                    ),
-                    height: 50,
-                    padding: const EdgeInsets.symmetric(horizontal: 15),
-                    child: const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          "Door",
-                          style: TextStyle(
-                              color: Colors.white, fontSize: 20),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ).paddingSymmetric(horizontal: 20),
-          ),
+
 
           const SizedBox(height: 20),
           Padding(

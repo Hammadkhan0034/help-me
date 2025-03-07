@@ -108,7 +108,6 @@ class AuthController extends GetxController {
       }
 
       final User? user = supabaseClient.auth.currentUser;
-
       userModel.value = UserModel(
         id: user!.id,
         name: nameController.text.trim(),
@@ -172,21 +171,19 @@ class AuthController extends GetxController {
 
       if (response != null) {
         userModel.value = UserModel.fromMap(response);
-        if (kDebugMode) {
           print("User Model fetched: ${userModel.toString()}");
-        }
+
         return 1; // Return 1 when profile is successfully fetched
       } else {
         Utils.showErrorSnackBar(title: 'Error', description: 'User Not Found');
         Get.off(() => AuthScreen());
       }
     } on PostgrestException catch (error) {
-      if (kDebugMode) {
         print('Error fetching user profile: ${error.message}');
-      }
       Utils.showErrorSnackBar(
           title: 'Error', description: 'Could not fetch user profile.');
-    } catch (error) {
+    } catch (error,st) {
+      print(st);
       if (MySharedPrefs().sharedPreferences.getBool("isLoggedIn") ?? false) {
         Get.offAll(HelpMeScreen());
       } else {

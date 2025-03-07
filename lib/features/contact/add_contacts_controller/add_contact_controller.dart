@@ -68,8 +68,8 @@ class ContactController extends GetxController {
   }
 
   Future<void> fetchPhoneContacts() async {
-    String userNumber = authController.userModel.value.phone
-        .substring(authController.userModel.value.phone.length - 10);
+    String userNumber = authController.userModel.value.phone!
+        .substring(authController.userModel.value.phone!.length - 10);
     if (await FlutterContacts.requestPermission()) {
       List<Contact> contacts =
           await FlutterContacts.getContacts(withProperties: true);

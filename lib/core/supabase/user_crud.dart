@@ -15,6 +15,11 @@ class UserCrud {
           .maybeSingle();
 
       if (response != null && response.isNotEmpty) {
+
+        userModel = UserModel.fromMap(response);
+        if(userModel.subscriptionExpiryDate == null){
+          userModel = userModel.copyWith(subscriptionExpiryDate: DateTime.now().add(Duration(days: 7)) );
+        }
         // User exists, proceed with update
         await Supabase.instance.client
             .from('profiles')

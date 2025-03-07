@@ -18,7 +18,7 @@ class GroupController extends GetxController {
   final TextEditingController name = TextEditingController();
   final TextEditingController defaultAddress = TextEditingController();
 
-  var groupType = "Indoor".obs;
+  var groupType = "Outdoor".obs;
   Position? position;
 
   List<GroupModel> allGroups = <GroupModel>[];
@@ -56,7 +56,7 @@ class GroupController extends GetxController {
     defaultAddress.text = "";
     position = null;
     groupContacts.clear();
-    groupType.value = "Indoor";
+    groupType.value = "Outdoor";
   }
 
   void addToGroupContacts(FriendsModel contact) {

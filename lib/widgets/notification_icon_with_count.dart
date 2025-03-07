@@ -1,10 +1,14 @@
+import 'package:alarm_app/features/tutorial_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 
 class NotificationIconWithCount extends StatelessWidget {
   const NotificationIconWithCount({
     super.key,
     required this.onPress,
   });
+
 
   final VoidCallback onPress;
 
