@@ -86,6 +86,7 @@ class ContactController extends GetxController {
                 name: contact.displayName,
       ))
           .toList().toSet().toList();
+      print(phoneContacts);
       findMatchedContacts();
     } else {
       Get.snackbar('Permission Denied',
