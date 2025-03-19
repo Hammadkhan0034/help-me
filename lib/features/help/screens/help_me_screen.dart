@@ -74,6 +74,16 @@ class _HelpMeScreenState extends State<HelpMeScreen> {
           style: TextStyle(fontWeight: FontWeight.w600),
         ),
         centerTitle: true,
+        actions: [
+          InkWell(
+              onTap: (){
+tutorialController.restartTutorial(context);
+              },
+              child: Padding(
+                padding: const EdgeInsets.only(right: 10),
+                child: Icon(Icons.help_outline),
+              ))
+        ],
       ),
       body: Stack(
         children: [

@@ -26,6 +26,12 @@ class TutorialController extends GetxController{
   List<TargetFocus> targets =[];
   ScrollController scrollController = ScrollController();
 
+  restartTutorial(BuildContext context){
+    MySharedPrefs().setBool(isSettingsTutorialFinishedOnce, false);
+    MySharedPrefs().setBool(isHomeTutorialFinishedOnce, false);
+    showHomeTutorial(context);
+
+  }
   List<TargetFocus> _createHomeTargets() {
     List<TargetFocus> targets = [];
     targets.add(
@@ -698,6 +704,8 @@ Spacer(),                      ElevatedButton(
 
       imageFilter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
       onFinish: () {
+        MySharedPrefs().setBool(isHomeTutorialFinishedOnce, true);
+
         print("finish");
       },
       onClickTarget: (target) {
@@ -715,6 +723,8 @@ Spacer(),                      ElevatedButton(
         print('onClickOverlay: $target');
       },
       onSkip: () {
+        MySharedPrefs().setBool(isHomeTutorialFinishedOnce, true);
+
         print("skip");
         return true;
       },
@@ -738,6 +748,8 @@ Spacer(),                      ElevatedButton(
       opacityShadow: 0.5,
       imageFilter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
       onFinish: () {
+        MySharedPrefs().setBool(isSettingsTutorialFinishedOnce, true);
+
         print("finish");
       },
       onClickTarget: (target) {
@@ -756,6 +768,8 @@ Spacer(),                      ElevatedButton(
         print('onClickOverlay: $target');
       },
       onSkip: () {
+        MySharedPrefs().setBool(isSettingsTutorialFinishedOnce, true);
+
         print("skip");
         return true;
       },
