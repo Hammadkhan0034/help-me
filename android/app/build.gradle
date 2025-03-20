@@ -62,7 +62,7 @@ flutter {
 }
 
 dependencies {
-    coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:2.0.3" // required for Java 17 features with desugaring
+    coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:2.1.4" // required for Java 17 features with desugaring
     implementation "org.jetbrains.kotlin:kotlin-stdlib:1.8.0" // ensure Kotlin standard library is up-to-date
     // Add other dependencies here as needed
 }
