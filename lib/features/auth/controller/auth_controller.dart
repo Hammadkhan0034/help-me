@@ -38,7 +38,6 @@ class AuthController extends GetxController {
       .obs;
   Rx<ContactsModel> contactModel = const ContactsModel(phone: '').obs;
   Future<void> signUp() async {
-    print("PHONE NUMBER : ${phoneNumber}");
     try {
       await supabaseClient.auth.signInWithOtp(
         phone: phoneNumber,

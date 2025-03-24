@@ -14,22 +14,27 @@ class UserCrud {
           .eq('id', userId)
           .maybeSingle();
 
-      if (response != null && response.isNotEmpty) {
+      if (response != null) {
+        final existingUser = UserModel.fromMap(response);
+        final mergedUser = existingUser.copyWith(
+          name: userModel.name ?? existingUser.name,
+          phone: userModel.phone ?? existingUser.phone,
+          subscriptionExpiryDate: userModel.subscriptionExpiryDate ?? existingUser.subscriptionExpiryDate ??  DateTime.now().add(Duration(days: 7)),
 
-        userModel = UserModel.fromMap(response);
-        if(userModel.subscriptionExpiryDate == null){
-          userModel = userModel.copyWith(subscriptionExpiryDate: DateTime.now().add(Duration(days: 7)) );
-        }
-        // User exists, proceed with update
+        );
+
+        final updateData = mergedUser.toMap()
+          ..removeWhere((key, value) => value == null);
+
         await Supabase.instance.client
             .from('profiles')
-            .update(userModel.toMap())
+            .update(updateData)
             .eq('id', userId);
-        if (kDebugMode) {
-          print("User updated: ${userModel.id}");
-        }
+
       } else {
-        // User doesn't exist, proceed with insert
+         userModel = userModel.copyWith(
+          subscriptionExpiryDate: DateTime.now().add(const Duration(days: 7)),
+        );
         await Supabase.instance.client
             .from('profiles')
             .insert(userModel.toMap());
@@ -40,7 +45,6 @@ class UserCrud {
       throw Exception('Error creating or updating user: ${error.toString()}');
     }
   }
-
   static Future<Map<String, dynamic>?> getUser(String userId) async {
     final response = await Supabase.instance.client
         .from('profiles')
@@ -50,7 +54,6 @@ class UserCrud {
     print(response);
     return response;
   }
-
   static Future<UserModel?> getUserById(String userId) async {
     try {
       final response = await Supabase.instance.client
@@ -65,7 +68,6 @@ class UserCrud {
       return null;
     }
   }
-
   static Future<void> updateUser(
       String userId, String name, String phone, String fcm) async {
     final response = await Supabase.instance.client.from('profiles').update({
