@@ -12,7 +12,18 @@ class SendNotificationService {
       required String? body,
       required Map<String, dynamic>? data,
       NotificationTypes notificationType = NotificationTypes.alert}) async {
+
     try {
+      final String channelId = notificationType == NotificationTypes.normal
+          ? "helpme_normal"
+          : "helpme_alert";
+      final String sound = notificationType == NotificationTypes.normal
+          ? "default"
+          : "raw_alarm";
+
+      log('Channel ID being used: $channelId');
+      log('Sound being used: $sound');
+
       if (data == null) {
         data = {
           "notificationType":
@@ -47,15 +58,17 @@ class SendNotificationService {
                     ? "helpme_normal"
                     : "helpme_alert",
                 "sound": notificationType == NotificationTypes.normal
-                    ? "normal"
+                    ? "default"
                     : "raw_alarm.wav"
               }
             },
             "apns": {
               "payload": {
-                "aps": {"sound": notificationType == NotificationTypes.normal
-                    ? "normal"
-                    : "raw_alarm.aiff"}
+                "aps": {
+                  "sound": notificationType == NotificationTypes.normal
+                      ? "default"
+                      : "raw_alarm.aiff"
+                }
               }
             },
             "data": data,

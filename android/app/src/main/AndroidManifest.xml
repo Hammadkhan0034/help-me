@@ -69,9 +69,9 @@
         <meta-data
             android:name="helpme_normal_channel_id"
             android:value="helpme_normal" />
-        <meta-data
-            android:name="com.google.firebase.messaging.default_notification_sound"
-            android:resource="@raw/raw_alarm"/>
+<!--        <meta-data-->
+<!--            android:name="com.google.firebase.messaging.default_notification_sound"-->
+<!--            android:resource="@raw/raw_alarm"/>-->
         <!-- Firebase Messaging Service -->
 
         <receiver android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver"

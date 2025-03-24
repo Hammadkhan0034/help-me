@@ -11,7 +11,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'core/subscription_controller.dart';
 import 'features/auth/screen/singnup_screen.dart';
 import 'firebase_options.dart';
@@ -23,12 +23,60 @@ Future<void> _firebaseBackgroundHandler(RemoteMessage message) async {
   }
 }
 
+
+Future<void> setupNotificationChannels() async {
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+  FlutterLocalNotificationsPlugin();
+
+  const AndroidNotificationChannel normalChannel = AndroidNotificationChannel(
+    'helpme_normal',
+    'Normal Notifications',
+    description: 'This channel is for normal notifications with default sound.',
+    importance: Importance.high,
+    playSound: true,
+
+  );
+
+
+  const AndroidNotificationChannel alertChannel = AndroidNotificationChannel(
+    'helpme_alert',
+    'Alert Notifications',
+    description: 'This channel is for alert notifications with a custom sound.',
+    importance: Importance.high,
+    playSound: true,
+    sound: RawResourceAndroidNotificationSound('raw_alarm'),
+  );
+
+  final AndroidInitializationSettings initializationSettingsAndroid =
+  AndroidInitializationSettings('@mipmap/ic_launcher');
+
+  final InitializationSettings initializationSettings =
+  InitializationSettings(android: initializationSettingsAndroid);
+
+  await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+
+  await flutterLocalNotificationsPlugin
+      .resolvePlatformSpecificImplementation<
+      AndroidFlutterLocalNotificationsPlugin>()
+      ?.createNotificationChannel(normalChannel);
+
+  await flutterLocalNotificationsPlugin
+      .resolvePlatformSpecificImplementation<
+      AndroidFlutterLocalNotificationsPlugin>()
+      ?.createNotificationChannel(alertChannel);
+}
+
+
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  await setupNotificationChannels();
+
   MySharedPrefs mySharedPrefs = MySharedPrefs();
   mySharedPrefs.sharedPreferences = await SharedPreferences.getInstance();
   // MySharedPrefs().sharedPreferences.setBool("isLoggedIn", true);
