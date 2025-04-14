@@ -1,9 +1,8 @@
 import 'dart:io';
 
+import 'package:alarm_app/common/widgets/permission_dialog_widget.dart';
 import 'package:alarm_app/constants/colors.dart';
-import 'package:alarm_app/utils/shared_prefs.dart';
 import 'package:alarm_app/widgets/no_notifications_dialog.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
@@ -18,47 +17,48 @@ import '../servies/get_services_key.dart';
 import '../servies/notification_service.dart';
 
 class Utils {
-
-
   static Future<bool> checkNotificationPermission() async {
-    final status =  await Permission.notification.isGranted || await Permission.notification.request().isProvisional;
-    if (status  ) {
+    final status = await Permission.notification.isGranted ||
+        await Permission.notification.request().isProvisional;
+    if (status) {
       // Permission granted
       return true;
-    } else  {
+    } else {
       // Permission denied or restricted
       return false;
     }
   }
 
-  static Future shouldInitNotification(BuildContext context)async{
-    if(await checkNotificationPermission()) {
+  static Future shouldInitNotification(BuildContext context) async {
+    if (await checkNotificationPermission()) {
       NotificationService notificationService = NotificationService();
       GetServicesKey getServicesKey = GetServicesKey();
 
       await getServicesKey.getServerToken();
-       notificationService.requestNotificationPermission();
+      // notificationService.requestNotificationPermission();
       await notificationService.getDeviceToken();
-       notificationService.firebaseInit(context);
+      notificationService.firebaseInit(context);
       await notificationService.setupInteractMessage(context);
-    }
-    else if(Supabase.instance.client.auth.currentUser!=null){
+    } else if (Supabase.instance.client.auth.currentUser != null) {
       Get.dialog(NoNotificationsDialog());
     }
   }
-
-
 
   static String getPhoneWithoutCode(String num) {
     String number = num.replaceAll(RegExp(r'[^0-9]'), '');
     return number.substring(number.length - 10);
   }
 
-
   static Future<Position?> getCurrentLatLng() async {
     try {
       LocationPermission permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
+        bool isOk = await Utils.askForPermissionConfirmation(Get.context!,
+            title: "Location Permission",
+            description:
+                "Help Me requires location permission to share with your family and friends. Are you sure you want to allow it?",
+            icon: Icons.notifications);
+        if (!isOk) null;
         permission = await Geolocator.requestPermission();
       }
       if (permission == LocationPermission.deniedForever) {
@@ -78,16 +78,12 @@ class Utils {
           locationSettings: locationSettings);
       return position;
     } catch (e) {
-
       print("Error retrieving location: $e");
       Utils.showErrorSnackBar(
           title: 'Location Error', description: e.toString());
     }
     return null;
   }
-
-
-
 
   static Future<void> openMap(double latitude, double longitude) async {
     String googleUrl =
@@ -290,6 +286,23 @@ class Utils {
     );
 
     return imageFile;
+  }
+
+  static Future<bool> askForPermissionConfirmation(BuildContext context,
+      {required String title,
+      required String description,
+      String? allowText,
+      String? denyText,
+      required IconData icon}) async {
+    bool isConfirmed = false;
+    isConfirmed = await showDialog(
+        context: context,
+        builder: (context) {
+          return PermissionDialog(
+              icon: icon, title: title, description: description);
+        });
+
+    return isConfirmed;
   }
 
   static Future<bool> askForConfirmation(

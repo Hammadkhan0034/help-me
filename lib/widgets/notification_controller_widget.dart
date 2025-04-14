@@ -7,7 +7,6 @@ import 'package:alarm_app/utils/utils.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../features/auth/controller/auth_controller.dart';
 
@@ -27,6 +26,13 @@ class _NotificationControllerWidgetState
     FirebaseMessaging messaging = FirebaseMessaging.instance;
     String token = "";
     if (isEnabled) {
+      bool isOk = await Utils.askForPermissionConfirmation(context,
+          title: "Notification Permission",
+          description:
+              "Help Me requires notification permission to show alerts. Are you sure you want to allow it?",
+          icon: Icons.notifications);
+      if (!isOk) return;
+
       NotificationSettings settings = await messaging.requestPermission();
       if (settings.authorizationStatus == AuthorizationStatus.authorized) {
         token = await FirebaseMessaging.instance.getToken() ?? "";
@@ -44,7 +50,6 @@ class _NotificationControllerWidgetState
         });
         return;
       }
-
     } else {
       await FirebaseMessaging.instance.deleteToken();
       setState(() {

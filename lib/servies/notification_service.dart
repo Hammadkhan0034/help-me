@@ -2,15 +2,15 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:alarm_app/features/notification/screens/notification_screen.dart';
 import 'package:app_settings/app_settings.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 
 import '../features/notification/controller/notification_controller.dart';
+import '../utils/utils.dart';
 
 class NotificationService {
   FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
@@ -18,6 +18,12 @@ class NotificationService {
       FlutterLocalNotificationsPlugin();
 
   void requestNotificationPermission() async {
+    bool isOk = await Utils.askForPermissionConfirmation(Get.context!,
+        title: "Notification Permission",
+        description:
+            "Help Me requires notification permission to show alerts. Are you sure you want to allow it?",
+        icon: Icons.notifications);
+    if (!isOk) return;
     NotificationSettings settings = await firebaseMessaging.requestPermission(
       alert: true,
       announcement: false,
@@ -108,15 +114,14 @@ class NotificationService {
         print('Message notification: ${notification?.title}');
         print('Message notification: ${notification?.body}');
       }
-      if(Get.isRegistered<NotificationController>()){
+      if (Get.isRegistered<NotificationController>()) {
         Get.find<NotificationController>().getNotificationsFromNotification();
       }
 
       if (Platform.isIOS) {
         iosForegroundMessage();
         // handleMessage(context, message);
-      }else
-      if (Platform.isAndroid) {
+      } else if (Platform.isAndroid) {
         intiLocationNotification(context, message);
         showNotification(message);
         // handleMessage(context, message);
@@ -150,9 +155,10 @@ class NotificationService {
 
     DarwinNotificationDetails darwinNotificationDetails =
         const DarwinNotificationDetails(
-
-          sound: "raw_alarm.aiff",
-            presentAlert: true, presentBadge: true, presentSound: true);
+            sound: "raw_alarm.aiff",
+            presentAlert: true,
+            presentBadge: true,
+            presentSound: true);
 
     //Combining both setting
 
@@ -189,7 +195,7 @@ class NotificationService {
         .getInitialMessage()
         .then((RemoteMessage? message) {
       if (message != null && message.data.isNotEmpty) {
-       // handleMessage(context, message);
+        // handleMessage(context, message);
       }
     });
   }

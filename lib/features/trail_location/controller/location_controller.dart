@@ -1,8 +1,11 @@
 import 'dart:developer';
 
-import 'package:get/get.dart';
+import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:get/get.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
+import '../../../utils/utils.dart';
 
 class LocationController extends GetxController {
   final supabase = Supabase.instance.client;
@@ -16,6 +19,7 @@ class LocationController extends GetxController {
   void updateSelectedDate(DateTime date) {
     selectedDate.value = date;
   }
+
   @override
   void onInit() {
     super.onInit();
@@ -31,6 +35,12 @@ class LocationController extends GetxController {
     }
 
     if (permission == LocationPermission.denied) {
+      bool isOk = await Utils.askForPermissionConfirmation(Get.context!,
+          title: "Location Permission",
+          description:
+              "Help Me requires location permission to share with your family and friends. Are you sure you want to allow it?",
+          icon: Icons.notifications);
+      if (!isOk) return;
       permission = await Geolocator.requestPermission();
     }
 
@@ -57,11 +67,13 @@ class LocationController extends GetxController {
       });
     }
   }
+
   Stream<Position?> fetchLocationByDate(String userId, DateTime date) async* {
     final formattedDate = date.toIso8601String().split('T').first;
 
     try {
-      while (true) {  // Continuous stream
+      while (true) {
+        // Continuous stream
         final response = await supabase
             .from('location_logs')
             .select('latitude, longitude')
@@ -69,14 +81,13 @@ class LocationController extends GetxController {
             .gte('timestamp', '$formattedDate 00:00:00')
             .lte('timestamp', '$formattedDate 23:59:59')
             .order('timestamp', ascending: true)
-            .limit(1)
-            ;
+            .limit(1);
 
         // if (response.error != null) {
         //   Get.snackbar('Error', 'Failed to fetch location: ${response.error!.message}');
         //   yield null; // Yield null in case of an error
         // } else
-          if (response.isNotEmpty) {
+        if (response.isNotEmpty) {
           final data = response[0];
           yield Position(
             latitude: data['latitude'],
@@ -94,17 +105,17 @@ class LocationController extends GetxController {
           yield null; // Yield null if no data is found for specified date
         }
 
-        await Future.delayed(Duration(seconds: 5)); // Delay to poll every 5 seconds
+        await Future.delayed(
+            Duration(seconds: 5)); // Delay to poll every 5 seconds
       }
-    } catch (e,st) {
-      log("Error",error: e,stackTrace: st);
+    } catch (e, st) {
+      log("Error", error: e, stackTrace: st);
       Get.snackbar('Error', 'An error occurred while fetching location: $e');
       yield null; // Yield null if an exception occurs
     }
   }
 
   bool _isDistanceExceeded(Position lastPosition, Position newPosition) {
-
     final distanceInMeters = Geolocator.distanceBetween(
       lastPosition.latitude,
       lastPosition.longitude,

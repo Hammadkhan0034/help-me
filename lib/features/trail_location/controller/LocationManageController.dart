@@ -5,7 +5,7 @@ import 'package:alarm_app/core/supabase/FriendsService.dart';
 import 'package:alarm_app/core/supabase/user_crud.dart';
 import 'package:alarm_app/models/friends_profile_model.dart';
 import 'package:alarm_app/utils/utils.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -77,6 +77,12 @@ class LocationManageController extends GetxController {
     }
 
     if (permission == LocationPermission.denied) {
+      bool isOk = await Utils.askForPermissionConfirmation(Get.context!,
+          title: "Location Permission",
+          description:
+              "Help Me requires location permission to share with your family and friends. Are you sure you want to allow it?",
+          icon: Icons.notifications);
+      if (!isOk) return;
       permission = await Geolocator.requestPermission();
     }
 

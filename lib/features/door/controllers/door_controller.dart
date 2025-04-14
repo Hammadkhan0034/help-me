@@ -2,19 +2,20 @@ import 'dart:convert';
 
 import 'package:alarm_app/features/auth/controller/auth_controller.dart';
 import 'package:alarm_app/features/group/controller/group_controller.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:get/get.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
 import 'package:supabase_flutter/supabase_flutter.dart';
+
 import '../../../core/supabase/groups_crud.dart';
 import '../../../core/supabase/notification_crud.dart';
 import '../../../core/supabase/user_crud.dart';
 import '../../../models/group_model.dart';
 import '../../../servies/send_notification_services.dart';
 import '../../../utils/utils.dart';
-import 'package:http/http.dart' as http;
 
 class DoorController extends GetxController {
   final groupController = Get.put(GroupController());
@@ -36,24 +37,23 @@ class DoorController extends GetxController {
     selectedType.value = value;
     final groupController = Get.find<GroupController>();
 
-    if(selectedType.value == 'Indoor'){
+    if (selectedType.value == 'Indoor') {
       selectedGroup.value = groupController.primaryIndoor;
-    }
-    else{
+    } else {
       selectedGroup.value = groupController.primaryOutdoor;
     }
     loadGroups();
   }
+
   void selectGroup(GroupModel groupModel) {
     selectedGroup.value = groupModel;
-    if(selectedGroup.value?.type == 'Indoor'){
+    if (selectedGroup.value?.type == 'Indoor') {
       addressTextController.text = selectedGroup.value?.defaultAddress ?? "";
       latitude.value = selectedGroup.value?.defaultLatitude ?? 0.0;
       longitude.value = selectedGroup.value?.defaultLongitude ?? 0.0;
-
     }
-
   }
+
   Future<void> loadGroups() async {
     final fetchedGroups = await GroupCrud.fetchGroupsByType(
         selectedType.value, authController.userModel.value.id);
@@ -65,6 +65,12 @@ class DoorController extends GetxController {
     try {
       LocationPermission permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
+        bool isOk = await Utils.askForPermissionConfirmation(Get.context!,
+            title: "Location Permission",
+            description:
+                "Help Me requires location permission to share with your family and friends. Are you sure you want to allow it?",
+            icon: Icons.notifications);
+        if (!isOk) return;
         permission = await Geolocator.requestPermission();
       }
       if (permission == LocationPermission.deniedForever) {
@@ -153,10 +159,10 @@ class DoorController extends GetxController {
     List<String> fcmList = [];
     isLoading.value = true; // Set loading to true
     try {
-      if(selectedType.value == "Outdoor"){
+      if (selectedType.value == "Outdoor") {
         await getCurrentAddress();
       }
-      if(selectedType.value == "Indoor"){
+      if (selectedType.value == "Indoor") {
         addressTextController.text = selectedGroup.value?.defaultAddress ?? "";
         currentAddress.value = selectedGroup.value?.defaultAddress ?? "";
       }
@@ -181,7 +187,12 @@ class DoorController extends GetxController {
         fcmList: fcmList,
         title: authController.userModel.value.name,
         body: message.text,
-        data: {'imageUrl': imageUrl.value, 'address': addressTextController.text.isNotEmpty ? addressTextController.text : currentAddress.value},
+        data: {
+          'imageUrl': imageUrl.value,
+          'address': addressTextController.text.isNotEmpty
+              ? addressTextController.text
+              : currentAddress.value
+        },
       );
 
       // Create notifications for each user in the group
@@ -189,18 +200,20 @@ class DoorController extends GetxController {
         await NotificationCrud.createNotification(
           notificationFrom: authController.userModel.value.id,
           notificationFor: user, // Create a notification for each member
-           notificationType: selectedType.value,
+          notificationType: selectedType.value,
           data: {
             'message': message.text,
             'imageUrl': imageUrl.value,
-            'address': addressTextController.text.isNotEmpty ? addressTextController.text : currentAddress.value
+            'address': addressTextController.text.isNotEmpty
+                ? addressTextController.text
+                : currentAddress.value
           },
-          address:  {'longitude': longitude.value, 'latitude': latitude.value},
+          address: {'longitude': longitude.value, 'latitude': latitude.value},
         );
       }
       addressTextController.text = "";
       currentAddress.value = "";
-         Get.back();
+      Get.back();
       Utils.showSuccessSnackBar(
         title: 'Success',
         description: 'Notifications sent successfully!',
@@ -216,20 +229,16 @@ class DoorController extends GetxController {
     }
   }
 
-
-  init()async{
+  init() async {
     await loadGroups();
     final groupController = Get.find<GroupController>();
 
-    if(selectedType.value == 'Indoor'){
+    if (selectedType.value == 'Indoor') {
       selectedGroup.value = groupController.primaryIndoor;
-    }
-    else{
+    } else {
       selectedGroup.value = groupController.primaryOutdoor;
     }
   }
-
-
 
   @override
   void onClose() {
@@ -239,11 +248,9 @@ class DoorController extends GetxController {
     super.onClose();
   }
 
-
-
   @override
   void onInit() {
-init();
+    init();
     super.onInit();
   }
 }

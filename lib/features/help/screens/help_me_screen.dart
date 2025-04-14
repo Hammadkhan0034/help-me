@@ -15,14 +15,12 @@ import 'package:alarm_app/widgets/notification_icon_with_count.dart';
 import 'package:alarm_app/widgets/warning_circle_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 
 import '../../contact/add_contacts_controller/add_contact_controller.dart';
 import '../../group/controller/group_controller.dart';
 import '../controller/alar_controller.dart';
 
 class HelpMeScreen extends StatefulWidget {
-
   HelpMeScreen({super.key});
 
   @override
@@ -58,6 +56,7 @@ class _HelpMeScreenState extends State<HelpMeScreen> {
     });
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -76,8 +75,8 @@ class _HelpMeScreenState extends State<HelpMeScreen> {
         centerTitle: true,
         actions: [
           InkWell(
-              onTap: (){
-tutorialController.restartTutorial(context);
+              onTap: () {
+                tutorialController.restartTutorial(context);
               },
               child: Padding(
                 padding: const EdgeInsets.only(right: 10),
@@ -104,18 +103,21 @@ tutorialController.restartTutorial(context);
                   ),
                   const SizedBox(height: 25),
                   AElevatedButton(
-                    key: tutorialController.alarmKey,
+                      key: tutorialController.alarmKey,
                       title: "ALARM",
                       onPress: () {
-                        alarmController.playAlarm();
-                        alarmController.showAlert(context);
-
+                        if (alarmController.alarmPlayer.playing) {
+                          alarmController.stopAlarm();
+                        } else {
+                          alarmController.playAlarm();
+                          alarmController.showAlert(context);
+                        }
                         // Get.to(const NotificationScreen());
                       }),
                   const SizedBox(height: 15),
                   Obx(() {
                     return AElevatedButton(
-                      key: tutorialController.doorKey,
+                        key: tutorialController.doorKey,
                         bgColor: inAppPurchaseUtils.isSubscribed()
                             ? AColors.dark
                             : Colors.grey,
@@ -123,17 +125,21 @@ tutorialController.restartTutorial(context);
                         onPress: inAppPurchaseUtils.isSubscribed()
                             ? () {
                                 ConnectionStatusListener.isOnHomePage = false;
-                                Get.to(() => DoorScreen());
+                                Future.delayed(Duration.zero, () {
+                                  Get.to(() => DoorScreen());
+                                });
                               }
                             : goToSubscription);
                   }),
                   const SizedBox(height: 15),
                   AElevatedButton(
-                    key: tutorialController.settingsKey,
+                      key: tutorialController.settingsKey,
                       title: "SETTINGS",
                       onPress: () {
                         ConnectionStatusListener.isOnHomePage = false;
-                        Get.to(() => SettingsScreen());
+                        Future.delayed(Duration.zero, () {
+                          Get.to(() => SettingsScreen());
+                        });
                       }),
                   // const SizedBox(height: 15),
                   // AElevatedButton(
@@ -165,10 +171,12 @@ tutorialController.restartTutorial(context);
                                       .userModel
                                       .value
                                       .id);
-                              Get.to(() => LocationManageScreen(
-                                  locationManageController:
-                                      locationManageController));
-                              ConnectionStatusListener.isOnHomePage = false;
+                              Future.delayed(Duration.zero, () {
+                                Get.to(() => LocationManageScreen(
+                                    locationManageController:
+                                        locationManageController));
+                                ConnectionStatusListener.isOnHomePage = false;
+                              });
 
                               // Get.dialog(
                               //   LocationTrailScreen(),

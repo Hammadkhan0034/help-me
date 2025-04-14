@@ -4,19 +4,22 @@ import 'dart:developer';
 import 'package:alarm_app/core/supabase/group_contacts.dart';
 import 'package:alarm_app/core/supabase/notification_crud.dart';
 import 'package:alarm_app/features/auth/controller/auth_controller.dart';
+import 'package:alarm_app/features/tutorial_controller.dart';
 import 'package:alarm_app/models/phone_number_model.dart';
 import 'package:alarm_app/utils/MyEnums.dart';
 import 'package:alarm_app/utils/utils.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:get/get.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../core/supabase/FriendsService.dart';
 import '../../../models/friends_model.dart';
 import '../../../servies/send_notification_services.dart';
+import '../../../utils/shared_prefs.dart';
 
 class ContactController extends GetxController {
   var groupContacts = <String>[].obs;
@@ -31,8 +34,8 @@ class ContactController extends GetxController {
   final friendsService = FriendsService();
   late StreamSubscription friendStream;
 
-  List<FriendsModel> getFriendsFromIds(List<String> ids){
-    return requestedFriends.where((val)=> ids.contains(val.friendId)).toList();
+  List<FriendsModel> getFriendsFromIds(List<String> ids) {
+    return requestedFriends.where((val) => ids.contains(val.friendId)).toList();
   }
 
   Future<void> fetchGroupContacts() async {
@@ -68,8 +71,25 @@ class ContactController extends GetxController {
   }
 
   Future<void> fetchPhoneContacts() async {
+    if (MySharedPrefs()
+            .getBool(TutorialController.isHomeTutorialFinishedOnce) ==
+        false) {
+      return;
+    }
+
+    await Future.delayed(Duration(milliseconds: 500));
+
     String userNumber = authController.userModel.value.phone!
         .substring(authController.userModel.value.phone!.length - 10);
+    bool isPermissionGranted = await Permission.contacts.isGranted;
+    if (!isPermissionGranted) {
+      bool isOk = await Utils.askForPermissionConfirmation(Get.context!,
+          title: "Contacts Permission",
+          description:
+              "Help Me requires notification permission to add your family and friends. Are you sure you want to allow it?",
+          icon: Icons.notifications);
+      if (!isOk) return;
+    }
     if (await FlutterContacts.requestPermission()) {
       List<Contact> contacts =
           await FlutterContacts.getContacts(withProperties: true);
@@ -84,8 +104,10 @@ class ContactController extends GetxController {
                 phone: contact.phones.first.number
                     .replaceAll(RegExp(r'[^0-9]'), ''),
                 name: contact.displayName,
-      ))
-          .toList().toSet().toList();
+              ))
+          .toList()
+          .toSet()
+          .toList();
       print(phoneContacts);
       findMatchedContacts();
     } else {
@@ -167,12 +189,12 @@ class ContactController extends GetxController {
     // }
 
     await SendNotificationService.sendNotificationUsingApi(
-      fcmList: [userProfile['fcm']!],
-      title: "Friend Request",
-      body: "You got a friend request from ${authController.userModel.value.name}",
-      data: null,
-      notificationType: NotificationTypes.normal
-    );
+        fcmList: [userProfile['fcm']!],
+        title: "Friend Request",
+        body:
+            "You got a friend request from ${authController.userModel.value.name}",
+        data: null,
+        notificationType: NotificationTypes.normal);
     await NotificationCrud.createNotification(
         notificationFrom: authController.userModel.value.id,
         notificationFor: userProfile['id']!,
@@ -199,17 +221,19 @@ class ContactController extends GetxController {
     try {
       await friendsService.updateFriend(
           newName, friendId, authController.userModel.value.id);
-      requestedFriends[index] = requestedFriends[index].copyWith(editedName: newName);
+      requestedFriends[index] =
+          requestedFriends[index].copyWith(editedName: newName);
       Get.back();
       // update();
-    }catch(e,st){
-      log("Update user contact name",error: e,stackTrace: st);
+    } catch (e, st) {
+      log("Update user contact name", error: e, stackTrace: st);
     }
   }
 
   void subscribeToFriends() {
     var userId = Get.find<AuthController>().userModel.value.id;
-    friendStream = friendsService.subscribeToFriends(userId).listen((snapshot) async {
+    friendStream =
+        friendsService.subscribeToFriends(userId).listen((snapshot) async {
       print("aaaaaaagsgkhfdkhfdskjhfkjhfdkhfgkhghfgdkhfgdkhgdfkjhfgkhdfgkjgfd");
       if (snapshot.isEmpty) {
         requestedFriends.clear(); // Clear list if no friends found
@@ -217,7 +241,7 @@ class ContactController extends GetxController {
       List<dynamic> friendsData = snapshot;
 
       List<Future<FriendsModel>> friendFutures =
-      friendsData.map((friend) async {
+          friendsData.map((friend) async {
         Map<String, dynamic> friendMap = friend as Map<String, dynamic>;
 
         final profileResponse = await Supabase.instance.client
@@ -233,70 +257,9 @@ class ContactController extends GetxController {
 
       List<FriendsModel> friends = await Future.wait(friendFutures);
       requestedFriends.clear();
-      requestedFriends.addAll( friends);
+      requestedFriends.addAll(friends);
     });
   }
-
-  // Future<void> fetchFriends() async {
-  //   try {
-  //     isLoading(true);
-  //     String userId = authController.userModel.value.id;
-  //     print("This is my ID   ${userId}");
-  //     final response = await friendsService.fetchFriends(userId);
-  //     print("These are friends of minf  ${response}");
-  //     if (response.isNotEmpty) {
-  //       requestedFriends.value =
-  //           response;
-  //     } else {
-  //       if (kDebugMode) {
-  //         print('No friends found');
-  //       }
-  //     }
-  //   } catch (e) {
-  //     if (kDebugMode) {
-  //       print('Error: $e');
-  //     }
-  //   } finally {
-  //     isLoading(false);
-  //   }
-  // }
-
-  //REAL TIME PROGRESS O
-
-  // // var friendsList = <FriendsModel>[].obs; // Observable list of friends
-  //
-  // void fetchInitialFriends() async {
-  //   String userId = authController.userModel.value.id;
-  //   final response = await Supabase.instance.client
-  //       .from('friends')
-  //       .select()
-  //       .eq('user_id', userId);
-  //
-  //   if (response != null && response.isNotEmpty) {
-  //     requestedFriends.assignAll(response.map((data) => FriendsModel.fromMap(data)).toList());
-  //   }
-  // }
-  //
-  // // Subscribe to real-time updates for friends
-  // void listenToFriendUpdates() {
-  //   String userId = authController.userModel.value.id;
-  //   Supabase.instance.client
-  //       .from('friends')
-  //       .stream(primaryKey: ['id']) // Watch for changes in requestStatus
-  //       .eq('user_id', userId) // Filter by your user ID
-  //       .listen((event) {
-  //     handleRealTimeUpdates(event);
-  //   });
-  // }
-  //
-  // // Handle real-time updates and update the UI
-  // void handleRealTimeUpdates(List<Map<String, dynamic>> event) {
-  //   final updatedFriends = event.map((data) => FriendsModel.fromMap(data)).toList();
-  //   requestedFriends.assignAll(updatedFriends); // Update the friendsList
-  //   update(); // Trigger UI update in GetX
-  // }
-  //
-  //
 
   @override
   void onInit() async {
@@ -307,6 +270,7 @@ class ContactController extends GetxController {
     // listenToFriendUpdates(); // Listen to real-time updates on initialization
     // fetchInitialFriends(); // Fetch initial data
   }
+
   @override
   void dispose() {
     // TODO: implement dispose

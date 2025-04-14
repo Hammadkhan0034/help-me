@@ -1,20 +1,20 @@
-
-
 import 'dart:ui';
 
+import 'package:alarm_app/features/contact/add_contacts_controller/add_contact_controller.dart';
 import 'package:alarm_app/utils/shared_prefs.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 
-class TutorialController extends GetxController{
+class TutorialController extends GetxController {
   GlobalKey alarmKey = GlobalKey();
   GlobalKey doorKey = GlobalKey();
   GlobalKey settingsKey = GlobalKey();
   GlobalKey locationKey = GlobalKey();
   GlobalKey notificationKey = GlobalKey();
   TutorialCoachMark? tutorialCoachMark;
-  final String isHomeTutorialFinishedOnce = "isHomeTutorialFinishedOnce", isSettingsTutorialFinishedOnce = "isSettingsTutorialFinishedOnce";
+  static const String isHomeTutorialFinishedOnce = "isHomeTutorialFinishedOnce",
+      isSettingsTutorialFinishedOnce = "isSettingsTutorialFinishedOnce";
 
   GlobalKey subscribeKey = GlobalKey();
   GlobalKey contactsKey = GlobalKey();
@@ -23,20 +23,19 @@ class TutorialController extends GetxController{
   GlobalKey primaryOutdoorKey = GlobalKey();
   GlobalKey notificationStatusKey = GlobalKey();
   GlobalKey deleteAccountKey = GlobalKey();
-  List<TargetFocus> targets =[];
+  List<TargetFocus> targets = [];
   ScrollController scrollController = ScrollController();
 
-  restartTutorial(BuildContext context){
+  restartTutorial(BuildContext context) {
     MySharedPrefs().setBool(isSettingsTutorialFinishedOnce, false);
     MySharedPrefs().setBool(isHomeTutorialFinishedOnce, false);
     showHomeTutorial(context);
-
   }
+
   List<TargetFocus> _createHomeTargets() {
     List<TargetFocus> targets = [];
     targets.add(
       TargetFocus(
-
         identify: "alarmKey",
         keyTarget: alarmKey,
         alignSkip: Alignment.topRight,
@@ -66,12 +65,14 @@ class TutorialController extends GetxController{
                     ),
                   ),
                   SizedBox(height: 20),
-
                   ElevatedButton(
                     onPressed: () {
                       controller.next();
                     },
-                    child: const Icon(Icons.chevron_right,size: 28,),
+                    child: const Icon(
+                      Icons.chevron_right,
+                      size: 28,
+                    ),
                   ),
                 ],
               );
@@ -87,7 +88,6 @@ class TutorialController extends GetxController{
         keyTarget: doorKey,
         alignSkip: Alignment.topRight,
         shape: ShapeLightFocus.RRect,
-
         contents: [
           TargetContent(
             align: ContentAlign.bottom,
@@ -118,13 +118,20 @@ class TutorialController extends GetxController{
                         onPressed: () {
                           controller.previous();
                         },
-                        child: const Icon(Icons.chevron_left,size: 28,),
+                        child: const Icon(
+                          Icons.chevron_left,
+                          size: 28,
+                        ),
                       ),
-Spacer(),                      ElevatedButton(
+                      Spacer(),
+                      ElevatedButton(
                         onPressed: () {
                           controller.next();
                         },
-                        child: const Icon(Icons.chevron_right,size: 28,),
+                        child: const Icon(
+                          Icons.chevron_right,
+                          size: 28,
+                        ),
                       ),
                     ],
                   ),
@@ -142,7 +149,6 @@ Spacer(),                      ElevatedButton(
         keyTarget: settingsKey,
         alignSkip: Alignment.topRight,
         shape: ShapeLightFocus.RRect,
-
         contents: [
           TargetContent(
             align: ContentAlign.top,
@@ -173,13 +179,20 @@ Spacer(),                      ElevatedButton(
                         onPressed: () {
                           controller.previous();
                         },
-                        child: const Icon(Icons.chevron_left,size: 28,),
+                        child: const Icon(
+                          Icons.chevron_left,
+                          size: 28,
+                        ),
                       ),
-                      Spacer(),                      ElevatedButton(
+                      Spacer(),
+                      ElevatedButton(
                         onPressed: () {
                           controller.next();
                         },
-                        child: const Icon(Icons.chevron_right,size: 28,),
+                        child: const Icon(
+                          Icons.chevron_right,
+                          size: 28,
+                        ),
                       ),
                     ],
                   ),
@@ -195,7 +208,6 @@ Spacer(),                      ElevatedButton(
         identify: "locationKey",
         keyTarget: locationKey,
         shape: ShapeLightFocus.RRect,
-
         contents: [
           TargetContent(
             align: ContentAlign.top,
@@ -226,13 +238,20 @@ Spacer(),                      ElevatedButton(
                         onPressed: () {
                           controller.previous();
                         },
-                        child: const Icon(Icons.chevron_left,size: 28,),
+                        child: const Icon(
+                          Icons.chevron_left,
+                          size: 28,
+                        ),
                       ),
-                      Spacer(),                      ElevatedButton(
+                      Spacer(),
+                      ElevatedButton(
                         onPressed: () {
                           controller.next();
                         },
-                        child: const Icon(Icons.chevron_right,size: 28,),
+                        child: const Icon(
+                          Icons.chevron_right,
+                          size: 28,
+                        ),
                       ),
                     ],
                   ),
@@ -248,7 +267,6 @@ Spacer(),                      ElevatedButton(
         identify: "notificationsKey",
         keyTarget: notificationKey,
         shape: ShapeLightFocus.RRect,
-
         color: Colors.purple,
         contents: [
           TargetContent(
@@ -277,22 +295,25 @@ Spacer(),                      ElevatedButton(
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                    ElevatedButton(
-                      onPressed: () {
-                        controller.previous();
-                      },
-                      child: const Icon(Icons.chevron_left),
-                    ),
-                    ElevatedButton(
-                      onPressed: () {
-                        MySharedPrefs().setBool(isHomeTutorialFinishedOnce, true);
-                        controller.next();
-                      },
-                      child: Text("Finish",style: TextStyle(fontWeight: FontWeight.bold),),
-                    ),
-
-                  ],)
-
+                      ElevatedButton(
+                        onPressed: () {
+                          controller.previous();
+                        },
+                        child: const Icon(Icons.chevron_left),
+                      ),
+                      ElevatedButton(
+                        onPressed: () {
+                          MySharedPrefs()
+                              .setBool(isHomeTutorialFinishedOnce, true);
+                          controller.next();
+                        },
+                        child: Text(
+                          "Finish",
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ],
+                  )
                 ],
               );
             },
@@ -302,9 +323,9 @@ Spacer(),                      ElevatedButton(
       ),
     );
 
-
     return targets;
   }
+
   List<TargetFocus> _createSettingTargets() {
     List<TargetFocus> targets = [];
     targets.add(
@@ -338,12 +359,14 @@ Spacer(),                      ElevatedButton(
                     ),
                   ),
                   SizedBox(height: 20),
-
                   ElevatedButton(
                     onPressed: () {
                       controller.next();
                     },
-                    child: const Icon(Icons.chevron_right,size: 28,),
+                    child: const Icon(
+                      Icons.chevron_right,
+                      size: 28,
+                    ),
                   ),
                 ],
               );
@@ -359,7 +382,6 @@ Spacer(),                      ElevatedButton(
         keyTarget: contactsKey,
         alignSkip: Alignment.topRight,
         shape: ShapeLightFocus.RRect,
-
         contents: [
           TargetContent(
             align: ContentAlign.bottom,
@@ -390,13 +412,20 @@ Spacer(),                      ElevatedButton(
                         onPressed: () {
                           controller.previous();
                         },
-                        child: const Icon(Icons.chevron_left,size: 28,),
+                        child: const Icon(
+                          Icons.chevron_left,
+                          size: 28,
+                        ),
                       ),
-Spacer(),                      ElevatedButton(
+                      Spacer(),
+                      ElevatedButton(
                         onPressed: () {
                           controller.next();
                         },
-                        child: const Icon(Icons.chevron_right,size: 28,),
+                        child: const Icon(
+                          Icons.chevron_right,
+                          size: 28,
+                        ),
                       ),
                     ],
                   ),
@@ -414,7 +443,6 @@ Spacer(),                      ElevatedButton(
         keyTarget: groupsKey,
         alignSkip: Alignment.topRight,
         shape: ShapeLightFocus.RRect,
-
         contents: [
           TargetContent(
             align: ContentAlign.bottom,
@@ -445,16 +473,25 @@ Spacer(),                      ElevatedButton(
                         onPressed: () {
                           controller.previous();
                         },
-                        child: const Icon(Icons.chevron_left,size: 28,),
+                        child: const Icon(
+                          Icons.chevron_left,
+                          size: 28,
+                        ),
                       ),
-                      Spacer(),                      ElevatedButton(
+                      Spacer(),
+                      ElevatedButton(
                         onPressed: () {
-                          scrollController.animateTo( scrollController.position.maxScrollExtent,
+                          scrollController.animateTo(
+                            scrollController.position.maxScrollExtent,
                             duration: Duration(milliseconds: 500),
-                            curve: Curves.easeOut,);
+                            curve: Curves.easeOut,
+                          );
                           controller.next();
                         },
-                        child: const Icon(Icons.chevron_right,size: 28,),
+                        child: const Icon(
+                          Icons.chevron_right,
+                          size: 28,
+                        ),
                       ),
                     ],
                   ),
@@ -470,7 +507,6 @@ Spacer(),                      ElevatedButton(
         identify: "primaryIndoorGroup",
         keyTarget: primaryGroupKey,
         shape: ShapeLightFocus.RRect,
-
         contents: [
           TargetContent(
             align: ContentAlign.top,
@@ -501,13 +537,20 @@ Spacer(),                      ElevatedButton(
                         onPressed: () {
                           controller.previous();
                         },
-                        child: const Icon(Icons.chevron_left,size: 28,),
+                        child: const Icon(
+                          Icons.chevron_left,
+                          size: 28,
+                        ),
                       ),
-                      Spacer(),                      ElevatedButton(
+                      Spacer(),
+                      ElevatedButton(
                         onPressed: () {
                           controller.next();
                         },
-                        child: const Icon(Icons.chevron_right,size: 28,),
+                        child: const Icon(
+                          Icons.chevron_right,
+                          size: 28,
+                        ),
                       ),
                     ],
                   ),
@@ -517,12 +560,12 @@ Spacer(),                      ElevatedButton(
           )
         ],
       ),
-    );targets.add(
+    );
+    targets.add(
       TargetFocus(
         identify: "primaryOutdoorGroup",
         keyTarget: primaryOutdoorKey,
         shape: ShapeLightFocus.RRect,
-
         contents: [
           TargetContent(
             align: ContentAlign.top,
@@ -553,14 +596,20 @@ Spacer(),                      ElevatedButton(
                         onPressed: () {
                           controller.previous();
                         },
-                        child: const Icon(Icons.chevron_left,size: 28,),
+                        child: const Icon(
+                          Icons.chevron_left,
+                          size: 28,
+                        ),
                       ),
-                      Spacer(),                      ElevatedButton(
+                      Spacer(),
+                      ElevatedButton(
                         onPressed: () {
-
                           controller.next();
                         },
-                        child: const Icon(Icons.chevron_right,size: 28,),
+                        child: const Icon(
+                          Icons.chevron_right,
+                          size: 28,
+                        ),
                       ),
                     ],
                   ),
@@ -570,12 +619,12 @@ Spacer(),                      ElevatedButton(
           )
         ],
       ),
-    );targets.add(
+    );
+    targets.add(
       TargetFocus(
         identify: "notificationStatus",
         keyTarget: notificationStatusKey,
         shape: ShapeLightFocus.RRect,
-
         contents: [
           TargetContent(
             align: ContentAlign.top,
@@ -606,13 +655,20 @@ Spacer(),                      ElevatedButton(
                         onPressed: () {
                           controller.previous();
                         },
-                        child: const Icon(Icons.chevron_left,size: 28,),
+                        child: const Icon(
+                          Icons.chevron_left,
+                          size: 28,
+                        ),
                       ),
-                      Spacer(),                      ElevatedButton(
+                      Spacer(),
+                      ElevatedButton(
                         onPressed: () {
                           controller.next();
                         },
-                        child: const Icon(Icons.chevron_right,size: 28,),
+                        child: const Icon(
+                          Icons.chevron_right,
+                          size: 28,
+                        ),
                       ),
                     ],
                   ),
@@ -628,7 +684,6 @@ Spacer(),                      ElevatedButton(
         identify: "delete",
         keyTarget: deleteAccountKey,
         shape: ShapeLightFocus.RRect,
-
         color: Colors.purple,
         contents: [
           TargetContent(
@@ -665,14 +720,18 @@ Spacer(),                      ElevatedButton(
                       ),
                       ElevatedButton(
                         onPressed: () {
-                          MySharedPrefs().setBool(isSettingsTutorialFinishedOnce, true);
+                          MySharedPrefs()
+                              .setBool(isSettingsTutorialFinishedOnce, true);
 
                           controller.next();
                         },
-                        child: Text("Finish",style: TextStyle(fontWeight: FontWeight.bold),),
+                        child: Text(
+                          "Finish",
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
                       ),
-
-                    ],)
+                    ],
+                  )
                 ],
               );
             },
@@ -682,16 +741,15 @@ Spacer(),                      ElevatedButton(
       ),
     );
 
-
     return targets;
   }
 
-
   void showHomeTutorial(BuildContext context) {
-    if(MySharedPrefs().getBool(isHomeTutorialFinishedOnce)) return;
+    if (MySharedPrefs().getBool(isHomeTutorialFinishedOnce)) return;
     createHomeTutorial();
     tutorialCoachMark?.show(context: context);
   }
+
   void createHomeTutorial() {
     tutorialCoachMark = TutorialCoachMark(
       targets: _createHomeTargets(),
@@ -700,11 +758,13 @@ Spacer(),                      ElevatedButton(
       showSkipInLastTarget: false,
       paddingFocus: 10,
       opacityShadow: 0.5,
-        alignSkip: Alignment.topRight,
-
+      alignSkip: Alignment.topRight,
       imageFilter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
       onFinish: () {
         MySharedPrefs().setBool(isHomeTutorialFinishedOnce, true);
+        if (Get.isRegistered<ContactController>()) {
+          Get.find<ContactController>().fetchPhoneContacts();
+        }
 
         print("finish");
       },
@@ -724,7 +784,9 @@ Spacer(),                      ElevatedButton(
       },
       onSkip: () {
         MySharedPrefs().setBool(isHomeTutorialFinishedOnce, true);
-
+        if (Get.isRegistered<ContactController>()) {
+          Get.find<ContactController>().fetchPhoneContacts();
+        }
         print("skip");
         return true;
       },
@@ -732,11 +794,12 @@ Spacer(),                      ElevatedButton(
   }
 
   void showSettingTutorial(BuildContext context) {
-    if(MySharedPrefs().getBool(isSettingsTutorialFinishedOnce)) return;
+    if (MySharedPrefs().getBool(isSettingsTutorialFinishedOnce)) return;
 
     createSettingTutorial();
     tutorialCoachMark?.show(context: context);
   }
+
   void createSettingTutorial() {
     tutorialCoachMark = TutorialCoachMark(
       targets: _createSettingTargets(),
@@ -749,7 +812,9 @@ Spacer(),                      ElevatedButton(
       imageFilter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
       onFinish: () {
         MySharedPrefs().setBool(isSettingsTutorialFinishedOnce, true);
-
+        if (Get.isRegistered<ContactController>()) {
+          Get.find<ContactController>().fetchPhoneContacts();
+        }
         print("finish");
       },
       onClickTarget: (target) {
@@ -769,18 +834,19 @@ Spacer(),                      ElevatedButton(
       },
       onSkip: () {
         MySharedPrefs().setBool(isSettingsTutorialFinishedOnce, true);
-
+        if (Get.isRegistered<ContactController>()) {
+          Get.find<ContactController>().fetchPhoneContacts();
+        }
         print("skip");
         return true;
       },
     );
-    
   }
+
   @override
   void onInit() {
     // TODO: implement onInit
 
     super.onInit();
   }
-
 }
