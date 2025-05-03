@@ -26,7 +26,7 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   final InAppPurchaseUtils inAppPurchaseUtils = Get.find<InAppPurchaseUtils>();
-final TutorialController tutorialController = Get.find<TutorialController>();
+  final TutorialController tutorialController = Get.find<TutorialController>();
   void goToSubscription() {
     Get.to(() => PaymentScreen());
   }
@@ -39,7 +39,6 @@ final TutorialController tutorialController = Get.find<TutorialController>();
     });
     super.initState();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -64,7 +63,7 @@ final TutorialController tutorialController = Get.find<TutorialController>();
             ),
             const SizedBox(height: 25),
             AElevatedButton(
-              key: tutorialController.subscribeKey,
+                key: tutorialController.subscribeKey,
                 title: "Subscribe",
                 onPress: () {
                   Get.to(PaymentScreen());
@@ -72,7 +71,7 @@ final TutorialController tutorialController = Get.find<TutorialController>();
             const SizedBox(height: 15),
             Obx(() {
               return AElevatedButton(
-                key: tutorialController.contactsKey,
+                  key: tutorialController.contactsKey,
                   bgColor: inAppPurchaseUtils.isSubscribed()
                       ? AColors.dark
                       : Colors.grey,
@@ -92,7 +91,7 @@ final TutorialController tutorialController = Get.find<TutorialController>();
             const SizedBox(height: 15),
             Obx(() {
               return AElevatedButton(
-                key: tutorialController.groupsKey,
+                  key: tutorialController.groupsKey,
                   bgColor: inAppPurchaseUtils.isSubscribed()
                       ? AColors.dark
                       : Colors.grey,
@@ -116,7 +115,7 @@ final TutorialController tutorialController = Get.find<TutorialController>();
             ).paddingSymmetric(horizontal: 20),
             const SizedBox(height: 15),
             PrimaryGroup(
-              key: tutorialController.primaryOutdoorKey,
+                    key: tutorialController.primaryOutdoorKey,
                     title: "Primary Outdoor Group",
                     groups: Get.find<GroupController>().outdoorGroups,
                     onChange:
@@ -124,12 +123,20 @@ final TutorialController tutorialController = Get.find<TutorialController>();
                     selectedGroup: Get.find<GroupController>().primaryOutdoor)
                 .paddingSymmetric(horizontal: 20),
             const SizedBox(height: 15),
-            NotificationControllerWidget(key: tutorialController.notificationStatusKey,).paddingSymmetric(horizontal: 20),
+            NotificationControllerWidget(
+              key: tutorialController.notificationStatusKey,
+            ).paddingSymmetric(horizontal: 20),
             const SizedBox(height: 15),
             AElevatedButton(
               key: tutorialController.deleteAccountKey,
               title: "Delete Account",
               onPress: Get.find<AuthController>().deleteAccount,
+            ).paddingSymmetric(horizontal: 20),
+            const SizedBox(height: 15),
+            AElevatedButton(
+              // key: tutorialController.deleteAccountKey,
+              title: "Privacy Policy",
+              onPress: Get.find<AuthController>().privacyPolicy,
             ).paddingSymmetric(horizontal: 20),
             const SizedBox(height: 30),
           ],

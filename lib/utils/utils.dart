@@ -56,7 +56,7 @@ class Utils {
         bool isOk = await Utils.askForPermissionConfirmation(Get.context!,
             title: "Location Permission",
             description:
-                "Help Me requires location permission to share with your family and friends. Are you sure you want to allow it?",
+                "Help Me requires location permission to share with your family and friends. Location will only shared with the people you have allowed the app. Are you sure you want to allow it?",
             icon: Icons.notifications);
         if (!isOk) null;
         permission = await Geolocator.requestPermission();

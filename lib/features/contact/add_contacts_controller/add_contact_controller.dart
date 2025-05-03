@@ -86,7 +86,7 @@ class ContactController extends GetxController {
       bool isOk = await Utils.askForPermissionConfirmation(Get.context!,
           title: "Contacts Permission",
           description:
-              "Help Me requires notification permission to add your family and friends. Are you sure you want to allow it?",
+              "Help Me requires contact permission to add your family and friends.Your contacts will not be stored or shared with anyone. Are you sure you want to allow it?",
           icon: Icons.notifications);
       if (!isOk) return;
     }

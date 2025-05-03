@@ -4,7 +4,6 @@ import 'dart:io' show Platform;
 
 import 'package:alarm_app/features/auth/controller/auth_controller.dart';
 import 'package:alarm_app/utils/utils.dart';
-import 'package:alarm_app/widgets/no_notifications_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
@@ -49,7 +48,7 @@ class InAppPurchaseUtils extends GetxController {
   }
 
   Future fetchOffers() async {
-    if (Platform.isAndroid) return;
+    // if (Platform.isAndroid) return;
     try {
       final offerings = await Purchases.getOfferings();
       final currentOffer = offerings.current;
@@ -61,33 +60,13 @@ class InAppPurchaseUtils extends GetxController {
         package = currentOffer.annual;
       }
       if (products.isEmpty) {
-        Get.snackbar("Plans", "No Plans Found");
+        print("aaaaaaaaaaaaaaaaaaaaaaaaaaaa No plans found");
         return;
       }
     } catch (e, st) {
-      Get.snackbar("Plans", "Couldn't fetch products from the app store.");
+      // Get.snackbar("Plans", "Couldn't fetch products from the app store.");
 
       log("Fetch offers", error: e, stackTrace: st);
-    }
-  }
-
-  Future purchaseProductIOS() async {
-    try {
-      products.clear();
-      products = await Purchases.getProducts(["premium_annual"]);
-
-      if (products.isEmpty) {
-        Get.snackbar("Plans", "No Plans Found");
-        return;
-      }
-
-      final purchaserInfo =
-          await Purchases.purchaseStoreProduct(products.first);
-      if (purchaserInfo.entitlements.active.containsKey('premium_annual')) {
-        await checkSubscription();
-      }
-    } catch (e, st) {
-      log("Fetch fetchOffersIos", error: e, stackTrace: st);
     }
   }
 
@@ -99,12 +78,12 @@ class InAppPurchaseUtils extends GetxController {
       );
       return;
     }
-    if(Platform.isAndroid){
-      Get.dialog(SubscriptionDialog());
-      return;
-    }
+    // if(Platform.isAndroid){
+    //   Get.dialog(SubscriptionDialog());
+    //   return;
+    // }
 
-     purchaseProduct();
+    purchaseProduct();
   }
 
   Future<void> purchaseProduct() async {
@@ -117,7 +96,9 @@ class InAppPurchaseUtils extends GetxController {
             await fetchOffers();
             final purchaserInfo = await Purchases.purchasePackage(package!);
             if (purchaserInfo.entitlements.active
-                .containsKey('premium_annual')) {
+                    .containsKey('premium_annual') ||
+                purchaserInfo.entitlements.active
+                    .containsKey('yearly_subscription')) {
               await checkSubscription();
             }
           } catch (e, st) {
@@ -171,9 +152,7 @@ class InAppPurchaseUtils extends GetxController {
   Future initInApp() async {
     try {
       await initPlatformState();
-      if (Platform.isIOS) {
-        await fetchOffers();
-      }
+      await fetchOffers();
       await checkSubscription();
     } catch (e, st) {
       log("", error: e, stackTrace: st);

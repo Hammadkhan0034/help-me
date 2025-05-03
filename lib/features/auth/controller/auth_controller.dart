@@ -17,6 +17,7 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../screen/otp_screen.dart';
 
@@ -25,7 +26,7 @@ class AuthController extends GetxController {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController pinController = TextEditingController();
   final SupabaseClient supabaseClient = Supabase.instance.client;
-  PhoneNumber initialPhoneNumber =  PhoneNumber(isoCode: 'MY');
+  PhoneNumber initialPhoneNumber = PhoneNumber(isoCode: 'MY');
   var isResendingOtp = false.obs;
   var isVerifyingOtp = false.obs;
 
@@ -170,7 +171,7 @@ class AuthController extends GetxController {
 
       if (response != null) {
         userModel.value = UserModel.fromMap(response);
-          print("User Model fetched: ${userModel.toString()}");
+        print("User Model fetched: ${userModel.toString()}");
 
         return 1; // Return 1 when profile is successfully fetched
       } else {
@@ -178,10 +179,10 @@ class AuthController extends GetxController {
         Get.off(() => AuthScreen());
       }
     } on PostgrestException catch (error) {
-        print('Error fetching user profile: ${error.message}');
+      print('Error fetching user profile: ${error.message}');
       Utils.showErrorSnackBar(
           title: 'Error', description: 'Could not fetch user profile.');
-    } catch (error,st) {
+    } catch (error, st) {
       print(st);
       if (MySharedPrefs().sharedPreferences.getBool("isLoggedIn") ?? false) {
         Get.offAll(HelpMeScreen());
@@ -241,6 +242,17 @@ class AuthController extends GetxController {
       Get.snackbar(
           "Delete User", "Couldn't delete your user account. Try again");
       log("Delete user", error: e, stackTrace: st);
+    }
+  }
+
+  void privacyPolicy() async {
+    if (await canLaunchUrl(Uri.parse(
+        'https://hammadkhan0034.github.io/privacy-policy.github.io'))) {
+      print("1111111111111111111111111111111111111111");
+      await launchUrl(Uri.parse(
+          'https://hammadkhan0034.github.io/privacy-policy.github.io'));
+    } else {
+      throw 'Could not launch https://hammadkhan0034.github.io/privacy-policy.github.io/';
     }
   }
 

@@ -80,7 +80,7 @@ class LocationManageController extends GetxController {
       bool isOk = await Utils.askForPermissionConfirmation(Get.context!,
           title: "Location Permission",
           description:
-              "Help Me requires location permission to share with your family and friends. Are you sure you want to allow it?",
+              "Help Me requires location permission to share with your family and friends. Location will only be shared with the people you have allowed the app. Are you sure you want to allow it?",
           icon: Icons.notifications);
       if (!isOk) return;
       permission = await Geolocator.requestPermission();

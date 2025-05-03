@@ -15,30 +15,29 @@ class PaymentScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BackgroundWidget(
-        appBarTitle: "Plans",
-        widgets: [
-          // BasicPlan(paymentController: paymentController),
-          SizedBox(height: 50),
-          // DailyPlan(paymentController: paymentController),
-          // SizedBox(height: 15),
-          // MonthlyPlan(paymentController: paymentController),
-          // SizedBox(height: 15),
-          YearlyPlan(paymentController: paymentController),
-          PrivacyPolicyAndEula(),
+    return BackgroundWidget(appBarTitle: "Plans", widgets: [
+      // BasicPlan(paymentController: paymentController),
+      SizedBox(height: 50),
+      // DailyPlan(paymentController: paymentController),
+      // SizedBox(height: 15),
+      // MonthlyPlan(paymentController: paymentController),
+      // SizedBox(height: 15),
+      YearlyPlan(paymentController: paymentController),
+      PrivacyPolicyAndEula(),
 
-
-            Obx(() {
-              return subscriptionController.isSubscriptionActive.value ?  Padding(
+      Obx(() {
+        return subscriptionController.isSubscriptionActive.value
+            ? Padding(
                 padding: EdgeInsets.symmetric(horizontal: Get.width * 0.2),
                 child: AElevatedButton(
-                    title: "Restore Purchase", onPress: () {
-                  Get.find<InAppPurchaseUtils>().restorePurchases();
-                }),
-              ): SizedBox.shrink();
-            }),
-        ]
-    );
+                    title: "Restore Purchase",
+                    onPress: () {
+                      Get.find<InAppPurchaseUtils>().restorePurchases();
+                    }),
+              )
+            : SizedBox.shrink();
+      }),
+    ]);
   }
 }
 
@@ -64,8 +63,7 @@ class MPlanTile extends StatelessWidget {
           children: [
             Text(
               title,
-              style: Theme
-                  .of(context)
+              style: Theme.of(context)
                   .textTheme
                   .headlineSmall!
                   .apply(fontWeightDelta: 2, color: up ? Colors.white : null),
