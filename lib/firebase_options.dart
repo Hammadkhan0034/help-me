@@ -60,13 +60,13 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyBp1yee0FXPv-G1ddxuAVR_FFoF0tL1geo',
-    appId: '1:1004698611646:ios:f69ec3a5146d800c9153ef',
+    appId: '1:1004698611646:ios:10babfa5c034dcdc9153ef',
     messagingSenderId: '1004698611646',
     projectId: 'helpme-bf036',
     databaseURL: 'https://helpme-bf036-default-rtdb.firebaseio.com',
     storageBucket: 'helpme-bf036.appspot.com',
     androidClientId: '1004698611646-1f8bmeqk3bu6icv194qp01mp4qo6v0da.apps.googleusercontent.com',
-    iosBundleId: 'com.devoasis.help.me',
+    iosClientId: '1004698611646-emg35hfj91860l9dh7rr9ohuikt2gks3.apps.googleusercontent.com',
+    iosBundleId: 'com.dendiemp.helpme',
   );
-
 }
