@@ -15,6 +15,17 @@ class NotificationCrud{
     try {
       print("Creating Notifications");
 
+      // Check if notificationFor user exists in profiles
+      final userProfile = await Supabase.instance.client
+          .from('profiles')
+          .select('id')
+          .eq('id', notificationFor)
+          .maybeSingle();
+      if (userProfile == null) {
+        print('User $notificationFor does not exist, skipping notification creation.');
+        return;
+      }
+
       // Insert notification into the Supabase database
       final response = await Supabase.instance.client
           .from('notifications')

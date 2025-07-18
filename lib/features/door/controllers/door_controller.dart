@@ -197,6 +197,12 @@ class DoorController extends GetxController {
 
       // Create notifications for each user in the group
       for (var user in selectedGroup.value!.members) {
+        // Check if user exists in profiles
+        Map<String, dynamic>? userProfile = await UserCrud.getUser(user);
+        if (userProfile == null) {
+          print('User $user does not exist, skipping notification.');
+          continue;
+        }
         await NotificationCrud.createNotification(
           notificationFrom: authController.userModel.value.id,
           notificationFor: user, // Create a notification for each member

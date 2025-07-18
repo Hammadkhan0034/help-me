@@ -195,12 +195,24 @@ class ContactController extends GetxController {
             "You got a friend request from ${authController.userModel.value.name}",
         data: null,
         notificationType: NotificationTypes.normal);
-    await NotificationCrud.createNotification(
-        notificationFrom: authController.userModel.value.id,
-        notificationFor: userProfile['id']!,
-        notificationType: 'invitation',
-        data: {},
-        address: {});
+
+    // Check if user exists in profiles before creating notification
+    final profile = await Supabase.instance.client
+        .from('profiles')
+        .select('id')
+        .eq('id', userProfile['id']!)
+        .maybeSingle();
+
+    if (profile != null) {
+      await NotificationCrud.createNotification(
+          notificationFrom: authController.userModel.value.id,
+          notificationFor: userProfile['id']!,
+          notificationType: 'invitation',
+          data: {},
+          address: {});
+    } else {
+      print('User does not exist, skipping notification.');
+    }
     // Add the contact to the local list of added friends
 
     if (kDebugMode) {
